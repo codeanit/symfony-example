@@ -16,7 +16,7 @@ use Symfony\Component\Debug\Debug;
 //     header('HTTP/1.0 403 Forbidden');
 //     exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
 // }
-if (!in_array(@$_SERVER['REMOTE_ADDR'], array('70.52.188.221', '127.0.0.1', 'fe80::1', '::1'))
+if (!in_array(@$_SERVER['REMOTE_ADDR'], array('70.52.188.221:8022', '127.0.0.1', 'fe80::1', '::1','localhost'))
 ) {
     header('HTTP/1.0 403 Forbidden');
     exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
