@@ -1,0 +1,39 @@
+-rw-r--r--  1 apache  apache      1700 Oct  3 09:29 remitxlogs_2013_10_03.txt
+-rw-r--r--  1 apache  apache      1022 Oct  3 09:29 remitxrequestlogs_2013_10_03.txt
+-rw-r--r--  1 apache  apache      1268 Oct  3 09:29 remitxresponselogs_2013_10_03.txt
+
+
+[wireadm@AROWAI-WEB logs]$ cat remitxlogs_2013_10_03.txt
+2013-10-03 09:27:46[ gcash ] => sending RMX check (20131003092746) request G489332547
+2013-10-03 09:27:47[ gcash ] => received RMX response  check  for (20131003092746):G489332547
+2013-10-03 09:28:41[ gcash ] => sending RMX check (20131003092841) request G486332547
+2013-10-03 09:28:43[ gcash ] => received RMX response  check  for (20131003092841):G486332547
+2013-10-03 09:29:05[ gcash ] => sending RMX check (20131003092905) request G486332547
+2013-10-03 09:29:06[ gcash ] => received RMX response  check-paid  for (20131003092905):G486332547
+2013-10-03 09:29:10[ gcash ] => sending RMX request Paid for (20131003092910):G486332547:1310036561
+2013-10-03 09:29:13[ payout ] => response:HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Content-Type: text/xml;charset=iso-8859-1
+Transfer-Encoding: chunked
+Date: Thu, 03 Oct 2013 01:29:08 GMT
+
+<?xml version="1.0" encoding="ISO-8859-1"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soapenv:Body><ns2:responseType xmlns:ns2="http://tempuri.org/response"><code>00</code><message>Success</message><responseBody><responseStr>1310036561|G486332547|0|15000.9000|Bohol|Juliet|B.|||| Dapa Surigao del Norte, Dapa, Surigao del Norte, Philippines|639199773969</responseStr></responseBody></ns2:responseType></soapenv:Body></soapenv:Envelope>
+2013-10-03 09:29:13[ gcash ] => received RMX response Paid for (20131003092910):G486332547:1310036561
+2013-10-03 09:29:13[ gcash ] => attempt to create RMX transaction record for G486332547:1310036561
+2013-10-03 09:29:13[ gcash ] => created RMX transaction record for G486332547:1310036561
+
+
+[wireadm@AROWAI-WEB logs]$ cat remitxrequestlogs_2013_10_03.txt
+2013-10-03 09:27:47[ 09262875560 ] =>  check POST /GCASH/services/AdviseAndPay HTTP/1.0 Host: 173.240.8.53 User-Agent: NuSOAP/0.7.3 (1.114) Content-Type: text/xml; charset=ISO-8859-1 SOAPAction: "" Content-Length: 592      gcash  xxxxxx  G489332547
+2013-10-03 09:28:43[ 09262875560 ] =>  check POST /GCASH/services/AdviseAndPay HTTP/1.0 Host: 173.240.8.53 User-Agent: NuSOAP/0.7.3 (1.114) Content-Type: text/xml; charset=ISO-8859-1 SOAPAction: "" Content-Length: 592      gcash  xxxxxx  G486332547
+2013-10-03 09:29:06[ 09262875560 ] =>  check-paid POST /GCASH/services/AdviseAndPay HTTP/1.0 Host: 173.240.8.53 User-Agent: NuSOAP/0.7.3 (1.114) Content-Type: text/xml; charset=ISO-8859-1 SOAPAction: "" Content-Length: 592      gcash  xxxxxx  G486332547
+2013-10-03 09:29:13[ 09262875560 ] => POST /GCASH/services/AdviseAndPay HTTP/1.0 Host: 173.240.8.53 User-Agent: NuSOAP/0.7.3 (1.114) Content-Type: text/xml; charset=ISO-8859-1 SOAPAction: "" Content-Length: 631      gcash  xxxxxx  G486332547  1310036561
+
+
+[wireadm@AROWAI-WEB logs]$ cat remitxresponselogs_2013_10_03.txt
+2013-10-03 09:27:47[ 09262875560 ] => HTTP/1.1 200 OK Server: Apache-Coyote/1.1 Content-Type: text/xml;charset=iso-8859-1 Transfer-Encoding: chunked Date: Thu, 03 Oct 2013 01:27:43 GMT      00  Transaction does not exist or is not available   4
+2013-10-03 09:28:43[ 09262875560 ] => HTTP/1.1 200 OK Server: Apache-Coyote/1.1 Content-Type: text/xml;charset=iso-8859-1 Transfer-Encoding: chunked Date: Thu, 03 Oct 2013 01:28:39 GMT      00  Available for Pickup   G486332547|0|15000.9000|Bohol|Juliet|B.|||| Dapa Surigao del Norte, Dapa, Surigao del Norte, Philippines|639199773969
+2013-10-03 09:29:06[ 09262875560 ] => HTTP/1.1 200 OK Server: Apache-Coyote/1.1 Content-Type: text/xml;charset=iso-8859-1 Transfer-Encoding: chunked Date: Thu, 03 Oct 2013 01:29:02 GMT      00  Available for Pickup   G486332547|0|15000.9000|Bohol|Juliet|B.|||| Dapa Surigao del Norte, Dapa, Surigao del Norte, Philippines|639199773969
+2013-10-03 09:29:13[ 09262875560 ] => HTTP/1.1 200 OK Server: Apache-Coyote/1.1 Content-Type: text/xml;charset=iso-8859-1 Transfer-Encoding: chunked Date: Thu, 03 Oct 2013 01:29:08 GMT      00  Success   1310036561|G486332547|0|15000.9000|Bohol|Juliet|B.|||| Dapa Surigao del Norte, Dapa, Surigao del Norte, Philippines|639199773969
+
+

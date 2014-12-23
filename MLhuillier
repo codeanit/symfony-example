@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://api.firstglobalmoney.com.local/mlhuillier/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="MLhuillier" targetNamespace="http://api.firstglobalmoney.com.local/mlhuillier/">
+  <portType name="MLhuillierPortType">
+    <operation name="ShowRemittanceDetail">
+      <input message="tns:ShowRemittanceDetailRequest"/>
+      <output message="tns:ShowRemittanceDetailResponse"/>
+    </operation>
+    <operation name="InquireTagAsCompleted">
+      <input message="tns:InquireTagAsCompletedRequest"/>
+      <output message="tns:InquireTagAsCompletedResponse"/>
+    </operation>
+    <operation name="TagAsCompleted">
+      <input message="tns:TagAsCompletedRequest"/>
+      <output message="tns:TagAsCompletedResponse"/>
+    </operation>
+    <operation name="ChangePassword">
+      <input message="tns:ChangePasswordRequest"/>
+      <output message="tns:ChangePasswordResponse"/>
+    </operation>
+  </portType>
+  <types>
+    <xsd:schema targetNamespace="http://api.firstglobalmoney.com.local/mlhuillier/"/>
+  </types>
+  <message name="ShowRemittanceDetailRequest">
+    <part name="sessionID" type="xsd:string"/>
+    <part name="username" type="xsd:string"/>
+    <part name="password" type="xsd:string"/>
+    <part name="refno" type="xsd:string"/>
+    <part name="signature" type="xsd:string"/>
+  </message>
+  <message name="ShowRemittanceDetailResponse">
+    <part name="return" type="xsd:string"/>
+  </message>
+  <message name="InquireTagAsCompletedRequest">
+    <part name="sessionID" type="xsd:string"/>
+    <part name="username" type="xsd:string"/>
+    <part name="password" type="xsd:string"/>
+    <part name="refno" type="xsd:string"/>
+    <part name="traceno" type="xsd:string"/>
+    <part name="signature" type="xsd:string"/>
+  </message>
+  <message name="InquireTagAsCompletedResponse">
+    <part name="return" type="xsd:string"/>
+  </message>
+  <message name="TagAsCompletedRequest">
+    <part name="sessionID" type="xsd:string"/>
+    <part name="username" type="xsd:string"/>
+    <part name="password" type="xsd:string"/>
+    <part name="refno" type="xsd:string"/>
+    <part name="traceno" type="xsd:string"/>
+    <part name="signature" type="xsd:string"/>
+  </message>
+  <message name="TagAsCompletedResponse">
+    <part name="return" type="xsd:string"/>
+  </message>
+  <message name="ChangePasswordRequest">
+    <part name="sessionID" type="xsd:string"/>
+    <part name="username" type="xsd:string"/>
+    <part name="password" type="xsd:string"/>
+    <part name="refno" type="xsd:string"/>
+    <part name="traceno" type="xsd:string"/>
+    <part name="signature" type="xsd:string"/>
+  </message>
+  <message name="ChangePasswordResponse">
+    <part name="return" type="xsd:string"/>
+  </message>
+  <service name="MLhuillierService">
+    <port name="MLhuillierPort" binding="tns:MLhuillierBinding">
+      <soap:address location="http://api.firstglobalmoney.com.local/MLhuillier"/>
+    </port>
+  </service>
+  <binding name="MLhuillierBinding" type="tns:MLhuillierPortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc"/>
+    <operation name="ShowRemittanceDetail">
+      <soap:operation soapAction="http://api.firstglobalmoney.com.local/mlhuillier/ShowRemittanceDetail"/>
+      <input>
+        <soap:body use="literal" namespace="http://api.firstglobalmoney.com.local/mlhuillier/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://api.firstglobalmoney.com.local/mlhuillier/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </output>
+    </operation>
+    <operation name="InquireTagAsCompleted">
+      <soap:operation soapAction="http://api.firstglobalmoney.com.local/mlhuillier/InquireTagAsCompleted"/>
+      <input>
+        <soap:body use="literal" namespace="http://api.firstglobalmoney.com.local/mlhuillier/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://api.firstglobalmoney.com.local/mlhuillier/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </output>
+    </operation>
+    <operation name="TagAsCompleted">
+      <soap:operation soapAction="http://api.firstglobalmoney.com.local/mlhuillier/TagAsCompleted"/>
+      <input>
+        <soap:body use="literal" namespace="http://api.firstglobalmoney.com.local/mlhuillier/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://api.firstglobalmoney.com.local/mlhuillier/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </output>
+    </operation>
+    <operation name="ChangePassword">
+      <soap:operation soapAction="http://api.firstglobalmoney.com.local/mlhuillier/ChangePassword"/>
+      <input>
+        <soap:body use="literal" namespace="http://api.firstglobalmoney.com.local/mlhuillier/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://api.firstglobalmoney.com.local/mlhuillier/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </output>
+    </operation>
+  </binding>
+</definitions>
