@@ -68,8 +68,9 @@ class MLhuillierController extends SoapController
             'refNo' => $refno,
             'signature'=> $signature);
 
-        $getResult = $this->TBConnection->curlTransborder($data);
 
+        //$getResult = $this->TBConnection->curlTransborder($data);
+        var_dump($data);die;
         return $this->container->get('besimple.soap.response')
             ->setReturnValue(sprintf('%s', $getResult));
     }
