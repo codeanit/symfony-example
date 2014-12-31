@@ -109,11 +109,25 @@ class TBConnectionModel
 
 
         $conn = $this->container->get('database_connection');
-        
+        $check = 0;
+
         try {
-            $check= $conn->insert('cdex_log', $logData);            
+
+            $qb = $conn->createQueryBuilder()
+                                    ->select('count(t.id)')
+                                    ->from('cdex_log', 't')
+                                    ->where('t.transaction_key = :transaction_key')
+                                    ->setParameter('transaction_key', $data['transaction']->transaction_key);
+           
+            if ($qb->execute()->fetchColumn() <= 0) {
+                $check= $conn->insert('cdex_log', $logData);            
+                
+            }
+                                    
         } catch (\Exception $e) {
-            $check=0;
+
+            echo $e->getMessage();die;     
+                   
         }
         return $check;
     }     
