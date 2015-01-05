@@ -15,6 +15,8 @@ namespace Api\PayoutBundle\Model;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * Bridge to call TB DBAL
  *
@@ -26,14 +28,14 @@ use Symfony\Component\HttpFoundation\Response;
  * @link     (remittanceController, http://firsglobaldata.com)
  */
 
-class TBConnectionModel 
+class TBConnectionModel
 {
 
     public $url;
 
     protected $container;
 
-    function __construct($container) {
+    function __construct(ContainerInterface $container) {
         $this->container = $container;
     }
 
@@ -122,12 +124,14 @@ class TBConnectionModel
             if ($qb->execute()->fetchColumn() <= 0) {
                 $check= $conn->insert('cdex_log', $logData);            
                 
+            }else{
+                $check=2;
             }
                                     
         } catch (\Exception $e) {
 
             echo $e->getMessage();die;     
-                   
+
         }
         return $check;
     }     

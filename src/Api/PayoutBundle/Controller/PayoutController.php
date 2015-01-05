@@ -7,10 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use FOS\RestBundle\Controller\Annotations\View;
 use Acme\BlogBundle\Entity\Page;
-use  Api\PayoutBundle\Model\TBConnectionModel as TBConnection;
 use Symfony\Component\HttpFoundation\Request;
-use  Api\PayoutBundle\Model\BTSModel as BTS;
-
 
 class PayoutController extends Controller
 {
@@ -50,8 +47,8 @@ class PayoutController extends Controller
      * 
      * */    
     public function postTransactionAction(Request $request)
-    {
-        $this->TBConnection = new TBConnection($this->container);     
+    {      
+        $this->TBConnection = $this->get('tb_connection');     
         $postData=$request->getContent();
         $decodedData=(array) json_decode($postData);       
         $log=$this->TBConnection->addLog($decodedData);
@@ -59,10 +56,36 @@ class PayoutController extends Controller
         {
             $result = array('Code'=>'200','Msg'=>'Log Insertion Success.');            
             //$result = $this->TBConnection->curlTransborder($decodedData);  
+        }elseif($log==2) {
+            $result = array('Code'=>'702','Msg'=>'Dublicate Transaction Key.');
         }else {
-            $result = array('Code'=>'777','Msg'=>'Error In Log Insertion Process.');
+            $result = array('Code'=>'701','Msg'=>'Error In Log Insertion Process.');
         }
         return $result;    
+    }
+
+    public function postPayoutAction(Request $request)
+    {
+        $this->TBConnection = $this->get('tb_connection');             
+        $this->BTS = $this->get('bts');     
+        $postData=$request->getContent();
+        $decodedData=(array) json_decode($postData);       
+        $log=$this->TBConnection->addLog($decodedData);
+        if($log==1)
+        {                       
+            $result = $this->BTS->doSALE($decodedData);
+
+        }elseif($log==2) {
+
+            $result = array('Code'=>'702','Msg'=>'Dublicate Transaction Key.');
+
+        }else {
+
+            $result = array('Code'=>'701','Msg'=>'Error In Log Insertion Process.');
+        }
+
+        return $result;  
+
     }
 
 
