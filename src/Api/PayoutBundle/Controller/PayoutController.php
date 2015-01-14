@@ -8,6 +8,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use FOS\RestBundle\Controller\Annotations\View;
 use Acme\BlogBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 class PayoutController extends Controller
 {
@@ -17,6 +21,7 @@ class PayoutController extends Controller
 
     public function __construct() 
     {
+
     }
   
     /** 
@@ -30,13 +35,8 @@ class PayoutController extends Controller
      * @param String $refno     [control number]
      * @param String $signature [signature]     
      * 
-     * */
-    
-    public function getTransactionsAction(Request $request)
-    { 
-         $getData = $request->getRequest();       
-         return $_GET;
-    }
+     * */    
+  
 
     /** 
      * @return array
@@ -46,46 +46,71 @@ class PayoutController extends Controller
      * @param String $sessionID [session_id ]     
      * 
      * */    
-    public function postTransactionAction(Request $request)
-    {      
-        $this->TBConnection = $this->get('tb_connection');     
+    public function postCreateAction(Request $request)
+    { 
+        $this->DB = $this->get('connection');     
         $postData=$request->getContent();
-        $decodedData=(array) json_decode($postData);       
-        $log=$this->TBConnection->addLog($decodedData);
-        if($log==1)
+        $decodedData=(array) json_decode($postData);
+
+        $status=$this->DB->operateTransaction($decodedData,$postData,'create');
+
+        if($status[0]==1 && $status[1]==1)
         {
-            $result = array('Code'=>'200','Msg'=>'Log Insertion Success.');            
-            //$result = $this->TBConnection->curlTransborder($decodedData);  
-        }elseif($log==2) {
+            $result = array('Code'=>'200','Msg'=>'Successfully Received');
+
+        }elseif($status[0]==2 && $status[1]==2) {
+
             $result = array('Code'=>'702','Msg'=>'Dublicate Transaction Key.');
+
         }else {
             $result = array('Code'=>'701','Msg'=>'Error In Log Insertion Process.');
         }
+       
+        return $result;    
+    }
+    
+    public function postModifyAction(Request $request)
+    {
+        $this->DB = $this->get('connection');     
+        $postData=$request->getContent();
+        $decodedData=(array) json_decode($postData);
+
+        $status=$this->DB->operateTransaction($decodedData,$postData,'modify');
+
+       if($status[0]==3 && $status[1]==3) {
+
+            $result = array('Code'=>'200','Msg'=>'Successfully Modified Transaction.');
+
+        }else {
+            $result = array('Code'=>'701','Msg'=>'Error In Transaction Modification.');
+        }
+       
         return $result;    
     }
 
-    public function postPayoutAction(Request $request)
+
+    public function postCancelAction(Request $request)
     {
-        $this->TBConnection = $this->get('tb_connection');             
-        $this->BTS = $this->get('bts');     
+        $this->DB = $this->get('connection');     
         $postData=$request->getContent();
-        $decodedData=(array) json_decode($postData);       
-        $log=$this->TBConnection->addLog($decodedData);
-        if($log==1)
-        {                       
-            $result = $this->BTS->doSALE($decodedData);
+        $decodedData=(array) json_decode($postData);
 
-        }elseif($log==2) {
+        $status=$this->DB->operateTransaction($decodedData,$postData,'cancel');
 
-            $result = array('Code'=>'702','Msg'=>'Dublicate Transaction Key.');
+        if($status[0]==4 && $status[1]==4 && !array_key_exists(3, $status))
+        {
+            $result = array('Code'=>'200','Msg'=>'Status Successfully Changed To Cancel');
+
+        }elseif($status[0]==4 && $status[1]==4 && isset($status[3])){
+
+            $result=array('Code'=>'200','Msg'=>'Change Status to Cancel','status'=>'cancelled','confirmation_no'=>$status[3]);
 
         }else {
 
-            $result = array('Code'=>'701','Msg'=>'Error In Log Insertion Process.');
+            $result = array('Code'=>'701','Msg'=>'Error In Status Change.');
         }
-
-        return $result;  
-
+       
+        return $result;    
     }
 
 

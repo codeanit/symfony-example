@@ -34,6 +34,7 @@ class BTSModel
      */
     public function __construct()
     {
+    
     }
 
    /**
@@ -96,10 +97,7 @@ class BTSModel
      *
      * @return array [description]
      */
-    public function hello()
-    {
-        return array('name' =>'manish');
-    }
+    
     public function doSALE(array $txn)
     {
         $sessionID = $this->doUSRL();
@@ -122,17 +120,17 @@ class BTSModel
         $itemNode = $dataNode->addChild('DEST_CURRENCY_CD', $data['transaction']->receiver_currency);
         $itemNode = $dataNode->addChild('R_ACCOUNT_TYPE_CD');
         $itemNode = $dataNode->addChild('R_ACCOUNT_NM');
-        $itemNode = $dataNode->addChild('R_AGENT_CD');
+        $itemNode = $dataNode->addChild('R_AGENT_CD',$data['transaction']->agent_code);
         $itemNode = $dataNode->addChild('R_AGENT_REGION_SD');
         $itemNode = $dataNode->addChild('R_AGENT_BRANCH_SD');
         $itemNode = $dataNode->addChild('ORIGIN_AM', $data['transaction']->sender_amount);
         $itemNode = $dataNode->addChild('DESTINATION_AM', $data['transaction']->receiver_amount);
         $itemNode = $dataNode->addChild('EXCH_RATE_FX', $data['transaction']->exchange_rate);
         $itemNode = $dataNode->addChild('WHOLESALE_FX');
-        $itemNode = $dataNode->addChild('FEE_AM','10');
+        $itemNode = $dataNode->addChild('FEE_AM',$data['transaction']->fee);
         $itemNode = $dataNode->addChild('DISCOUNT_AM');
         $itemNode = $dataNode->addChild('DISCOUNT_REASON_CD');
-        $itemNode = $dataNode->addChild('S_PAYMENT_TYPE_CD',$data['transaction']->payment_type);
+        $itemNode = $dataNode->addChild('S_PAYMENT_TYPE_CD',$data['transaction']->payment_type_code);
         $itemNode = $dataNode->addChild('S_ACCOUNT_TYPE_CD');
         $itemNode = $dataNode->addChild('S_ACCOUNT_NM');
         $itemNode = $dataNode->addChild('S_BANK_CD');
@@ -158,9 +156,9 @@ class BTSModel
         $itemNode3->addChild('FIRST_NAME', $data['transaction']->sender_first_name);
         $itemNode3->addChild('MIDDLE_NAME');
         $itemNode3->addChild('LAST_NAME', $data['transaction']->sender_last_name);
-        $itemNode3->addChild('MOTHER_M_NAME', $data['transaction']->sender_middle_name);
+        $itemNode3->addChild('MOTHER_M_NAME', $data['transaction']->sender_mother_name);
         $addr = $itemNode3->addChild('ADDRESS');
-        $addr->addChild('ADDRESS', '1225 Norte Street, Esciondido, California, United States, 95026');
+        $addr->addChild('ADDRESS', $data['transaction']->sender_address);
         $addr->addChild('CITY', $data['transaction']->sender_city);
         $addr->addChild('STATE_CD', $data['transaction']->sender_state);
         $addr->addChild('COUNTRY_CD', $data['transaction']->sender_country);
@@ -189,7 +187,7 @@ class BTSModel
         $itemNode5->addChild('FIRST_NAME', $data['transaction']->receiver_first_name);
         $itemNode5->addChild('MIDDLE_NAME');
         $itemNode5->addChild('LAST_NAME', $data['transaction']->receiver_last_name);
-        $itemNode5->addChild('MOTHER_M_NAME', $data['transaction']->receiver_middle_name);
+        $itemNode5->addChild('MOTHER_M_NAME', $data['transaction']->receiver_mother_name);
         $itemNode5->addChild('IDENTIF_TYPE_CD');
         $itemNode5->addChild('IDENTIF_NM');
         $foreign = $itemNode5->addChild('FOREIGN_NAME');
@@ -198,7 +196,7 @@ class BTSModel
         $foreign->addChild('LAST_NAME');
         $foreign->addChild('MOTHER_M_NAME');
         $addr3 = $itemNode5->addChild('ADDRESS');
-        $addr3->addChild('ADDRESS', '');
+        $addr3->addChild('ADDRESS', $data['transaction']->receiver_address);
         $addr3->addChild('CITY', $data['transaction']->receiver_city);
         $addr3->addChild('STATE_CD', $data['transaction']->receiver_state);
         $addr3->addChild('COUNTRY_CD',$data['transaction']->receiver_country);
@@ -219,19 +217,19 @@ class BTSModel
         //ADDITIONAL INFORMATION NODE
         $itemNode6 = $dataNode->addChild('ADDITIONAL_INFO');
         $itemNode6->addChild('DOB_DT');
-        $itemNode6->addChild('OCCUPATION', 'student');
+        $itemNode6->addChild('OCCUPATION', 'Systems');
         $itemNode6->addChild('SSN');
         $itemNode6->addChild('SOURCE_OF_FUNDS_DS');
         $itemNode6->addChild('REASON_OF_TRANS_DS');
 
         $xml = $rootNode->asXML();
 
-      
+        
         // $logFilePath = rtrim(FCPATH, '/\\') . '/assets/uploads/bts-'
         //     .$dataTXN['CONFIRMATION_NM'] . '.xml';
         // @file_put_contents($logFilePath, $xml);
         $xmlString = ((string) $xml);
-
+ 
         $xmlString = str_replace('<?xml version="1.0"?>
 <ExecTR xmlns="http://www.btsincusa.com/gp/">', '', $xmlString);
 
@@ -386,11 +384,12 @@ class BTSModel
 
         $response = $soap_client->ExecTR($paramXMLString);
         $xmlFinal   = simplexml_load_string(
-            $saleRes->ExecTRResult->any,
+            $response->ExecTRResult->any,
             'SimpleXMLElement', LIBXML_NOCDATA
         );
 
         $response = json_decode(json_encode((array) $xmlFinal), true);
+        // var_dump($response);die;
         $return = "";
 
         if ($response['OPCODE'] == '1300') {
