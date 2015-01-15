@@ -10,11 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/hello/{name}", name="default_index")
+     * @Route("/queue/", name="default_index")
      */
-    public function indexAction($name)
+    public function indexAction()
     {
-        // return Response('ok');
-        return array('adfd' => 'adfadf');
+        
+        $Q=$this->get('queue');
+        print_r($Q->executeQueuedOperation());
+        die;
+      
     }
 }

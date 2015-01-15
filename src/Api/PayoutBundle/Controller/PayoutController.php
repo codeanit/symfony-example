@@ -79,39 +79,14 @@ class PayoutController extends Controller
 
        if($status[0]==3 && $status[1]==3) {
 
-            $result = array('Code'=>'200','Msg'=>'Successfully Modified Transaction.');
+            $result = array('Code'=>'200','Msg'=>'Successfully Added Transaction for Modification.');
 
         }else {
-            $result = array('Code'=>'701','Msg'=>'Error In Transaction Modification.');
+            $result = array('Code'=>'701','Msg'=>'Error In Adding Transaction Modification.');
         }
        
         return $result;    
-    }
-
-
-    public function postCancelAction(Request $request)
-    {
-        $this->DB = $this->get('connection');     
-        $postData=$request->getContent();
-        $decodedData=(array) json_decode($postData);
-
-        $status=$this->DB->operateTransaction($decodedData,$postData,'cancel');
-
-        if($status[0]==4 && $status[1]==4 && !array_key_exists(3, $status))
-        {
-            $result = array('Code'=>'200','Msg'=>'Status Successfully Changed To Cancel');
-
-        }elseif($status[0]==4 && $status[1]==4 && isset($status[3])){
-
-            $result=array('Code'=>'200','Msg'=>'Change Status to Cancel','status'=>'cancelled','confirmation_no'=>$status[3]);
-
-        }else {
-
-            $result = array('Code'=>'701','Msg'=>'Error In Status Change.');
-        }
-       
-        return $result;    
-    }
+    }   
 
 
 }

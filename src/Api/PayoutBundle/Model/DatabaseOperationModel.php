@@ -39,10 +39,13 @@ class DatabaseOperationModel
 
     public function operateTransaction(array $data,$jsonData,$operation)
     {    
-        $status='hold';      
-        if($operation =='cancel'){
-        $status='cancelled';
+        if(isset($data['transaction_status']))
+        {
+            $status=$data['transaction_status'];
+        } else{            
+            $status='hold'; 
         }
+
         $logData = array(
                         'transaction_key'=>$data['transaction']->transaction_key,
                         'transaction_source'=>$data['source'],
@@ -106,15 +109,13 @@ class DatabaseOperationModel
 
         try {
                 if($operation=='modify') {
-                    $check=$conn->update('transactions',$logData, array('transaction_key' => $data['transaction']->transaction_key));                    
+                    $check= $conn->insert('transactions', $logData);            
+                    $check_queue = $conn->insert('operations_queue', $queueData);            
+                    $check_queue = $conn->insert('TB', $logData); 
                     $check=3;                    
                     $check_queue=3;
 
-                } elseif($operation=='cancel'){
-                    $check=$conn->update('transactions',$logData, array('transaction_key' => $data['transaction']->transaction_key));
-                    $check=4;                    
-                    $check_queue=4;
-                }else{
+                } else{
                     $qb = $conn->createQueryBuilder()
                                ->select('count(t.id)')
                                ->from('transactions', 't')
@@ -124,6 +125,7 @@ class DatabaseOperationModel
                     if ($qb->execute()->fetchColumn() <= 0) {
                         $check= $conn->insert('transactions', $logData);            
                         $check_queue = $conn->insert('operations_queue', $queueData);            
+                        $check_queue = $conn->insert('TB', $logData);            
                         
                     }else{
                         $check=2;
