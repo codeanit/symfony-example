@@ -116,9 +116,11 @@ class MOCK
 
         try {                     
              $check=$conn->update('TB',$logData, array('transaction_key' => $data['transaction']->transaction_key));
+             $checkT=$conn->update('transactions',$logData, array('transaction_key' => $data['transaction']->transaction_key));
             } catch (\Exception $e) {
              $e->getMessage();
             }
+     
         if($check==1){
             return array('code'=>'204',
                          'message'=>'Successfully Updated Transaction',

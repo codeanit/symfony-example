@@ -66,7 +66,7 @@ class QueueModel
             }
             if($serviceObj) {
                 $result=$serviceObj->{$operation}($parameter);
-                print_r($result);die;
+               
                 if($operation=='modify'){
                     if($result['code']==204){
                         //create notification queue to source

@@ -108,10 +108,8 @@ class DatabaseOperationModel
         $check_queue = 0;
 
         try {
-                if($operation=='modify') {
-                    $check= $conn->insert('transactions', $logData);            
-                    $check_queue = $conn->insert('operations_queue', $queueData);            
-                    $check_queue = $conn->insert('TB', $logData); 
+                if($operation=='modify') {                             
+                    $check_queue = $conn->insert('operations_queue', $queueData); 
                     $check=3;                    
                     $check_queue=3;
 
