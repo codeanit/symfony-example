@@ -150,4 +150,11 @@ class DatabaseOperationModel
             }
     }
 
+    public function getTransactions()
+    {
+        $conn = $this->container->get('database_connection');
+        $data=$conn->fetchAll('SELECT * FROM transactions');
+        return $data;
+    }
+
 }

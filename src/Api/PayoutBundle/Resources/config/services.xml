@@ -22,6 +22,9 @@
         <service id="queue" class="Api\PayoutBundle\Model\QueueModel">            
             <argument type="service" id="service_container" />         
         </service>
+         <service id="TB" class="Api\PayoutBundle\Model\TB">            
+            <argument type="service" id="service_container" />         
+        </service>
         <service id="MOCK" class="Api\PayoutBundle\Model\MOCK">            
             <argument type="service" id="service_container" />         
         </service>

@@ -39,23 +39,37 @@ class MOCK
 
    public function create(array $data)
    {
-     $conn = $this->container->get('database_connection');
-     try {                     
+        $conn = $this->container->get('database_connection');
+        try {                     
              $check=$conn->update('transactions',array('transaction_status'=>'processing'), array('transaction_key' => $data['transaction']->transaction_key));
             } catch (\Exception $e) {
              $e->getMessage();
             }
-            if($check=1){
-                return array('code'=>'200','message'=>'Successfully Created Transaction');
-            } else{
-                return array('error_code'=>'905','error_message'=>'Transaction Cannot Be Created');                
-            }
+        if($check==1){
+            $conn->update('transactions',array('transaction_status'=>'complete'), array('transaction_key' => $data['transaction']->transaction_key));
+
+            return array('code'=>'200',
+                         'message'=>'Transaction Successfull',
+                         'notify_source'=>$data['source'],
+                         'confirmation_number'=>$data['transaction']->transaction_code,
+                         'status'=>'complete'
+                        );
+
+        }else{
+            return array('code'=>'901',
+                         'message'=>'Cannot Modify Transaction',
+                         'confirmation_number'=>$data['transaction']->transaction_code,
+                         'notify_source'=>$data['source'],
+                         'status' => 'failed'
+                        );
+        }    
    }
+
    public function modify(array $data)
    {
-    if(isset($data['transaction_status']))
+    if(isset($data['transaction']->transaction_status))
         {
-            $status=$data['transaction_status'];
+            $status=$data['transaction']->transaction_status;
         } else{            
             $status='processing'; 
         }
@@ -115,8 +129,8 @@ class MOCK
         $check_queue = 0;
 
         try {                     
-             $check=$conn->update('TB',$logData, array('transaction_key' => $data['transaction']->transaction_key));
-             $checkT=$conn->update('transactions',$logData, array('transaction_key' => $data['transaction']->transaction_key));
+             $check=$conn->update('transactions',$logData, array('transaction_key' => $data['transaction']->transaction_key));
+             // $checkT=$conn->update('transactions',$logData, array('transaction_key' => $data['transaction']->transaction_key));
             } catch (\Exception $e) {
              $e->getMessage();
             }
@@ -127,14 +141,15 @@ class MOCK
                          'notify_source'=>$data['source'],
                          'confirmation_number'=>$data['transaction']->transaction_code,
                          'status'=>'complete'
+
                         );
 
         }else{
             return array('error_code'=>'901',
                          'error_message'=>'Cannot Modify Transaction',
                          'confirmation_number'=>$data['transaction']->transaction_code,
-                         'notify_source'=>$data['source'],
-                         'status' => 'failed'
+                         'notify_source'=>$data['source'], 
+                         'status' => 'failed'                                      
                         );
         }    
    }

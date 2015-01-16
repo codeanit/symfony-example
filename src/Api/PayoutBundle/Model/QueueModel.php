@@ -41,9 +41,11 @@ class QueueModel
     { 
         $source='MOCK';
         $connection = $this->container->get('database_connection');
+        // $getUnexecutedOp = "SELECT * FROM operations_queue"
+        //     . "  WHERE is_executed = 0 AND transaction_service = '"
+        //     . $source . "'ORDER BY id DESC LIMIT 1 ";
         $getUnexecutedOp = "SELECT * FROM operations_queue"
-            . "  WHERE is_executed = 0 AND transaction_service = '"
-            . $source . "'ORDER BY id DESC LIMIT 1 ";
+            . "  WHERE is_executed = 0  ORDER BY id DESC LIMIT 1 ";
         $result = $connection->fetchAll($getUnexecutedOp);  
         if(count($result)<1)
         {
@@ -51,7 +53,7 @@ class QueueModel
         }    
         $operation = '';
         $parameter = '';
-
+      
         foreach ($result as $result) {
             $operation = $result['operation'];
             $parameter = (array) json_decode($result['parameter']);
@@ -66,7 +68,35 @@ class QueueModel
             }
             if($serviceObj) {
                 $result=$serviceObj->{$operation}($parameter);
-               
+
+                if($operation=='create'){
+                    if($result['code']==200){
+                        // change status to complete 
+                        try {                     
+                             $check=$conn->update('transactions',array('transaction_status'=>'complete'), array('transaction_key' => $data['transaction']->transaction_key));                             
+                            } catch (\Exception $e) {
+                             $e->getMessage();
+                            } 
+                    }else{
+                        try {                     
+                             $check=$conn->update('transactions',array('transaction_status'=>'failed'), array('transaction_key' => $data['transaction']->transaction_key));
+                            } catch (\Exception $e) {
+                             $e->getMessage();
+                            } 
+                    }
+                    // add queue to notify to source that is complete
+                    $queueData = array(
+                        'transaction_source' => 'CDEX',
+                        'transaction_service' => $result['notify_source'],
+                        'operation' => 'notify', 
+                        'parameter' => json_encode(array('confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'])),
+                        'is_executed' => 0,
+                        'creation_datetime' => date('Y-m-d H:i:s')
+                        );
+                    $check_queue = $connection->insert('operations_queue', $queueData);
+                }
+
+
                 if($operation=='modify'){
                     if($result['code']==204){
                         //create notification queue to source
