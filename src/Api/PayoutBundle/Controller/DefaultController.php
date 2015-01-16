@@ -11,19 +11,26 @@ class DefaultController extends Controller
 {
     /**
      * @Route("/queue/", name="default_index")
-     * @Template()
+     * 
      */
     public function indexAction()
-    {
-        $DB=$this->get('connection');
-        $transactions=$DB->getTransactions();
-      
-        return array('transactions'=>$transactions);
-        // $Q=$this->get('queue');
-        // print_r($Q->executeQueuedOperation());
-        // die;
-      
+    {        
+        $Q=$this->get('queue');
+        print_r($Q->executeQueuedOperation());
+        die;      
     }
+
+    /**
+     * @Route("/dashboard/", name="default_index")
+     * @Template()
+     */
+    public function transactionAction()
+    { 
+        $DB=$this->get('connection');
+        $transactions=$DB->getTransactions();      
+        return array('transactions'=>$transactions);     
+    }
+
 
 
 }
