@@ -47,10 +47,11 @@ class DatabaseOperationModel
         }
 
         $logData = array(
-                        'transaction_key'=>$data['transaction']->transaction_key,
+                        'transaction_key'=> mt_rand(1, 9999999),
                         'transaction_source'=>$data['source'],
                         'transaction_service'=>$data['service'],
                         'transaction_status'=>$status,
+                        'status'=>'approved',
                         'transaction_code'=>$data['transaction']->transaction_code,
                         'transaction_type'=>$data['transaction']->transaction_type,
                         'transaction_payment_type'=>$data['transaction']->payment_type,
@@ -113,12 +114,16 @@ class DatabaseOperationModel
                     $check=3;                    
                     $check_queue=3;
 
+                }elseif ($operation== 'cancel') {
+                    $check_queue = $conn->insert('operations_queue', $queueData); 
+                    $check=4;                    
+                    $check_queue=4;
                 } else{
                     $qb = $conn->createQueryBuilder()
                                ->select('count(t.id)')
                                ->from('transactions', 't')
-                               ->where('t.transaction_key = :transaction_key')
-                               ->setParameter('transaction_key', $data['transaction']->transaction_key);
+                               ->where('t.transaction_code = :transaction_code')
+                               ->setParameter('transaction_code', $data['transaction']->transaction_code);
                    
                     if ($qb->execute()->fetchColumn() <= 0) {
                         $check= $conn->insert('transactions', $logData);            

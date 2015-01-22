@@ -16,11 +16,12 @@ use Symfony\Component\Debug\Debug;
 //     header('HTTP/1.0 403 Forbidden');
 //     exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
 // }
-if (!in_array(@$_SERVER['REMOTE_ADDR'], array('116.90.225.50', '127.0.0.1', 'fe80::1', '::1','localhost', '172.16.1.6'))
-) {
-    header('HTTP/1.0 403 Forbidden');
-    exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
-}
+
+// if (!in_array(@$_SERVER['REMOTE_ADDR'], array('116.90.225.50', '127.0.0.1', 'fe80::1', '::1','localhost', '172.16.1.6'))
+// ) {
+//     header('HTTP/1.0 403 Forbidden');
+//     exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
+// }
 
 $loader = require_once __DIR__.'/../app/bootstrap.php.cache';
 Debug::enable();

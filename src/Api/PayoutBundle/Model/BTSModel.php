@@ -28,7 +28,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BTSModel
 {
-  
+    private $operationMap = array(
+        'create' => 'doSALE',
+        'modify' => 'doCORI',
+        'update' => 'doCORI',
+        'cancel' => 'doCNLI'
+    );
+
     /**
      * [__construct description]
      */
@@ -44,7 +50,7 @@ class BTSModel
      */
     public function doUSRL()
     {
-        ini_set("soap.wsdl_cache_enabled", false); 
+       ini_set("soap.wsdl_cache_enabled", false); 
        $this->url= "https://test.globalplatform.ws/ts/gpcs/gpts/transactionservice.asmx?WSDL"; 
        $soap_client = new \SoapClient($this->url, array(
                 "trace" => 1,
@@ -98,8 +104,8 @@ class BTSModel
      * @return array [description]
      */
     
-    public function doSALE(array $txn)
-    {
+    public function doSALE($txn)
+    {        
         $sessionID = $this->doUSRL();
         $data=$txn;
         // var_dump($txn);die;
@@ -112,7 +118,7 @@ class BTSModel
         $dataNode = $itemNode->addChild('DATA');
         $itemNode = $dataNode->addChild('CONFIRMATION_NM', $data['transaction']->transaction_code);
         $itemNode = $dataNode->addChild('ORDER_STATUS', 'O');
-        $itemNode = $dataNode->addChild('SERVICE_CD', $data['service']);
+        $itemNode = $dataNode->addChild('SERVICE_CD', 'MTR');
         $itemNode = $dataNode->addChild('PAYMENT_TYPE_CD', $data['transaction']->payment_type);
         $itemNode = $dataNode->addChild('ORIG_COUNTRY_CD', $data['transaction']->sender_country);
         $itemNode = $dataNode->addChild('ORIG_CURRENCY_CD', $data['transaction']->sender_currency);
@@ -120,7 +126,7 @@ class BTSModel
         $itemNode = $dataNode->addChild('DEST_CURRENCY_CD', $data['transaction']->receiver_currency);
         $itemNode = $dataNode->addChild('R_ACCOUNT_TYPE_CD');
         $itemNode = $dataNode->addChild('R_ACCOUNT_NM');
-        $itemNode = $dataNode->addChild('R_AGENT_CD',$data['transaction']->agent_code);
+        $itemNode = $dataNode->addChild('R_AGENT_CD');
         $itemNode = $dataNode->addChild('R_AGENT_REGION_SD');
         $itemNode = $dataNode->addChild('R_AGENT_BRANCH_SD');
         $itemNode = $dataNode->addChild('ORIGIN_AM', $data['transaction']->sender_amount);
@@ -277,22 +283,27 @@ class BTSModel
         $response = json_decode(json_encode((array)$xmlFinal), true);
 
         $return = "";
+        
         if ($response['OPCODE'] == '0001'
             || $response['OPCODE'] == '0002'
         ) {
-            $return = array('status' => '200', 'message' => 'Transaction Successful.');
+            $return = array('code' => '200', 'message' => 'Transaction Successful.' ,'notify_source'=>$data['source'],'status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code);
         } else {
-            $return = array(
-                'status' => '400',
-                'message' => $response['PROCESS_MSG']
-                    .$response['ERROR_PARAM_FULL_NAME']);
+            // $return = array(
+            //     'status' => '400',
+            //     'message' => $response['PROCESS_MSG']
+            //         .$response['ERROR_PARAM_FULL_NAME']);
+            //                     
+            $return = array('code' => '400', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source'],'status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
+
         }
 
         $request = "\n SALE REQUEST XML:\n" . $soap_client->__getLastRequest() . "\n"; 
-        $response = "\n SALE RESPONSE XML :\n" . $response['PROCESS_MSG'].$response['ERROR_PARAM_FULL_NAME'];        
+        // $response = "\n SALE RESPONSE XML :\n" . $response['PROCESS_MSG'].$response['ERROR_PARAM_FULL_NAME'];        
+        $response = "\n SALE RESPONSE XML :\n" . $response['PROCESS_MSG'];        
         $line = "\n ---------------------------- \n ";
-        $file = 'BTSRequestResponse.txt';        
-        file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
+        // $file = 'BTSRequestResponse.txt';        
+        // file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
         return $return;
 
 
@@ -429,6 +440,7 @@ class BTSModel
      */
     public function doCNLI(array $cnliData)
     {
+        $data=$cnliData;
         $sessionID = $this->doUSRL();
 
         $rootNode = new \SimpleXMLElement("<ExecTR xmlns='http://www.btsincusa.com/gp/'> </ExecTR>");
@@ -438,11 +450,11 @@ class BTSModel
         $requestNode->addChild('AGENT_TRANS_TYPE_CODE', 'CNLI');
 
         $dataNode = $requestNode->addChild('DATA');
-        $dataNode->addChild('CONFIRMATION_NM', $cnliData['CONFIRMATION_NM']);
+        $dataNode->addChild('CONFIRMATION_NM', $data['transaction']->transaction_code);
 
         $dataNode->addChild('PROCESS_REASON_CD', 'RBC');
         $dataNode->addChild('WHOLESALE_FX');
-        $dataNode->addChild('FEE_AM', $cnliData['FEE_AM']);
+        $dataNode->addChild('FEE_AM', $data['transaction']->fee);
         $dataNode->addChild('DISCOUNT_AM');
         $dataNode->addChild('DISCOUNT_REASON_CD');
 
@@ -508,22 +520,25 @@ class BTSModel
             'SimpleXMLElement', LIBXML_NOCDATA
         );
         $response = json_decode(json_encode((array)$xmlFinal), true);
-
         $return = "";
         if ($response['OPCODE'] == '0702') {
-            $return = array('status' => '200', 'message' => 'Transaction Successful.');
+            // $return = array('status' => '200', 'message' => 'Transaction Successful.','confirmation_number'=>$data['transaction']->transaction_code);
+            $return = array('code' => '200', 'message' => 'Transaction Successful.' ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code);
+
         } else {
-            $return = array(
-                'status' => '400',
-                'message' => $response['PROCESS_MSG']
-                    .$response['ERROR_PARAM_FULL_NAME']);
+            // $return = array(
+            //     'status' => '400',
+            //     'message' => $response['PROCESS_MSG']
+            //         );
+            $return = array('code' => '400', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
+
         }
 
         $request = "\n CNLI REQUEST XML:\n" . $soap_client->__getLastRequest() . "\n"; 
-        $response = "\n CNLI RESPONSE XML :\n" . $response['PROCESS_MSG'].$response['ERROR_PARAM_FULL_NAME'];        
+        $response = "\n CNLI RESPONSE XML :\n" . $response['PROCESS_MSG'];        
         $line = "\n ---------------------------- \n ";
-        $file = 'BTSRequestResponse.txt';        
-        file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
+        // $file = 'BTSRequestResponse.txt';        
+        // file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
         
 
         return $return;
@@ -547,7 +562,7 @@ class BTSModel
      */
     public function doCORI($txn)
     {
-        $txnChanges = $txn['REQUEST']['DATA'];
+        $data = $txn;
 
         $sessionID = $this->doUSRL();
         $rootNode = new \SimpleXMLElement("<ExecTR xmlns='http://www.btsincusa.com/gp/'> </ExecTR>");
@@ -557,7 +572,7 @@ class BTSModel
         $requestNode->addChild('AGENT_TRANS_TYPE_CODE', 'CORI');
 
         $dataNode = $requestNode->addChild('DATA');
-        $dataNode->addChild('CONFIRMATION_NM', $txnChanges['CONFIRMATION_NM']);
+        $dataNode->addChild('CONFIRMATION_NM', $data['transaction']->transaction_code);
 
         // PROCESS_REASON_CD values
         // PAE  PAYMENT AGENT ERROR
@@ -568,11 +583,11 @@ class BTSModel
 
         $dataNode->addChild('PROCESS_REASON_CD', 'RBC');
         $dataNode->addChild('WHOLESALE_FX');
-        $dataNode->addChild('FEE_AM', $txnChanges['FEE_AM']);
+        $dataNode->addChild('FEE_AM', $data['transaction']->fee);
         $dataNode->addChild('DISCOUNT_AM');
         $dataNode->addChild('DISCOUNT_REASON_CD');
         $dataNode->addChild('R_SMS_MSG_REQ');
-        $dataNode->addChild('EXCH_RATE_FX', $txnChanges['EXCH_RATE_FX']);
+        $dataNode->addChild('EXCH_RATE_FX', $data['transaction']->exchange_rate);
 
         $agentNode = $dataNode->addChild('AGENT');
         $agentNode->addChild('ORDER_NM', '120300110153');
@@ -587,12 +602,12 @@ class BTSModel
         $agentNode->addChild('AGENT_TM', '231634');
 
         $recepientNode = $dataNode->addChild('RECIPIENT');
-        $recepientNode->addChild('FIRST_NAME', $txnChanges['RECIPIENT']['FIRST_NAME']);
-        $recepientNode->addChild('MIDDLE_NAME', $txnChanges['RECIPIENT']['MIDDLE_NAME']);
-        $recepientNode->addChild('LAST_NAME', $txnChanges['RECIPIENT']['LAST_NAME']);
-        $recepientNode->addChild('MOTHER_M_NAME', $txnChanges['RECIPIENT']['MOTHER_M_NAME']);
-        $recepientNode->addChild('IDENTIF_TYPE_CD', $txnChanges['RECIPIENT']['IDENTIF_TYPE_CD']);
-        $recepientNode->addChild('IDENTIF_NM', $txnChanges['RECIPIENT']['IDENTIF_NM']);
+        $recepientNode->addChild('FIRST_NAME', $data['transaction']->receiver_first_name);
+        $recepientNode->addChild('MIDDLE_NAME');
+        $recepientNode->addChild('LAST_NAME', $data['transaction']->receiver_last_name);
+        $recepientNode->addChild('MOTHER_M_NAME', $data['transaction']->receiver_mother_name);
+        $recepientNode->addChild('IDENTIF_TYPE_CD');
+        $recepientNode->addChild('IDENTIF_NM');
 
         $recepientForeignNameNode = $recepientNode->addChild('FOREIGN_NAME');
         $recepientForeignNameNode->addChild('FIRST_NAME');
@@ -601,14 +616,14 @@ class BTSModel
         $recepientForeignNameNode->addChild('MOTHER_M_NAME');
 
         $recepientAddressNode = $recepientNode->addChild('ADDRESS');
-        $recepientAddressNode->addChild('ADDRESS', $txnChanges['RECIPIENT']['ADDRESS']['ADDRESS']);
-        $recepientAddressNode->addChild('CITY', $txnChanges['RECIPIENT']['ADDRESS']['CITY']);
-        $recepientAddressNode->addChild('STATE_CD', $txnChanges['RECIPIENT']['ADDRESS']['STATE_CD']);
-        $recepientAddressNode->addChild('COUNTRY_CD', $txnChanges['RECIPIENT']['ADDRESS']['COUNTRY_CD']);
-        $recepientAddressNode->addChild('ZIP_CODE', $txnChanges['RECIPIENT']['ADDRESS']['ZIP_CODE']);
-        $recepientAddressNode->addChild('PHONE', $txnChanges['RECIPIENT']['ADDRESS']['PHONE']);
-        $recepientAddressNode->addChild('CELL_PHONE', $txnChanges['RECIPIENT']['ADDRESS']['CELL_PHONE']);
-        $recepientAddressNode->addChild('EMAIL', $txnChanges['RECIPIENT']['ADDRESS']['EMAIL']);
+        $recepientAddressNode->addChild('ADDRESS', $data['transaction']->receiver_address);
+        $recepientAddressNode->addChild('CITY', $data['transaction']->receiver_city);
+        $recepientAddressNode->addChild('STATE_CD', $data['transaction']->receiver_state);
+        $recepientAddressNode->addChild('COUNTRY_CD', $data['transaction']->receiver_country);
+        $recepientAddressNode->addChild('ZIP_CODE', $data['transaction']->receiver_postal_code);
+        $recepientAddressNode->addChild('PHONE', $data['transaction']->receiver_phone_mobile);
+        $recepientAddressNode->addChild('CELL_PHONE');
+        $recepientAddressNode->addChild('EMAIL');
 
         $senderIdentificationNode = $dataNode->addChild('SENDER_IDENTIFICATION');
         $senderIdentificationNode->addChild('TYPE_CD');
@@ -663,16 +678,20 @@ class BTSModel
 
         $return = "";
         if ($response['OPCODE'] == '0902') {
-            $return = array('status' => '200', 'message' => 'Transaction Successful.');
+            // $return = array('status' => '200', 'message' => 'Transaction Successful.');
+            $return = array('code' => '200', 'message' => 'Transaction Successful.' ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code,'data'=>$data);
+
         } else {
-            $return = array(
-                'status' => '400',
-                'message' => $response['PROCESS_MSG']
-                    .$response['ERROR_PARAM_FULL_NAME']);
+            // $return = array(
+            //     'status' => '400',
+            //     'message' => $response['PROCESS_MSG']
+            //         );
+            $return = array('code' => '200', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code);
+            
         }
 
         $request = "\n CORI REQUEST XML:\n" . $soap_client->__getLastRequest() . "\n"; 
-        $response = "\n CORI RESPONSE XML :\n" . $response['PROCESS_MSG'].$response['ERROR_PARAM_FULL_NAME'];        
+        $response = "\n CORI RESPONSE XML :\n" . $response['PROCESS_MSG'];        
         $line = "\n ---------------------------- \n ";
         $file = 'BTSRequestResponse.txt';        
         file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
@@ -883,6 +902,11 @@ class BTSModel
         file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
 
         return $return;
+    }
+
+    public function process($operation, $args)
+    {        
+        return call_user_func_array(array($this, $this->operationMap[$operation]), [$args]);
     }
 }
 

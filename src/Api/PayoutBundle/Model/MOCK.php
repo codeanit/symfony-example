@@ -40,13 +40,8 @@ class MOCK
    public function create(array $data)
    {
         $conn = $this->container->get('database_connection');
-        try {                     
-             $check=$conn->update('transactions',array('transaction_status'=>'processing'), array('transaction_key' => $data['transaction']->transaction_key));
-            } catch (\Exception $e) {
-             $e->getMessage();
-            }
-        if($check==1){
-            $conn->update('transactions',array('transaction_status'=>'complete'), array('transaction_key' => $data['transaction']->transaction_key));
+        $check=$conn->update('transactions',array('transaction_status'=>'complete'), array('transaction_code' => $data['transaction']->transaction_code));
+       if($check==1){
 
             return array('code'=>'200',
                          'message'=>'Transaction Successfull',
@@ -56,7 +51,7 @@ class MOCK
                         );
 
         }else{
-            return array('code'=>'901',
+            return array('code'=>'400',
                          'message'=>'Cannot Modify Transaction',
                          'confirmation_number'=>$data['transaction']->transaction_code,
                          'notify_source'=>$data['source'],
@@ -127,26 +122,26 @@ class MOCK
         $conn = $this->container->get('database_connection');
         $check = 0;
         $check_queue = 0;
-
+        
         try {                     
-             $check=$conn->update('transactions',$logData, array('transaction_key' => $data['transaction']->transaction_key));
+             $check=$conn->update('TB',$logData, array('transaction_code' => $data['transaction']->transaction_code));
              // $checkT=$conn->update('transactions',$logData, array('transaction_key' => $data['transaction']->transaction_key));
             } catch (\Exception $e) {
              $e->getMessage();
             }
      
         if($check==1){
-            return array('code'=>'204',
+            return array('code'=>'200',
                          'message'=>'Successfully Updated Transaction',
                          'notify_source'=>$data['source'],
                          'confirmation_number'=>$data['transaction']->transaction_code,
-                         'status'=>'complete'
-
+                         'status'=>'complete',
+                         'data' => $logData
                         );
 
         }else{
-            return array('error_code'=>'901',
-                         'error_message'=>'Cannot Modify Transaction',
+            return array('code'=>'400',
+                         'message'=>'Cannot Modify Transaction',
                          'confirmation_number'=>$data['transaction']->transaction_code,
                          'notify_source'=>$data['source'], 
                          'status' => 'failed'                                      

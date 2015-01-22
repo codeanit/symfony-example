@@ -14,10 +14,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 class PayoutController extends Controller
-{
-
-    private $TBConnection;
-    private $BTSConn;
+{   
 
     public function __construct() 
     {
@@ -60,10 +57,10 @@ class PayoutController extends Controller
 
         }elseif($status[0]==2 && $status[1]==2) {
 
-            $result = array('Code'=>'702','Msg'=>'Dublicate Transaction Key.');
+            $result = array('Code'=>'400','Msg'=>'Dublicate Confirmation Number.');
 
         }else {
-            $result = array('Code'=>'701','Msg'=>'Error In Log Insertion Process.');
+            $result = array('Code'=>'400','Msg'=>'Error In Log Insertion Process.');
         }
        
         return $result;    
@@ -82,11 +79,30 @@ class PayoutController extends Controller
             $result = array('Code'=>'200','Msg'=>'Successfully Added Transaction for Modification.');
 
         }else {
-            $result = array('Code'=>'701','Msg'=>'Error In Adding Transaction Modification.');
+            $result = array('Code'=>'400','Msg'=>'Error In Adding Transaction Modification.');
         }
        
         return $result;    
-    }   
+    }  
+
+    public function postCancelAction(Request $request)
+    {
+        $this->DB = $this->get('connection');     
+        $postData=$request->getContent();
+        $decodedData=(array) json_decode($postData);
+
+        $status=$this->DB->operateTransaction($decodedData,$postData,'cancel');
+
+       if($status[0]==4 && $status[1]==4) {
+
+            $result = array('Code'=>'200','Msg'=>'Successfully Added Transaction for Cancel.');
+
+        }else {
+            $result = array('Code'=>'400','Msg'=>'Error In Canceling Transaction.');
+        }
+       
+        return $result;    
+    } 
 
 
 }

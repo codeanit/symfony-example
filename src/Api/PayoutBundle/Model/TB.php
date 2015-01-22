@@ -105,17 +105,19 @@ class TB
         
    }
    public function notify(array $data){
-             $conn = $this->container->get('database_connection');
-         try {                     
-             $check=$conn->update('TB',array('transaction_status'=>$data['status']), array('transaction_code' => $data['confirmation_number']));        
-            } catch (\Exception $e) {
-             $e->getMessage();
-            } 
-            if($check==1){
+         //     $conn = $this->container->get('database_connection');
+         // try {                     
+         //     $check=$conn->update('TB',array('status'=>$data['status']), array('transaction_code' => $data['confirmation_number']));        
+         //    } catch (\Exception $e) {
+         //     $e->getMessage();
+         //    } 
+         //    if($check==1){
+         //        return array('code'=>'200','message'=>'notification successfull');
+         //    }else{
+         //        return array('code'=>'400','message'=>'notification Unsuccessfull');
+         //    }
                 return array('code'=>'200','message'=>'notification successfull');
-            }else{
-                return array('code'=>'756','message'=>'notification Unsuccessfull');
-            }
+            
    }
    
 }

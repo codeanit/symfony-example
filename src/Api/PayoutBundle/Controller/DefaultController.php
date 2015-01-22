@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/queue/", name="default_index")
+     * @Route("/queue/", name="queue")
      * 
      */
     public function indexAction()
