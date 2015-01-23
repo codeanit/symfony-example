@@ -686,7 +686,7 @@ class BTSModel
             //     'status' => '400',
             //     'message' => $response['PROCESS_MSG']
             //         );
-            $return = array('code' => '200', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code);
+            $return = array('code' => '400', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
             
         }
 

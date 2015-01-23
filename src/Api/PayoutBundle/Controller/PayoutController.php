@@ -57,7 +57,7 @@ class PayoutController extends Controller
 
         }elseif($status[0]==2 && $status[1]==2) {
 
-            $result = array('Code'=>'400','Msg'=>'Dublicate Confirmation Number.');
+            $result = array('Code'=>'400','Msg'=>'Duplicate Confirmation Number.');
 
         }else {
             $result = array('Code'=>'400','Msg'=>'Error In Log Insertion Process.');

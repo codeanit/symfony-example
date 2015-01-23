@@ -41,7 +41,7 @@ class QueueModel
     {         
         $connection = $this->container->get('database_connection');
         $getUnexecutedOp = "SELECT * FROM operations_queue"
-            . "  WHERE is_executed = 0  ORDER BY id DESC LIMIT 1 ";
+            . "  WHERE is_executed = 0  ORDER BY id ASC LIMIT 1 ";
         $results = $connection->fetchAll($getUnexecutedOp);  
         if(count($results)<1)
         {
@@ -63,12 +63,14 @@ class QueueModel
             $connection->update('transactions',array('transaction_status'=>'inprogress'), array('transaction_code' => $CN));                 
         } 
 
+        $serviceObj = null;
         try {
             $serviceObj=$this->container->get($service);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $e->getMessage();
         }
-        if($serviceObj) {
+
+        if($serviceObj != '') {            
             if(strtolower($service)=='bts') {                
                 $result=$serviceObj->process($operation, $parameter);
             }else {                
@@ -137,7 +139,7 @@ class QueueModel
                 $check_queue = $connection->insert('operations_queue', $queueData);
             }            
                 
-        }        
+        }   
 
         $connection->update(
             'operations_queue',
