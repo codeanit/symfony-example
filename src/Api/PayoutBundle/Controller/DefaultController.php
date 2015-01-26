@@ -15,8 +15,19 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {        
-        $Q=$this->get('queue');
+        $Q=$this->get('queue');       
         print_r($Q->executeQueuedOperation());
+        die;      
+    }
+
+    /**
+     * @Route("/notification/", name="notification")
+     * 
+     */
+    public function notificationAction()
+    {        
+        $Q=$this->get('queue');
+        print_r($Q->noti());     
         die;      
     }
 

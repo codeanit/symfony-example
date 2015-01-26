@@ -105,19 +105,32 @@ class TB
         
    }
    public function notify(array $data){
-         //     $conn = $this->container->get('database_connection');
-         // try {                     
-         //     $check=$conn->update('TB',array('status'=>$data['status']), array('transaction_code' => $data['confirmation_number']));        
-         //    } catch (\Exception $e) {
-         //     $e->getMessage();
-         //    } 
-         //    if($check==1){
-         //        return array('code'=>'200','message'=>'notification successfull');
-         //    }else{
-         //        return array('code'=>'400','message'=>'notification Unsuccessfull');
-         //    }
+             $conn = $this->container->get('database_connection');
+         try {                     
+             $check=$conn->update('TB',array('status'=>$data['change_status']), array('transaction_code' => $data['confirmation_number']));        
+            } catch (\Exception $e) {
+             $e->getMessage();
+            } 
+            if($check==1){
                 return array('code'=>'200','message'=>'notification successfull');
+            }else{
+                return array('code'=>'400','message'=>'notification Unsuccessfull');
+            }
+                //return array('code'=>'200','message'=>'notification successfull');
             
    }
+   // public function modify(array $data){ 
+   //      $conn = $this->container->get('database_connection');
+   //      $check = 0; 
+   //      try {                     
+   //           $check=$conn->update('TB',$logData, array('transaction_key' => $data['transaction']->transaction_key));        
+   //          } catch (\Exception $e) {
+   //           $e->getMessage();
+   //          }
+
+   //      return array('code'=>'200','message'=>'notification successfull','confirmation_number'=>$data['CONFIRMATION_NM']);            
+   // }
+
+
    
 }

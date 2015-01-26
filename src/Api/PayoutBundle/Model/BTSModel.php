@@ -15,6 +15,8 @@ namespace Api\PayoutBundle\Model;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * Bridge to call TB DBAL
  *
@@ -28,6 +30,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BTSModel
 {
+    protected $container;  
+
     private $operationMap = array(
         'create' => 'doSALE',
         'modify' => 'doCORI',
@@ -38,9 +42,9 @@ class BTSModel
     /**
      * [__construct description]
      */
-    public function __construct()
-    {
-    
+
+    function __construct(ContainerInterface $container) {
+        $this->container = $container;
     }
 
    /**
@@ -796,21 +800,26 @@ class BTSModel
                 ['NOTIFICATION'][$i]['@attributes'];
         }
         
-        $return = "";
+        $return = "";        
+        // echo "<pre>";
+        // print_r($notiReturnArray);
+        // echo '</pre>';
+        // die;
         if ($responseArray['OPCODE'] == '1304') {
             $return = array('status' => '200', 'message' => $notiReturnArray);
         } else {
             $return = array(
                 'status' => '400',
                 'message' => $responseArray['PROCESS_MSG']
-                    . ' ' . $responseArray['ERROR_PARAM_FULL_NAME']);
+                );
         }
 
         $request = "\n NOTI REQUEST XML:\n" . $soap_client->__getLastRequest() . "\n"; 
         $response = "\n NOTI RESPONSE XML :\n" . json_encode($responseArray);        
         $line = "\n ---------------------------- \n ";
-        $file = 'BTSRequestResponse.txt';        
-        file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
+        // $file = 'BTSRequestResponse.txt';        
+        // file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
+        // print_r($return);die;
 
         return $return;
     }
@@ -900,8 +909,54 @@ class BTSModel
         $line = "\n ---------------------------- \n ";
         $file = 'BTSRequestResponse.txt';        
         file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
-
         return $return;
+    }
+
+    public function doNotiWithNotc()
+    {       
+        $list = $this->doNOTI();  // get TXN list from BTS 
+        $connection = $this->container->get('database_connection');        
+        if($list['status']=='200')
+        {
+            foreach ($list['message'] as $noti) {
+                if (in_array($noti['MOVEMENT_TYPE_CODE'], array('PAYC', 'PAYI','PAYJ', 'CNLI'))) { 
+                    if(in_array($noti['MOVEMENT_TYPE_CODE'], array('PAYC', 'PAYI'))){
+                        $cStatus='paid';
+                    }else{
+                        $cStatus='cancel';                        
+                    }
+                    $notiData=array(
+                            'NOTIFICATION_ID' => $noti['NOTIFICATION_ID'],
+                            'CONFIRMATION_NM' => $noti['CONFIRMATION_NM'],
+                            'AGENT_ORDER_NM' => $noti['AGENT_ORDER_NM'],
+                            'MOVEMENT_TYPE_CODE' => $noti['MOVEMENT_TYPE_CODE'],
+                            'OPCODE' =>  $noti['OPCODE']
+                            );                                 
+                    $queueData = array(
+                            'transaction_source' => 'cdex',
+                            'transaction_service' => 'tb',
+                            'operation' => 'modify', 
+                            'parameter' => json_encode(array(
+                                           'change_status'=>$cStatus,
+                                           'confirmation_number'=>$noti['CONFIRMATION_NM']                                           
+                                            )),
+                            'is_executed' => 0,
+                            'creation_datetime' => date('Y-m-d H:i:s')
+                            );
+
+                    //update transaction status in CDEX
+                    $check=$connection->update('transactions',array('transaction_status'=>'successful','status'=>$cStatus), array('transaction_code' => $noti['CONFIRMATION_NM'])); 
+                    
+                    //Send Data to NOTI                     
+                   $this->doNOTC($notiData);
+
+                    
+                $check_queue = $connection->insert('operations_queue', $queueData);
+                } 
+            }          
+        }
+
+        return;
     }
 
     public function process($operation, $args)

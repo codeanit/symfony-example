@@ -37,6 +37,13 @@ class QueueModel
         $this->container = $container;
     }
 
+    public function noti()
+    {
+        $s=$this->container->get('bts');
+        $s->doNotiWithNotc();
+        die;
+    }
+
     public function executeQueuedOperation()
     {         
         $connection = $this->container->get('database_connection');
@@ -54,7 +61,7 @@ class QueueModel
         foreach ($results as $result) {
             $operation = $result['operation'];
             $parameter = (array) json_decode($result['parameter']);
-            $service=$result['transaction_service'];            
+            $service=strtolower($result['transaction_service']);            
             $id=$result['id'];            
         }
 
@@ -65,88 +72,89 @@ class QueueModel
 
         $serviceObj = null;
         try {
-            $serviceObj=$this->container->get($service);
+            $serviceObj=$this->container->get($service);       
+
+            if($serviceObj != '') {            
+                if(strtolower($service)=='bts') {                
+                    $result=$serviceObj->process($operation, $parameter);
+                }else {                
+                    $result=$serviceObj->{$operation}($parameter);
+                }
+
+                if($operation=='create'){
+                    if($result['code']==200){                    
+                        try {                     
+                             $check=$connection->update('transactions',array('transaction_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                             
+                            } catch (\Exception $e) {
+                             $e->getMessage();
+                            } 
+                    }else{
+                        try {                     
+                             $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
+                            } catch (\Exception $e) {
+                             $e->getMessage();
+                            } 
+                    }
+                }
+
+                if($operation=='modify'){ 
+
+                    if($result['code']==200){
+                        // change status to complete 
+                        try {
+                            $updateTransaction=$connection->update('transactions',$result['data'], array('transaction_code' => $result['confirmation_number']));                                              
+                            } catch (\Exception $e) {
+                             $e->getMessage();
+                            } 
+                    }else{
+                        try {                     
+                             $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
+                            } catch (\Exception $e) {
+                             $e->getMessage();
+                            } 
+                    }
+                }
+
+                if($operation=='cancel'){                
+                    if($result['code']==200){                    
+                        try {                     
+                             $check=$connection->update('transactions',array('transaction_status'=>'successful','status'=>'cancel'), array('transaction_code' => $result['confirmation_number']));                             
+                            } catch (\Exception $e) {
+                             $e->getMessage();
+                            } 
+                    }else{
+                        try {                     
+                             $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
+                            } catch (\Exception $e) {
+                             $e->getMessage();
+                            } 
+                    }
+                }
+
+                if($operation == 'create' || $operation == 'modify' || $operation == 'cancel'){
+                    // add queue to notify to source
+                    $queueData = array(
+                        'transaction_source' => 'CDEX',
+                        'transaction_service' => $result['notify_source'],
+                        'operation' => 'notify', 
+                        'parameter' => json_encode(array('confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'])),
+                        'is_executed' => 0,
+                        'creation_datetime' => date('Y-m-d H:i:s')
+                        );
+                    $check_queue = $connection->insert('operations_queue', $queueData);
+                }            
+                    
+            }   
         } catch (\Exception $e) {
-            $e->getMessage();
+            // $e->getMessage();
+            $result=array('code'=>'400','message'=>'Service Not Found.');
         }
-
-        if($serviceObj != '') {            
-            if(strtolower($service)=='bts') {                
-                $result=$serviceObj->process($operation, $parameter);
-            }else {                
-                $result=$serviceObj->{$operation}($parameter);
-            }
-
-            if($operation=='create'){
-                if($result['code']==200){                    
-                    try {                     
-                         $check=$connection->update('transactions',array('transaction_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                             
-                        } catch (\Exception $e) {
-                         $e->getMessage();
-                        } 
-                }else{
-                    try {                     
-                         $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
-                        } catch (\Exception $e) {
-                         $e->getMessage();
-                        } 
-                }
-            }
-
-            if($operation=='modify'){                
-                if($result['code']==200){
-                    // change status to complete 
-                    try {
-                         $updateTransaction=$connection->update('transactions',$result['data'], array('transaction_code' => $result['confirmation_number']));                             
-                        } catch (\Exception $e) {
-                         $e->getMessage();
-                        } 
-                }else{
-                    try {                     
-                         $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
-                        } catch (\Exception $e) {
-                         $e->getMessage();
-                        } 
-                }
-            }
-
-            if($operation=='cancel'){                
-                if($result['code']==200){                    
-                    try {                     
-                         $check=$connection->update('transactions',array('transaction_status'=>'successful','status'=>'cancel'), array('transaction_code' => $result['confirmation_number']));                             
-                        } catch (\Exception $e) {
-                         $e->getMessage();
-                        } 
-                }else{
-                    try {                     
-                         $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
-                        } catch (\Exception $e) {
-                         $e->getMessage();
-                        } 
-                }
-            }
-
-            if($operation == 'create' || $operation == 'modify' || $operation == 'cancel'){
-                // add queue to notify to source
-                $queueData = array(
-                    'transaction_source' => 'CDEX',
-                    'transaction_service' => $result['notify_source'],
-                    'operation' => 'notify', 
-                    'parameter' => json_encode(array('confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'])),
-                    'is_executed' => 0,
-                    'creation_datetime' => date('Y-m-d H:i:s')
-                    );
-                $check_queue = $connection->insert('operations_queue', $queueData);
-            }            
-                
-        }   
 
         $connection->update(
             'operations_queue',
             array('is_executed' => '1'),
             array('id' => $id)
-        );
-
+        );     
         return $result;   
     }
 }

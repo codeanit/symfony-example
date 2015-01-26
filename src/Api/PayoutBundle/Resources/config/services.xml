@@ -22,16 +22,17 @@
         <service id="queue" class="Api\PayoutBundle\Model\QueueModel">            
             <argument type="service" id="service_container" />         
         </service>
-         <service id="TB" class="Api\PayoutBundle\Model\TB">            
+         <service id="tb" class="Api\PayoutBundle\Model\TB">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="MOCK" class="Api\PayoutBundle\Model\MOCK">            
+        <service id="mock" class="Api\PayoutBundle\Model\MOCK">            
             <argument type="service" id="service_container" />         
         </service>
         <service id="connection" class="Api\PayoutBundle\Model\DatabaseOperationModel">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="bts" class="Api\PayoutBundle\Model\BTSModel">            
+        <service id="bts" class="Api\PayoutBundle\Model\BTSModel"> 
+            <argument type="service" id="service_container" /> 
          <!--    <argument type="string">Suraj</argument>
             <argument>%testing.array%</argument> -->
         </service>
