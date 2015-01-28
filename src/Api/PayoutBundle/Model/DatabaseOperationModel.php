@@ -109,27 +109,31 @@ class DatabaseOperationModel
         $check_queue = 0;
 
         try {
-                if($operation=='modify') {                             
-                    $check_queue = $conn->insert('operations_queue', $queueData); 
-                    $check=3;                    
-                    $check_queue=3;
+                $qb = $conn->createQueryBuilder()
+                               ->select('count(t.id)')
+                               ->from('transactions', 't')
+                               ->where('t.transaction_code = :transaction_code')
+                               ->setParameter('transaction_code', $data['transaction']->transaction_code);
+                $count=$qb->execute()->fetchColumn();               
+                if($operation=='modify') {
+                    if($count>0) {
+                        $check_queue = $conn->insert('operations_queue', $queueData); 
+                        $check=3;                    
+                        $check_queue=3;                        
+                    }else {
+                        $check=4;                    
+                        $check_queue=4;
+                    }                             
 
                 }elseif ($operation== 'cancel') {
                     $check_queue = $conn->insert('operations_queue', $queueData); 
                     $check=4;                    
                     $check_queue=4;
                 } else{
-                    $qb = $conn->createQueryBuilder()
-                               ->select('count(t.id)')
-                               ->from('transactions', 't')
-                               ->where('t.transaction_code = :transaction_code')
-                               ->setParameter('transaction_code', $data['transaction']->transaction_code);
-                   
-                    if ($qb->execute()->fetchColumn() <= 0) {
+                    if ($count <= 0) {
                         $check= $conn->insert('transactions', $logData);            
                         $check_queue = $conn->insert('operations_queue', $queueData);            
-                        $check_queue = $conn->insert('TB', $logData);            
-                        
+                        $check_queue = $conn->insert('TB', $logData);
                     }else{
                         $check=2;
                         $check_queue=2;

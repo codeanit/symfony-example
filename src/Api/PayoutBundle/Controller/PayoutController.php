@@ -20,27 +20,14 @@ class PayoutController extends Controller
     {
 
     }
-  
-    /** 
-     * @return array
-     * @View()
-     * @Route(requirements={"_format"="json"})
-     *
-     * @param String $sessionID [session id ]
-     * @param String $username  [username]
-     * @param String $password  [password]
-     * @param String $refno     [control number]
-     * @param String $signature [signature]     
-     * 
-     * */    
-  
 
     /** 
-     * @return array
+     * It Handels all post request from TB for Create(approved TxN) Operation
+     * @return JSON 
      * @View()
      * @Route(requirements={"_format"="json"})
      *
-     * @param String $sessionID [session_id ]     
+     * @param JSON Post Data     
      * 
      * */    
     public function postCreateAction(Request $request)
@@ -53,18 +40,28 @@ class PayoutController extends Controller
 
         if($status[0]==1 && $status[1]==1)
         {
-            $result = array('Code'=>'200','Msg'=>'Successfully Received');
+            $result = array('code'=>'200','message'=>'Successfully Received');
 
         }elseif($status[0]==2 && $status[1]==2) {
 
-            $result = array('Code'=>'400','Msg'=>'Duplicate Confirmation Number.');
+            $result = array('code'=>'400','message'=>'Duplicate Confirmation Number.');
 
         }else {
-            $result = array('Code'=>'400','Msg'=>'Error In Log Insertion Process.');
+            $result = array('code'=>'400','message'=>'Error In Log Insertion Process.');
         }
        
         return $result;    
     }
+
+    /** 
+     * It Handels all post request from TB for Update Operation
+     * @return JSON 
+     * @View()
+     * @Route(requirements={"_format"="json"})
+     *
+     * @param JSON Post Data     
+     * 
+     * */    
     
     public function postModifyAction(Request $request)
     {
@@ -76,15 +73,24 @@ class PayoutController extends Controller
 
        if($status[0]==3 && $status[1]==3) {
 
-            $result = array('Code'=>'200','Msg'=>'Successfully Added Transaction for Modification.');
+            $result = array('code'=>'200','message'=>'Successfully Added Transaction for Modification.');
 
         }else {
-            $result = array('Code'=>'400','Msg'=>'Error In Adding Transaction Modification.');
+            $result = array('code'=>'400','message'=>'Error In Adding Transaction Modification.');
         }
        
         return $result;    
     }  
 
+    /** 
+     * It Handels all post request from TB for Cancel Operation
+     * @return JSON
+     * @View()
+     * @Route(requirements={"_format"="json"})
+     *
+     * @param JSON Post Data     
+     * 
+     * */    
     public function postCancelAction(Request $request)
     {
         $this->DB = $this->get('connection');     
@@ -95,10 +101,10 @@ class PayoutController extends Controller
 
        if($status[0]==4 && $status[1]==4) {
 
-            $result = array('Code'=>'200','Msg'=>'Successfully Added Transaction for Cancel.');
+            $result = array('code'=>'200','message'=>'Successfully Added Transaction for Cancel.');
 
         }else {
-            $result = array('Code'=>'400','Msg'=>'Error In Canceling Transaction.');
+            $result = array('code'=>'400','message'=>'Error In Canceling Transaction.');
         }
        
         return $result;    

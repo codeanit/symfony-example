@@ -106,11 +106,22 @@ class TB
    }
    public function notify(array $data){
              $conn = $this->container->get('database_connection');
-         try {                     
-             $check=$conn->update('TB',array('status'=>$data['change_status']), array('transaction_code' => $data['confirmation_number']));        
-            } catch (\Exception $e) {
-             $e->getMessage();
-            } 
+             if(isset($data['change_status']))
+             {
+             try {                     
+                 $check=$conn->update('TB',array('status'=>$data['change_status']), array('transaction_code' => $data['confirmation_number']));        
+                } catch (\Exception $e) {
+                 $e->getMessage();
+                }                 
+             }
+             else{
+                try {                     
+                 $check=$conn->update('TB',array('transaction_status'=>$data['status']), array('transaction_code' => $data['confirmation_number']));        
+                } catch (\Exception $e) {
+                 $e->getMessage();
+                } 
+             }
+
             if($check==1){
                 return array('code'=>'200','message'=>'notification successfull');
             }else{

@@ -948,8 +948,7 @@ class BTSModel
                     $check=$connection->update('transactions',array('transaction_status'=>'successful','status'=>$cStatus), array('transaction_code' => $noti['CONFIRMATION_NM'])); 
                     
                     //Send Data to NOTI                     
-                   $this->doNOTC($notiData);
-
+                    $this->doNOTC($notiData);
                     
                 $check_queue = $connection->insert('operations_queue', $queueData);
                 } 
