@@ -108,13 +108,14 @@ class DatabaseOperationModel
         $check = 0;
         $check_queue = 0;
 
-        try {
+        try { 
                 $qb = $conn->createQueryBuilder()
                                ->select('count(t.id)')
                                ->from('transactions', 't')
                                ->where('t.transaction_code = :transaction_code')
                                ->setParameter('transaction_code', $data['transaction']->transaction_code);
-                $count=$qb->execute()->fetchColumn();               
+                $count=$qb->execute()->fetchColumn();
+                               
                 if($operation=='modify') {
                     if($count>0) {
                         $check_queue = $conn->insert('operations_queue', $queueData); 
@@ -164,6 +165,43 @@ class DatabaseOperationModel
         $conn = $this->container->get('database_connection');
         $data=$conn->fetchAll('SELECT * FROM transactions');
         return $data;
+    }
+
+    public function getServices()
+    {
+        $conn = $this->container->get('database_connection');
+        $data=$conn->fetchAll('SELECT * FROM services');
+        return $data;
+    }
+
+    public function getServiceCredentials($id='')
+    {   
+        $conn = $this->container->get('database_connection');        
+        $data = $conn->fetchArray('SELECT * FROM service_credentials WHERE service_name = ?', array($id));
+        return $data;
+    }
+
+    public function saveCredentials($service,$credential)
+    {
+        $conn = $this->container->get('database_connection');  
+        try {
+             $qb = $conn->createQueryBuilder()
+                               ->select('count(t.id)')
+                               ->from('service_credentials', 't')
+                               ->where('t.service_name = :service_name')
+                               ->setParameter('service_name', $service);
+                $count=$qb->execute()->fetchColumn();      
+            } catch ( \Exception $e) {
+                  $e->getMessage();
+            }  
+        $enc=base64_encode($credential);    
+        if($count > 0 ) {
+         $result =$conn->update('service_credentials',array('service_name'=>$service,'credential'=>$enc), array('service_name' => $service));
+         
+        }else{
+         $result = $conn->insert('service_credentials',array('service_name'=>$service,'credential'=>$enc));
+        }
+        return $result;
     }
 
 }
