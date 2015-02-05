@@ -343,10 +343,10 @@ class DatabaseOperationModel
         return $result;
     }
 
-     public function checkDuplicateServiceName($name){
+     public function checkDuplicateServiceName($name,$id){
         
         $conn = $this->container->get('database_connection');        
-        $data = $conn->fetchArray('SELECT * FROM services WHERE service_name = ?', array(strtolower($name)));
+        $data = $conn->fetchArray('SELECT * FROM services WHERE service_name = ? and id != ?', array(strtolower($name),$id));        
         return $data;
                  
     }

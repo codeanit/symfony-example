@@ -53,33 +53,34 @@ class DefaultController extends Controller
         $services=$DB->getServices();
         return array('services'=>$services);     
     }
-
      /**
-     * @Route("/addService/{name}", name="addService")
+     * @Route("/addService/{name}/{id}", name="addService")
      * @Template()
      */
-    public function addServiceAction(Request $request,$name=null)
+    public function addServiceAction(Request $request,$name=null,$id=null)
     {   
         $DB = $this->get('connection');
         if($request->request->get('service_name'))
         {             
             $service_name=$request->request->get('service_name');
-            $fields=$request->request->get('fields'); 
-
-            $duplicateServiceCheck=$DB->checkDuplicateServiceName($service_name);
-
-            if(count($duplicateServiceCheck)>1){
-                return array('error_msg'=>'Service Name Already Exists','service_name'=>$service_name,'fields'=>$fields);
-            }
+            $fields=$request->request->get('fields');
+            if(!is_null($request->request->get('service_id')))
+            {
+                $id=$request->request->get('service_id');
+                $duplicateServiceCheck=$DB->checkDuplicateServiceName($service_name,$id);                
+                if(count($duplicateServiceCheck)>1){
+                    return array('error_msg'=>'Service Name Already Exists','service_name'=>$service_name,'service_id'=>$id,'fields'=>$fields);
+                }
+            }           
             
             if(in_array('', $fields)){
-                return array('error_msg'=>'Empty Fields Found','service_name'=>$service_name,'fields'=>$fields);                
+                return array('error_msg'=>'Empty Fields Found','service_name'=>$service_name,'service_id'=>$id,'fields'=>$fields);                
             }
                                   
             $check=array_diff_assoc($fields, array_unique($fields));
 
             if(count($check)>0){
-                return array('error_msg'=>'Duplicate Fields Found','service_name'=>$service_name,'fields'=>$fields);
+                return array('error_msg'=>'Duplicate Fields Found','service_name'=>$service_name,'service_id'=>$id,'fields'=>$fields);
             }
             
             $service_id=$request->request->get('service_id');            
@@ -96,6 +97,7 @@ class DefaultController extends Controller
         }
 
     }
+
 
     /**
      * @Route("/credential/{id}", name="credential")
