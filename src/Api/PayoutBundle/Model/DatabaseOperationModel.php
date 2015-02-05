@@ -38,7 +38,8 @@ class DatabaseOperationModel
     }
 
     public function operateTransaction(array $data,$jsonData,$operation)
-    {    
+    { 
+
         if(isset($data['transaction_status']))
         {
             $status=$data['transaction_status'];
@@ -108,6 +109,7 @@ class DatabaseOperationModel
         $check = 0;
         $check_queue = 0;
 
+
         try { 
                 $qb = $conn->createQueryBuilder()
                                ->select('count(t.id)')
@@ -131,11 +133,14 @@ class DatabaseOperationModel
                     $check=4;                    
                     $check_queue=4;
                 } else{
+
                     if ($count <= 0) {
+                        echo 1;die;
                         $check= $conn->insert('transactions', $logData);            
                         $check_queue = $conn->insert('operations_queue', $queueData);            
                         $check_queue = $conn->insert('TB', $logData);
                     }else{
+
                         $check=2;
                         $check_queue=2;
                     } 
@@ -177,31 +182,173 @@ class DatabaseOperationModel
     public function getServiceCredentials($id='')
     {   
         $conn = $this->container->get('database_connection');        
-        $data = $conn->fetchArray('SELECT * FROM service_credentials WHERE service_name = ?', array($id));
+        $data = $conn->fetchArray('SELECT * FROM services WHERE service_name = ?', array(strtolower($id)));
         return $data;
-    }
+    }   
 
-    public function saveCredentials($service,$credential)
+    
+
+
+    public function saveCredentials($serviceName,$fields)
     {
-        $conn = $this->container->get('database_connection');  
+        $conn = $this->container->get('database_connection');
+        $cred=array();
+        $result=0;
+        $service=strtolower($serviceName);
+
+        
+        foreach ($fields as $key => $field) {            
+            $cred[$key]=$field;            
+        }        
         try {
              $qb = $conn->createQueryBuilder()
                                ->select('count(t.id)')
-                               ->from('service_credentials', 't')
+                               ->from('services', 't')
                                ->where('t.service_name = :service_name')
                                ->setParameter('service_name', $service);
                 $count=$qb->execute()->fetchColumn();      
             } catch ( \Exception $e) {
                   $e->getMessage();
             }  
-        $enc=base64_encode($credential);    
+        $enc=base64_encode(json_encode($cred));    
         if($count > 0 ) {
-         $result =$conn->update('service_credentials',array('service_name'=>$service,'credential'=>$enc), array('service_name' => $service));
+         $result =$conn->update('services',array('service_name'=>$service,'credentials'=>$enc), array('service_name' => $service));
          
         }else{
-         $result = $conn->insert('service_credentials',array('service_name'=>$service,'credential'=>$enc));
+         $result = $conn->insert('services',array('service_name'=>$service,'status'=>'1','credentials'=>$enc));
         }
+        
         return $result;
+    }
+
+    public function changeStatus($id,$status)
+    {
+        $cStatus=($status==1)?'0':'1';
+        $conn = $this->container->get('database_connection');
+        $result =$conn->update('services',array('status'=>$cStatus), array('id' => $id));
+    }
+
+    public function getFields($name){
+        $conn = $this->container->get('database_connection');
+        $fields=array();
+        try {
+            $data = $conn->fetchArray('SELECT id,credentials FROM services WHERE service_name = ?', array(strtolower($name)));            
+            $decodedData=json_decode(base64_decode($data[1]));
+            foreach ($decodedData as $key => $value) {
+               array_push($fields,$key);
+            }
+        } catch (\Exception $e) {
+            
+        }
+        return array($fields,$data[0]);
+    }
+
+    public function getFieldsById($id){
+        $conn = $this->container->get('database_connection');
+        $fields=array();
+        try {
+            $data = $conn->fetchArray('SELECT credentials FROM services WHERE id = ?', array(strtolower($id)));                     
+            $decodedData=json_decode(base64_decode($data[0]));
+            foreach ($decodedData as $key => $value) {
+               array_push($fields,$value);
+            }
+        } catch (\Exception $e) {
+            
+        }
+        return array($decodedData);
+    }
+
+    public function editService($serviceName,$fields,$id)
+    {        
+
+        $conn = $this->container->get('database_connection');
+        $cred=array();
+        $result=0;
+        $newFieldsKey=array();
+        $service=strtolower($serviceName);
+        $old=$this->getFieldsById($id);
+        
+        //get new fields key 
+        foreach ($fields as $key => $value) {
+            if (is_int($key)) {
+                array_push($newFieldsKey,$key);
+            }
+        }
+        foreach ($old[0] as $key => $value) {
+            if(array_key_exists($key,$fields)){
+                if($fields[$key] !=''){
+                   $cred[$fields[$key]]=$value;
+                }
+            }else{
+                foreach ($newFieldsKey as $key => $value)
+                 {                    
+                    $cred[$fields[$value]]='';
+                 }                 
+
+            }
+           
+        }
+               
+        try {
+             $qb = $conn->createQueryBuilder()
+                               ->select('count(t.id)')
+                               ->from('services', 't')
+                               ->where('t.service_name = :service_name')
+                               ->setParameter('service_name', $service);
+                $count=$qb->execute()->fetchColumn();      
+            } catch ( \Exception $e) {
+                  $e->getMessage();
+            }  
+        $enc=base64_encode(json_encode($cred));    
+        if($count > 0 ) {
+         $result =$conn->update('services',array('service_name'=>$service,'credentials'=>$enc), array('service_name' => $service));
+         
+        }else{
+         $result = $conn->insert('services',array('service_name'=>$service,'status'=>'1','credentials'=>$enc));
+        }
+        
+        return $result;
+    }
+    public function saveService($serviceName,$fields)
+    {        
+        $conn = $this->container->get('database_connection');
+        $cred=array();
+        $result=0;
+        $service=strtolower($serviceName);
+
+        
+        foreach ($fields as $key => $field) {
+            $cred[$field]='';
+            // $cred[$key]=$value;
+
+        }        
+        try {
+             $qb = $conn->createQueryBuilder()
+                               ->select('count(t.id)')
+                               ->from('services', 't')
+                               ->where('t.service_name = :service_name')
+                               ->setParameter('service_name', $service);
+                $count=$qb->execute()->fetchColumn();      
+            } catch ( \Exception $e) {
+                  $e->getMessage();
+            }  
+        $enc=base64_encode(json_encode($cred));    
+        if($count > 0 ) {
+         $result =$conn->update('services',array('service_name'=>$service,'credentials'=>$enc), array('service_name' => $service));
+         
+        }else{
+         $result = $conn->insert('services',array('service_name'=>$service,'status'=>'1','credentials'=>$enc));
+        }
+        
+        return $result;
+    }
+
+     public function checkDuplicateServiceName($name){
+        
+        $conn = $this->container->get('database_connection');        
+        $data = $conn->fetchArray('SELECT * FROM services WHERE service_name = ?', array(strtolower($name)));
+        return $data;
+                 
     }
 
 }

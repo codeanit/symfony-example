@@ -27,6 +27,8 @@
       <!-- Main component for a primary marketing message or call to action -->
       <div class="jumbotron">
         <h2>Third Party Service List</h2>
+        <a href="{{ url('addService')}}" class='btn btn-primary'>Add</a>
+        <br>
         <br>
          
         <table class="table table-hover">
@@ -34,13 +36,18 @@
                 <th>S.N</th>
                 <th>Service Name</th>               
                 <th>Add</th>               
-            </tr>
-            
+            </tr>          
+            {% set status = 1 %}
             {% for entry in services %}            
             <tr>
                 <td>{{loop.index}}</td>
-                <td>{{ entry.service }}</td>
-                <td><a href="{{url('credential', {'id': entry.service})}}" class='btn btn-primary'>credentials</a></td>
+                <td>{{ entry.service_name | upper }}</td>
+                <td>
+                  <a href="{{url('credential', {'id': entry.service_name})}}" class='btn btn-primary btn-xs'>Credentials</a>
+                  <a href="{{url('addService', {'name': entry.service_name})}}" class='btn btn-primary btn-xs'>Edit</a>
+                  <a href="{{url('status',{'id':entry.id,'status':entry.status})}}" class='btn btn-primary btn-xs' 
+                  value='{{entry.id}}' name='status'>{{(status in entry.status)?'Deactivate':'Activate'}}</a>
+                </td>
             </tr>
             {% endfor %}
         </table>
