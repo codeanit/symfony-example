@@ -8,6 +8,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
+
+
 class DefaultController extends Controller
 {
     /**
@@ -15,9 +17,12 @@ class DefaultController extends Controller
      * 
      */
     public function indexAction()
-    {        
-        $Q=$this->get('queue');       
+    {         
+        $Q=$this->get('queue');
+        //$result=$Q->executeQueuedOperation();       
         print_r($Q->executeQueuedOperation());
+        // $TB=$this->get('tb_connection');
+        // $TB->curlTransborder($result);
         die;      
     }
 
@@ -53,6 +58,7 @@ class DefaultController extends Controller
         $services=$DB->getServices();
         return array('services'=>$services);     
     }
+
      /**
      * @Route("/addService/{name}/{id}", name="addService")
      * @Template()
@@ -64,6 +70,11 @@ class DefaultController extends Controller
         {             
             $service_name=$request->request->get('service_name');
             $fields=$request->request->get('fields');
+            if(is_null($fields))
+            {
+                return array('error_msg'=>'Fields Are Needed','service_name'=>$service_name,'service_id'=>$id);                
+            }
+            
             if(!is_null($request->request->get('service_id')))
             {
                 $id=$request->request->get('service_id');
@@ -80,11 +91,12 @@ class DefaultController extends Controller
             $check=array_diff_assoc($fields, array_unique($fields));
 
             if(count($check)>0){
-                return array('error_msg'=>'Duplicate Fields Found','service_name'=>$service_name,'service_id'=>$id,'fields'=>$fields);
+                return array('error_msg'=>'Duplicate Fields Found','service_name'=>$service_name,'service_id'=>$id,'fields'=>$fields,'case'=>'duplicate');
             }
             
             $service_id=$request->request->get('service_id');            
             if($service_id !=''){
+                // var_dump($request->request->all());die;
                 $status=$DB->editService($service_name,$fields,$service_id);
             }else{
                 $status=$DB->saveService($service_name,$fields);
@@ -97,7 +109,6 @@ class DefaultController extends Controller
         }
 
     }
-
 
     /**
      * @Route("/credential/{id}", name="credential")

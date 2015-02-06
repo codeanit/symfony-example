@@ -16,6 +16,8 @@ namespace Api\PayoutBundle\Model;
 use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 /**
  * Bridge to call TB DBAL
@@ -288,18 +290,18 @@ class BTSModel
 
         $return = "";
         
+        $log = new \Symfony\Bridge\Monolog\Logger('BTS');
+        $log->pushHandler(new StreamHandler(__DIR__ . '/BTS_LOG.txt' , Logger::INFO));
+        
         if ($response['OPCODE'] == '0001'
             || $response['OPCODE'] == '0002'
         ) {
-            $return = array('code' => '200', 'message' => 'Transaction Successful.' ,'notify_source'=>$data['source'],'status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code);
+            $log->addInfo('Transaction Successful',array('notify_source'=>$data['source'],'status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code));
+            $return = array('code' => '200','operation'=>'create','message' => 'Transaction Successful.' ,'notify_source'=>$data['source'],'status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code);
         } else {
-            // $return = array(
-            //     'status' => '400',
-            //     'message' => $response['PROCESS_MSG']
-            //         .$response['ERROR_PARAM_FULL_NAME']);
-            //                     
-            $return = array('code' => '400', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source'],'status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
+            $log->addError($response['PROCESS_MSG'],array('notify_source'=>$data['source'],'status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code));
 
+            $return = array('code' => '400','operation'=>'create','message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source'],'status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
         }
 
         $request = "\n SALE REQUEST XML:\n" . $soap_client->__getLastRequest() . "\n"; 
@@ -308,6 +310,12 @@ class BTSModel
         $line = "\n ---------------------------- \n ";
         // $file = 'BTSRequestResponse.txt';        
         // file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
+     
+        
+        
+    
+        //$log=$this->get('logger'); 
+           
         return $return;
 
 
@@ -525,16 +533,17 @@ class BTSModel
         );
         $response = json_decode(json_encode((array)$xmlFinal), true);
         $return = "";
+        $log = new \Symfony\Bridge\Monolog\Logger('BTS');
+        $log->pushHandler(new StreamHandler(__DIR__ . '/BTS_LOG.txt' , Logger::INFO));
+        
         if ($response['OPCODE'] == '0702') {
             // $return = array('status' => '200', 'message' => 'Transaction Successful.','confirmation_number'=>$data['transaction']->transaction_code);
-            $return = array('code' => '200', 'message' => 'Transaction Successful.' ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code);
+            $log->addInfo('Cancel Successful',array('code' => '200','notify_source'=>$data['source']?$data['source']:'tb','confirmation_number' =>$data['transaction']->transaction_code));
+            $return = array('code' => '200','operation'=>'cancel','message' => 'Transaction Cancel Successful.' ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code);
 
         } else {
-            // $return = array(
-            //     'status' => '400',
-            //     'message' => $response['PROCESS_MSG']
-            //         );
-            $return = array('code' => '400', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
+            $log->addError($response['PROCESS_MSG'],array('code' => '400','notify_source'=>$data['source']?$data['source']:'tb','confirmation_number' =>$data['transaction']->transaction_code));            
+            $return = array('code' => '400','operation'=>'cancel', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
 
         }
 
@@ -543,8 +552,6 @@ class BTSModel
         $line = "\n ---------------------------- \n ";
         // $file = 'BTSRequestResponse.txt';        
         // file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
-        
-
         return $return;
     }
 
@@ -680,17 +687,23 @@ class BTSModel
         );
         $response = json_decode(json_encode((array)$xmlFinal), true);
 
+        $log = new \Symfony\Bridge\Monolog\Logger('BTS');
+        $log->pushHandler(new StreamHandler(__DIR__ . '/BTS_LOG.txt' , Logger::INFO));
+
         $return = "";
         if ($response['OPCODE'] == '0902') {
             // $return = array('status' => '200', 'message' => 'Transaction Successful.');
-            $return = array('code' => '200', 'message' => 'Transaction Successful.' ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code,'data'=>$data);
+            $log->addInfo('Modfication Successful',array('code' => '200','notify_source'=>$data['source']?$data['source']:'tb','confirmation_number' =>$data['transaction']->transaction_code,'data'=>$data));
+            $return = array('code' => '200','operation'=>'modify', 'message' => 'Transaction Successful.' ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code,'data'=>$data);
 
         } else {
             // $return = array(
             //     'status' => '400',
             //     'message' => $response['PROCESS_MSG']
             //         );
-            $return = array('code' => '400', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
+            $log->addError('Modfication Failed',array('code' => '400','notify_source'=>$data['source']?$data['source']:'tb','confirmation_number' =>$data['transaction']->transaction_code,'data'=>$data));
+            
+            $return = array('code' => '400','operation'=>'modify', 'message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
             
         }
 

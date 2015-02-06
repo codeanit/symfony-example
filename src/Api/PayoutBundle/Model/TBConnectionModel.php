@@ -48,8 +48,8 @@ class TBConnectionModel
      */
     public function curlTransborder(array $postedData)
     { 
-         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "http://firstglobalmoney.com.local/secure/dexdbal");
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, "http://firstglobalmoney.com.local/secure/cdex");
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $postedData);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

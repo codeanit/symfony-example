@@ -134,8 +134,7 @@ class DatabaseOperationModel
                     $check_queue=4;
                 } else{
 
-                    if ($count <= 0) {
-                        echo 1;die;
+                    if ($count <= 0) {                        
                         $check= $conn->insert('transactions', $logData);            
                         $check_queue = $conn->insert('operations_queue', $queueData);            
                         $check_queue = $conn->insert('TB', $logData);
@@ -267,28 +266,26 @@ class DatabaseOperationModel
         $newFieldsKey=array();
         $service=strtolower($serviceName);
         $old=$this->getFieldsById($id);
-        
+
         //get new fields key 
         foreach ($fields as $key => $value) {
             if (is_int($key)) {
                 array_push($newFieldsKey,$key);
             }
         }
+
         foreach ($old[0] as $key => $value) {
             if(array_key_exists($key,$fields)){
                 if($fields[$key] !=''){
                    $cred[$fields[$key]]=$value;
-                }
-            }else{
-                foreach ($newFieldsKey as $key => $value)
-                 {                    
-                    $cred[$fields[$value]]='';
-                 }                 
-
+                }            
             }
-           
         }
-               
+        foreach ($newFieldsKey as $key => $value)
+                 {                    
+                    $cred[$fields[$value]]='';                    
+                 } 
+          
         try {
              $qb = $conn->createQueryBuilder()
                                ->select('count(t.id)')
@@ -343,10 +340,11 @@ class DatabaseOperationModel
         return $result;
     }
 
-     public function checkDuplicateServiceName($name,$id){
+    public function checkDuplicateServiceName($name,$id){
         
         $conn = $this->container->get('database_connection');        
-        $data = $conn->fetchArray('SELECT * FROM services WHERE service_name = ? and id != ?', array(strtolower($name),$id));        
+        $data = $conn->fetchArray('SELECT * FROM services WHERE service_name = ? and id != ?', array(strtolower($name),$id));
+        
         return $data;
                  
     }
