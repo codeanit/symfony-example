@@ -539,7 +539,7 @@ class BTSModel
         if ($response['OPCODE'] == '0702') {
             // $return = array('status' => '200', 'message' => 'Transaction Successful.','confirmation_number'=>$data['transaction']->transaction_code);
             $log->addInfo('Cancel Successful',array('code' => '200','notify_source'=>$data['source']?$data['source']:'tb','confirmation_number' =>$data['transaction']->transaction_code));
-            $return = array('code' => '200','operation'=>'cancel','message' => 'Transaction Cancel Successful.' ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code);
+            $return = array('code' => '200','operation'=>'cancel','message' => 'Transaction Cancel Successful.' ,'notify_source'=>$data['source']?$data['source']:'tb','status' => 'complete' ,'confirmation_number' =>$data['transaction']->transaction_code,'change_status'=>'cancel');
 
         } else {
             $log->addError($response['PROCESS_MSG'],array('code' => '400','notify_source'=>$data['source']?$data['source']:'tb','confirmation_number' =>$data['transaction']->transaction_code));            

@@ -52,7 +52,7 @@ class QueueModel
         $results = $connection->fetchAll($getUnexecutedOp);  
         if(count($results)<1)
         {
-            return array('code'=>'405','message'=>'No Operation Found In Queue');
+            return array('code'=>'400','message'=>'No Operation Found In Queue');
         }    
         $operation = '';
         $parameter = '';
@@ -133,11 +133,16 @@ class QueueModel
 
                 if($operation == 'create' || $operation == 'modify' || $operation == 'cancel'){
                     // add queue to notify to source
+                    if(array_key_exists('change_status', $result)){
+                        $change_status=$result['change_status'];
+                    }else{
+                        $change_status='';
+                    }
                     $queueData = array(
                         'transaction_source' => 'CDEX',
                         'transaction_service' => $result['notify_source'],
                         'operation' => 'notify', 
-                        'parameter' => json_encode(array('confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'])),
+                        'parameter' => json_encode(array('code'=>$result['code'],'operation'=>$result['operation'],'confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'],'change_status'=>$change_status)),
                         'is_executed' => 0,
                         'creation_datetime' => date('Y-m-d H:i:s')
                         );
