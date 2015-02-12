@@ -27,6 +27,18 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/bdo/", name="bdo")
+     * 
+     */
+    public function testAction()
+    {        
+        $Q=$this->get('bdo');
+        print_r($Q->pickupCash());     
+        die;      
+    }
+
+
+    /**
      * @Route("/notification/", name="notification")
      * 
      */
@@ -69,7 +81,8 @@ class DefaultController extends Controller
         if($request->request->get('service_name'))
         {             
             $service_name=$request->request->get('service_name');
-            $fields=$request->request->get('fields');
+            $fieldsArray=$request->request->get('fields');
+            $fields = array_map('strtolower', $fieldsArray);
             if(is_null($fields))
             {
                 return array('error_msg'=>'Fields Are Needed','service_name'=>$service_name,'service_id'=>$id);                

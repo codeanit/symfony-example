@@ -197,7 +197,7 @@ class DatabaseOperationModel
 
         
         foreach ($fields as $key => $field) {            
-            $cred[$key]=$field;            
+            $cred[strtolower($key)]=$field;            
         }        
         try {
              $qb = $conn->createQueryBuilder()
@@ -209,6 +209,7 @@ class DatabaseOperationModel
             } catch ( \Exception $e) {
                   $e->getMessage();
             }  
+           
         $enc=base64_encode(json_encode($cred));    
         if($count > 0 ) {
          $result =$conn->update('services',array('service_name'=>$service,'credentials'=>$enc), array('service_name' => $service));

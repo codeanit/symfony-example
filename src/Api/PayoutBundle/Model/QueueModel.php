@@ -82,52 +82,27 @@ class QueueModel
                 }
 
                 if($operation=='create'){
-                    if($result['code']==200){                    
-                        try {                     
-                             $check=$connection->update('transactions',array('transaction_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                             
-                            } catch (\Exception $e) {
-                             $e->getMessage();
-                            } 
-                    }else{
-                        try {                     
-                             $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
-                            } catch (\Exception $e) {
-                             $e->getMessage();
-                            } 
+                    if($result['code']==200){
+                        $check=$connection->update('transactions',array('transaction_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                           
+                    }else{                                             
+                        $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));                            
                     }
                 }
 
                 if($operation=='modify'){ 
-
                     if($result['code']==200){
                         // change status to complete 
-                        try {
-                            $updateTransaction=$connection->update('transactions',$result['data'], array('transaction_code' => $result['confirmation_number']));                                              
-                            } catch (\Exception $e) {
-                             $e->getMessage();
-                            } 
-                    }else{
-                        try {                     
-                             $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
-                            } catch (\Exception $e) {
-                             $e->getMessage();
-                            } 
+                        $updateTransaction=$connection->update('transactions',$result['data'], array('transaction_code' => $result['confirmation_number']));                                              
+                    }else{                
+                        $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
                     }
                 }
 
                 if($operation=='cancel'){                
-                    if($result['code']==200){                    
-                        try {                     
-                             $check=$connection->update('transactions',array('transaction_status'=>'successful','status'=>'cancel'), array('transaction_code' => $result['confirmation_number']));                             
-                            } catch (\Exception $e) {
-                             $e->getMessage();
-                            } 
-                    }else{
-                        try {                     
-                             $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
-                            } catch (\Exception $e) {
-                             $e->getMessage();
-                            } 
+                    if($result['code']==200){
+                        $check=$connection->update('transactions',array('transaction_status'=>'successful','status'=>'cancel'), array('transaction_code' => $result['confirmation_number']));                             
+                    }else{               
+                        $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
                     }
                 }
 
@@ -151,7 +126,7 @@ class QueueModel
                     
             }   
         } catch (\Exception $e) {
-            // $e->getMessage();
+            //$e->getMessage();
             $result=array('code'=>'400','message'=>'Service Not Found.');
         }
 

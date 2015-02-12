@@ -54,7 +54,7 @@ class BTSModel
      *
      * @return string Session ID
      */
-    public function doUSRL()
+    public function doUSRL($cred=null)
     {
        ini_set("soap.wsdl_cache_enabled", false); 
        $this->url= "https://test.globalplatform.ws/ts/gpcs/gpts/transactionservice.asmx?WSDL"; 
@@ -64,11 +64,20 @@ class BTSModel
                 'cache_wsdl' => WSDL_CACHE_NONE));  
 
         $headers = array();
-        $headera = array(
-                                'SESSION_ID' =>'',
-                                'USER_NAME'  => 'GPWSSAMSOS',
-                                'USER_DOMAIN' => 'BTS_AGENTS',
-                                'USER_PASS' => 'samsosexpress');        
+        if(count($cred)>1 && array_key_exists('username',$cred) && array_key_exists('domain',$cred) && array_key_exists('password',$cred)){            
+             $headera = array(
+                                    'SESSION_ID' =>'',
+                                    'USER_NAME'  => $cred['username'],
+                                    'USER_DOMAIN' => $cred['domain'],
+                                    'USER_PASS' => $cred['password']);
+        }else {
+            $headera = array(
+                                    'SESSION_ID' =>'',
+                                    'USER_NAME'  => 'GPWSSAMSOS',
+                                    'USER_DOMAIN' => 'BTS_AGENTS',
+                                    'USER_PASS' => 'samsosexpress');
+        }
+
         $headerb = array(
                                 'FROM' => '',
                                 'TO' => '');
@@ -111,10 +120,10 @@ class BTSModel
      */
     
     public function doSALE($txn)
-    {        
-        $sessionID = $this->doUSRL();
+    {
+        $cred=$txn[0];      
+        $sessionID = $this->doUSRL($cred);
         $data=$txn;
-        // var_dump($txn);die;
         $rootNode = new \SimpleXMLElement("<ExecTR xmlns='http://www.btsincusa.com/gp/'> </ExecTR>");
         $itemNode = $rootNode->addChild('REQUEST');
 
@@ -260,11 +269,19 @@ class BTSModel
         );
 
         $headers = array();
-        $headera = array(
-            'SESSION_ID' => $sessionID,
-            'USER_NAME'  => 'GPWSSAMSOS',
-            'USER_DOMAIN' => 'BTS_AGENTS',
-            'USER_PASS' => 'samsosexpress', );
+       if(count($cred)>1 && array_key_exists('username',$cred) && array_key_exists('domain',$cred) && array_key_exists('password',$cred)){            
+             $headera = array(
+                                    'SESSION_ID' =>'',
+                                    'USER_NAME'  => $cred['username'],
+                                    'USER_DOMAIN' => $cred['domain'],
+                                    'USER_PASS' => $cred['password']);
+        }else {
+            $headera = array(
+                                    'SESSION_ID' =>'',
+                                    'USER_NAME'  => 'GPWSSAMSOS',
+                                    'USER_DOMAIN' => 'BTS_AGENTS',
+                                    'USER_PASS' => 'samsosexpress');
+        }
         $headerb = array(
             'FROM' => '',
             'TO' => '', );
@@ -303,22 +320,11 @@ class BTSModel
 
             $return = array('code' => '400','operation'=>'create','message' => $response['PROCESS_MSG'] ,'notify_source'=>$data['source'],'status' => 'failed' ,'confirmation_number' =>$data['transaction']->transaction_code);
         }
-
-        $request = "\n SALE REQUEST XML:\n" . $soap_client->__getLastRequest() . "\n"; 
-        // $response = "\n SALE RESPONSE XML :\n" . $response['PROCESS_MSG'].$response['ERROR_PARAM_FULL_NAME'];        
+        print_r($response);die;
+        $request = "\n SALE REQUEST XML:\n" . $soap_client->__getLastRequest() . "\n";               
         $response = "\n SALE RESPONSE XML :\n" . $response['PROCESS_MSG'];        
         $line = "\n ---------------------------- \n ";
-        // $file = 'BTSRequestResponse.txt';        
-        // file_put_contents($file, $request . $response . $line, FILE_APPEND | LOCK_EX);
-     
-        
-        
-    
-        //$log=$this->get('logger'); 
-           
         return $return;
-
-
     }
 
     /**
@@ -453,7 +459,8 @@ class BTSModel
     public function doCNLI(array $cnliData)
     {
         $data=$cnliData;
-        $sessionID = $this->doUSRL();
+        $cred=$data[0];
+        $sessionID = $this->doUSRL($cred);
 
         $rootNode = new \SimpleXMLElement("<ExecTR xmlns='http://www.btsincusa.com/gp/'> </ExecTR>");
         $requestNode = $rootNode->addChild('REQUEST');
@@ -506,11 +513,19 @@ class BTSModel
                 'cache_wsdl' => WSDL_CACHE_NONE, ));
 
         $headers = array();
-        $headera = array(
-                                'SESSION_ID' => $sessionID,
-                                'USER_NAME'  => 'GPWSSAMSOS',
-                                'USER_DOMAIN' => 'BTS_AGENTS',
-                                'USER_PASS' => 'samsosexpress', );
+        if(count($cred)>1 && array_key_exists('username',$cred) && array_key_exists('domain',$cred) && array_key_exists('password',$cred)){            
+             $headera = array(
+                                    'SESSION_ID' =>'',
+                                    'USER_NAME'  => $cred['username'],
+                                    'USER_DOMAIN' => $cred['domain'],
+                                    'USER_PASS' => $cred['password']);
+        }else {
+            $headera = array(
+                                    'SESSION_ID' =>'',
+                                    'USER_NAME'  => 'GPWSSAMSOS',
+                                    'USER_DOMAIN' => 'BTS_AGENTS',
+                                    'USER_PASS' => 'samsosexpress');
+        }
         $headerb = array(
                                 'FROM' => '',
                                 'TO' => '', );
@@ -574,8 +589,8 @@ class BTSModel
     public function doCORI($txn)
     {
         $data = $txn;
-
-        $sessionID = $this->doUSRL();
+        $cred=$data[0];
+        $sessionID = $this->doUSRL($cred);
         $rootNode = new \SimpleXMLElement("<ExecTR xmlns='http://www.btsincusa.com/gp/'> </ExecTR>");
         $requestNode = $rootNode->addChild('REQUEST');
 
@@ -667,11 +682,19 @@ class BTSModel
                 'cache_wsdl' => WSDL_CACHE_NONE, ));
 
         $headers = array();
-        $headera = array(
-                        'SESSION_ID' => $sessionID,
-                        'USER_NAME'  => 'GPWSSAMSOS',
-                        'USER_DOMAIN' => 'BTS_AGENTS',
-                        'USER_PASS' => 'samsosexpress', );
+        if(count($cred)>1 && array_key_exists('username',$cred) && array_key_exists('domain',$cred) && array_key_exists('password',$cred)){            
+             $headera = array(
+                                    'SESSION_ID' =>'',
+                                    'USER_NAME'  => $cred['username'],
+                                    'USER_DOMAIN' => $cred['domain'],
+                                    'USER_PASS' => $cred['password']);
+        }else {
+            $headera = array(
+                                    'SESSION_ID' =>'',
+                                    'USER_NAME'  => 'GPWSSAMSOS',
+                                    'USER_DOMAIN' => 'BTS_AGENTS',
+                                    'USER_PASS' => 'samsosexpress');
+        }
         $headerb = array(
                         'FROM' => '',
                         'TO' => '', );
@@ -972,8 +995,18 @@ class BTSModel
     }
 
     public function process($operation, $args)
-    {        
+    {   
+        $cred=$this->getCredentaials();
+        array_push($args, $cred);          
         return call_user_func_array(array($this, $this->operationMap[$operation]), [$args]);
+    }
+
+    public function getCredentaials()
+    {
+        $connection = $this->container->get('database_connection');
+        $data=$connection->fetchArray('SELECT credentials from services where service_name=?',array('bts'));
+        $creds=(array)json_decode(base64_decode($data[0]));
+        return $creds;
     }
 }
 
