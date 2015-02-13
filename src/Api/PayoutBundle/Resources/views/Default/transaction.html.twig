@@ -18,8 +18,13 @@
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
               <li class="active"><a href="{{ url('dashboard') }}">Transactions</a></li>               
-              <li class=""><a href="{{ url('service') }}">Services</a></li>               
-            </ul>           
+              <li class=""><a href="{{ url('service') }}">Services</a></li>
+                            
+            </ul> 
+            <ul class="nav navbar-nav pull-right">
+              <li><a href="#">{{ 'Hello, ' ~ app.session.get('username') }}</a></li>               
+              <li><a href="{{ url('logout') }}">Logout</a></li>               
+            </ul>
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
       </nav>

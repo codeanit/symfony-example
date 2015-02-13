@@ -350,4 +350,12 @@ class DatabaseOperationModel
                  
     }
 
+    public function getUser(array $data){
+        $conn = $this->container->get('database_connection');        
+        $result = $conn->fetchArray('SELECT * FROM users WHERE username = ? and password = ?', $data);
+        return count($result);
+    }
+
+
+
 }
