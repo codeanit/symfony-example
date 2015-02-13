@@ -13,6 +13,9 @@ payout:
     resource: Api\PayoutBundle\Controller\PayoutController
     prefix:  cdex
 
+landing_page:
+    path:     /
+    defaults: { _controller: 'ApiPayoutBundle:Default:transaction'}
 # pages:
 #     type: rest
 #     resource: Acme\BlogBundle\Controller\PageController

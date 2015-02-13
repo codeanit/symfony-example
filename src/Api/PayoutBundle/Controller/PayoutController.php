@@ -25,7 +25,6 @@ class PayoutController extends Controller
      * It Handels all post request from TB for Create(approved TxN) Operation
      * @return JSON 
      * @View()
-     * @Route(requirements={"_format"="json"})
      *
      * @param JSON Post Data     
      * 
@@ -55,7 +54,6 @@ class PayoutController extends Controller
      * It Handels all post request from TB for Update Operation
      * @return JSON 
      * @View()
-     * @Route(requirements={"_format"="json"})
      *
      * @param JSON Post Data     
      * 
@@ -84,7 +82,6 @@ class PayoutController extends Controller
      * It Handels all post request from TB for Cancel Operation
      * @return JSON
      * @View()
-     * @Route(requirements={"_format"="json"})
      *
      * @param JSON Post Data     
      * 
