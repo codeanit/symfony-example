@@ -1,6 +1,13 @@
 ﻿UPGRADE FROM 2.4 to 2.5
 =======================
 
+FrameworkBundle
+---------------
+
+* The `Symfony\Bundle\FrameworkBundle\Console\Descriptor\Descriptor::renderTable()`
+  method expects the table to be an instance of `Symfony\Component\Console\Helper\Table`
+  instead of `Symfony\Component\Console\Helper\TableHelper`.
+
 Routing
 -------
 
@@ -109,7 +116,7 @@ Validator
 
    After:
 
-   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compilant) to be
+   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compliant) to be
    valid. This is the default behaviour.
 
    Strict email validation has to be explicitly activated in the configuration file by adding

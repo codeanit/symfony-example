@@ -112,21 +112,18 @@ EOF
         $builder->setTimeout(null);
         $process = $builder->getProcess();
 
-        if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-            $callback = function ($type, $buffer) use ($output) {
-                $output->write($buffer);
-            };
-        } else {
-            $callback = null;
+        if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
             $process->disableOutput();
         }
 
-        $process->run($callback);
+        $this
+            ->getHelper('process')
+            ->run($output, $process, null, null, OutputInterface::VERBOSITY_VERBOSE);
 
         if (!$process->isSuccessful()) {
             $output->writeln('<error>Built-in server terminated unexpectedly</error>');
 
-            if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
+            if ($process->isOutputDisabled()) {
                 $output->writeln('<error>Run the command again with -v option for more details</error>');
             }
         }

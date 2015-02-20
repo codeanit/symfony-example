@@ -21,3 +21,7 @@
 [2015-02-10 11:54:23] BTS.ERROR: NOT ACCESS ON PRODUCT/CONTRACT BLOCKED {"notify_source":"tb","status":"failed","confirmation_number":"11637903200"} []
 [2015-02-10 11:56:22] BTS.ERROR: NOT ACCESS ON PRODUCT/CONTRACT BLOCKED {"notify_source":"tb","status":"failed","confirmation_number":"11630997142"} []
 [2015-02-10 12:54:18] BTS.ERROR: NOT ACCESS ON PRODUCT/CONTRACT BLOCKED {"notify_source":"tb","status":"failed","confirmation_number":"11630997142"} []
+[2015-02-16 10:57:13] BTS.ERROR: SESSION ID IS MISSING {"notify_source":"tb","status":"failed","confirmation_number":"11630997142"} []
+[2015-02-16 10:57:55] BTS.ERROR: SESSION ID IS MISSING {"notify_source":"tb","status":"failed","confirmation_number":"11637576369"} []
+[2015-02-16 11:04:16] BTS.ERROR: INVALID CONFIRMATION NUMBER CHECK DIGIT {"notify_source":"tb","status":"failed","confirmation_number":"11637576369"} []
+[2015-02-16 11:17:38] BTS.ERROR: INVALID CONFIRMATION NUMBER CHECK DIGIT {"notify_source":"tb","status":"failed","confirmation_number":"11637576369"} []

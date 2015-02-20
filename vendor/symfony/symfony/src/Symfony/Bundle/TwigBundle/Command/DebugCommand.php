@@ -27,7 +27,10 @@ class DebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('twig:debug')
+            ->setName('debug:twig')
+            ->setAliases(array(
+                'twig:debug',
+            ))
             ->setDefinition(array(
                 new InputArgument('filter', InputArgument::OPTIONAL, 'Show details for all entries matching this filter'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: text or json', 'text'),
@@ -37,15 +40,15 @@ class DebugCommand extends ContainerAwareCommand
 The <info>%command.name%</info> command outputs a list of twig functions,
 filters, globals and tests. Output can be filtered with an optional argument.
 
-<info>php %command.full_name%</info>
+  <info>php %command.full_name%</info>
 
 The command lists all functions, filters, etc.
 
-<info>php %command.full_name% date</info>
+  <info>php %command.full_name% date</info>
 
 The command lists everything that contains the word date.
 
-<info>php %command.full_name% --format=json</info>
+  <info>php %command.full_name% --format=json</info>
 
 The command lists everything in a machine readable json format.
 EOF

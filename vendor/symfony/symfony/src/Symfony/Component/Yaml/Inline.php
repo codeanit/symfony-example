@@ -25,6 +25,7 @@ class Inline
 
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;
+    private static $objectForMap = false;
 
     /**
      * Converts a YAML string to a PHP array.
@@ -32,16 +33,18 @@ class Inline
      * @param string $value                  A YAML string
      * @param bool   $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool   $objectSupport          true if object support is enabled, false otherwise
+     * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
      * @param array  $references             Mapping of variable names to values
      *
      * @return array A PHP array representing the YAML string
      *
      * @throws ParseException
      */
-    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $references = array())
+    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $references = array())
     {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
+        self::$objectForMap = $objectForMap;
 
         $value = trim($value);
 
@@ -125,22 +128,29 @@ class Inline
                 if (false !== $locale) {
                     setlocale(LC_NUMERIC, 'C');
                 }
-                $repr = is_string($value) ? "'$value'" : (is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : strval($value));
-
+                if (is_float($value)) {
+                    $repr = strval($value);
+                    if (is_infinite($value)) {
+                        $repr = str_ireplace('INF', '.Inf', $repr);
+                    } elseif (floor($value) == $value && $repr == $value) {
+                        // Preserve float data type since storing a whole number will result in integer value.
+                        $repr = '!!float '.$repr;
+                    }
+                } else {
+                    $repr = is_string($value) ? "'$value'" : strval($value);
+                }
                 if (false !== $locale) {
                     setlocale(LC_NUMERIC, $locale);
                 }
 
                 return $repr;
+            case '' == $value:
+                return "''";
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):
-                return Escaper::escapeWithSingleQuotes($value);
-            case '' == $value:
-                return "''";
             case preg_match(self::getTimestampRegex(), $value):
-            case in_array(strtolower($value), array('null', '~', 'true', 'false')):
-                return "'$value'";
+                return Escaper::escapeWithSingleQuotes($value);
             default:
                 return $value;
         }
@@ -182,7 +192,7 @@ class Inline
     /**
      * Parses a scalar to a YAML string.
      *
-     * @param scalar $scalar
+     * @param string $scalar
      * @param string $delimiters
      * @param array  $stringDelimiters
      * @param int    &$i
@@ -344,6 +354,10 @@ class Inline
                     ++$i;
                     continue 2;
                 case '}':
+                    if (self::$objectForMap) {
+                        return (object) $output;
+                    }
+
                     return $output;
             }
 
@@ -352,6 +366,7 @@ class Inline
 
             // value
             $done = false;
+
             while ($i < $len) {
                 switch ($mapping[$i]) {
                     case '[':
@@ -462,6 +477,8 @@ class Inline
                         }
 
                         return;
+                    case 0 === strpos($scalar, '!!float '):
+                        return (float) substr($scalar, 8);
                     case ctype_digit($scalar):
                         $raw = $scalar;
                         $cast = intval($scalar);

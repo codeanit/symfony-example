@@ -45,44 +45,16 @@ class BDO
     }
 
     public function pickupCash($data=null){
-                $xml='<?xml version="1.0" encoding="UTF-8"?>
-                        <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://www.bdo.com.ph/RemitAPI">
-                          <SOAP-ENV:Body>
-                            <ns1:apiRequest>
-                              <ns1:userName>?</ns1:userName>
-                              <ns1:password>?</ns1:password>
-                              <ns1:signedData>?</ns1:signedData>
-                              <ns1:conduitCode>?</ns1:conduitCode>
-                              <ns1:locatorCode>?</ns1:locatorCode>
-                              <ns1:referenceNo>?</ns1:referenceNo>
-                              <ns1:transDate>?</ns1:transDate>
-                              <ns1:senderFirstname>?</ns1:senderFirstname>
-                              <ns1:senderLastname>?</ns1:senderLastname>
-                              <ns1:senderMiddlename>?</ns1:senderMiddlename>
-                              <ns1:senderAddress1>?</ns1:senderAddress1>
-                              <ns1:senderAddress2>?</ns1:senderAddress2>
-                              <ns1:senderPhone>?</ns1:senderPhone>
-                              <ns1:receiverFirstname>?</ns1:receiverFirstname>
-                              <ns1:receiverLastname>?</ns1:receiverLastname>
-                              <ns1:receiverMiddlename>?</ns1:receiverMiddlename>
-                              <ns1:receiverAddress1>?</ns1:receiverAddress1>
-                              <ns1:receiverAddress2>?</ns1:receiverAddress2>
-                              <ns1:receiverMobilePhone>?</ns1:receiverMobilePhone>
-                              <ns1:receiverGender>?</ns1:receiverGender>
-                              <ns1:receiverBirthDate>?</ns1:receiverBirthDate>
-                              <ns1:transactionType>?</ns1:transactionType>
-                              <ns1:payableCode>?</ns1:payableCode>
-                              <ns1:bankCode>?</ns1:bankCode>
-                              <ns1:branchName>?</ns1:branchName>
-                              <ns1:accountNo>?</ns1:accountNo>
-                              <ns1:landedCurrency>?</ns1:landedCurrency>
-                              <ns1:landedAmount>?</ns1:landedAmount>
-                              <ns1:messageToBene1>?</ns1:messageToBene1>
-                              <ns1:messageToBene2>?</ns1:messageToBene2>
-                            </ns1:apiRequest>
-                          </SOAP-ENV:Body>
-                        </SOAP-ENV:Envelope>
-                        ';
+                echo shell_exec('java -cp /home/manish/bdo-implemented/RemittanceAPITool.jar:. com.tb.security.SignedData 
+                  SignatureType=TXN,CLEAR_BRS_PASSWORD=p8%A$$9X6,TRANSACTION_REFERENCE_NUMBER=REFNO123456,
+                  KEYSTORE_FILE=/home/manish/bdo-implemented/certificate-and-jks/220FGOFC1,KEYSTORE_PASSWORD=FGM#374040w,
+                  KEY_NAME=fgdc,KEY_PASSWORD=FGM#374040w,LANDED_AMOUNT=500,TRANSACTION_DATE=2014-11-24,ACCOUNT_NUMBER=100661036243');
+                echo shell_exec('java -cp RemittanceAPITool.jar:. com.tb.security.SignedData 
+                  SignatureType=TXN,CLEAR_BRS_PASSWORD=p8%A$$9X6,TRANSACTION_REFERENCE_NUMBER=REFNO123456,
+                  KEYSTORE_FILE=/home/manish/bdo-implemented/certificate-and-jks/220FGOFC1,KEYSTORE_PASSWORD=FGM#374040w,
+                  KEY_NAME=fgdc,KEY_PASSWORD=FGM#374040w,LANDED_AMOUNT=500,TRANSACTION_DATE=2014-11-24,ACCOUNT_NUMBER=100661036243 ');
+                die;
+                $xml=$this->xml($data);
                 $soap_client = new \SoapClient(
                     $this->url,
                     array(
@@ -133,6 +105,11 @@ class BDO
 
     }
 
+    /**
+     * [xml String Generator]
+     * @param  [array] $data 
+     * @return [String]       [xml string]
+     */
     public function xml($data=null){
         $wsdl='<?xml version="1.0" encoding="UTF-8"?>
                 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://www.bdo.com.ph/RemitAPI">
@@ -171,7 +148,7 @@ class BDO
                     </ns1:apiRequest>
                   </SOAP-ENV:Body>
                 </SOAP-ENV:Envelope>';
-
+                
             return $wsdl;
 
     }

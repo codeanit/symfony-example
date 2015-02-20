@@ -31,6 +31,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->load() loads the twig.xml file');
+
         $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
 
         // Twig options
@@ -56,6 +57,8 @@ class TwigExtensionTest extends TestCase
         $resources = $container->getParameter('twig.form.resources');
         $this->assertContains('form_div_layout.html.twig', $resources, '->load() includes default template for form resources');
         $this->assertContains('MyBundle::form.html.twig', $resources, '->load() merges new templates into form resources');
+        // @deprecated since 2.6, to be removed in 3.0
+        $this->assertContains('MyBundle::formDeprecated.html.twig', $resources, '->load() merges new templates into form resources');
 
         // Globals
         $calls = $container->getDefinition('twig')->getMethodCalls();
@@ -95,7 +98,8 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'customTemplateEscapingGuesser', $format);
         $this->compileContainer($container);
 
-        $this->assertTemplateEscapingGuesserDefinition($container, 'my_project.some_bundle.template_escaping_guesser', 'guess');
+        $options = $container->getParameter('twig.options');
+        $this->assertEquals(array(new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'), $options['autoescape']);
     }
 
     /**
@@ -108,7 +112,8 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'empty', $format);
         $this->compileContainer($container);
 
-        $this->assertTemplateEscapingGuesserDefinition($container, 'templating.engine.twig', 'guessDefaultEscapingStrategy');
+        $options = $container->getParameter('twig.options');
+        $this->assertEquals(array('Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy', 'guess'), $options['autoescape']);
     }
 
     public function testGlobalsWithDifferentTypesAndValues()
@@ -179,6 +184,37 @@ class TwigExtensionTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider stopwatchExtensionAvailabilityProvider
+     */
+    public function testStopwatchExtensionAvailability($debug, $stopwatchEnabled, $expected)
+    {
+        $container = $this->createContainer();
+        $container->setParameter('kernel.debug', $debug);
+        if ($stopwatchEnabled) {
+            $container->register('debug.stopwatch', 'Symfony\Component\Stopwatch\Stopwatch');
+        }
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig', array());
+        $this->compileContainer($container);
+
+        $tokenParsers = $container->get('twig.extension.debug.stopwatch')->getTokenParsers();
+        $stopwatchIsAvailable = new \ReflectionProperty($tokenParsers[0], 'stopwatchIsAvailable');
+        $stopwatchIsAvailable->setAccessible(true);
+
+        $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
+    }
+
+    public function stopwatchExtensionAvailabilityProvider()
+    {
+        return array(
+            'debug-and-stopwatch-enabled' => array(true, true, true),
+            'only-stopwatch-enabled' => array(false, true, false),
+            'only-debug-enabled' => array(true, false, false),
+            'debug-and-stopwatch-disabled' => array(false, false, false),
+        );
+    }
+
     private function createContainer()
     {
         $container = new ContainerBuilder(new ParameterBag(array(
@@ -218,19 +254,5 @@ class TwigExtensionTest extends TestCase
         }
 
         $loader->load($file.'.'.$format);
-    }
-
-    private function assertTemplateEscapingGuesserDefinition(ContainerBuilder $container, $serviceId, $serviceMethod)
-    {
-        $def = $container->getDefinition('templating.engine.twig');
-
-        $this->assertCount(1, $def->getMethodCalls());
-
-        foreach ($def->getMethodCalls() as $call) {
-            if ('setDefaultEscapingStrategy' === $call[0]) {
-                $this->assertSame($serviceId, (string) $call[1][0][0]);
-                $this->assertSame($serviceMethod, $call[1][0][1]);
-            }
-        }
     }
 }

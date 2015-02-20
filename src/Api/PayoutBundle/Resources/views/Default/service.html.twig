@@ -18,8 +18,9 @@
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
               <li class=""><a href="{{ url('dashboard') }}">Transactions</a></li>               
-              <li class="active"><a href="{{ url('service') }}">Services</a></li>               
-            </ul>           
+              <li class="active"><a href="{{ url('service') }}">Services</a></li>
+              <!-- <li class=""><a href="{{ url('fService') }}">FTP Services</a></li>  -->
+            </ul>                       
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
       </nav>
@@ -47,6 +48,9 @@
                   <a href="{{url('addService', {'name': entry.service_name,'id':entry.id})}}" class='btn btn-primary btn-xs'>Edit</a>
                   <a href="{{url('status',{'id':entry.id,'status':entry.status})}}" class='btn btn-primary btn-xs' 
                   value='{{entry.id}}' name='status'>{{(status in entry.status)?'Deactivate':'Activate'}}</a>
+                  {% if entry.is_ftp_service == 1 %}  
+                    <a href="{{url('upload', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-primary btn-xs'>Upload</a>
+                  {% endif %}
                 </td>
             </tr>
             {% endfor %}

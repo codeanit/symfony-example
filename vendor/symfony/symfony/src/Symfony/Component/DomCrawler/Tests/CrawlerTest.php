@@ -313,6 +313,16 @@ EOF
         $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
     }
 
+    public function testSlice()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
+        $this->assertNotSame($crawler->slice(), $crawler, '->slice() returns a new instance of a crawler');
+        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler->slice(), '->slice() returns a new instance of a crawler');
+
+        $this->assertCount(3, $crawler->slice(), '->slice() does not slice the nodes in the list if any param is entered');
+        $this->assertCount(1, $crawler->slice(1, 1), '->slice() slices the nodes in the list');
+    }
+
     public function testReduce()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
@@ -346,6 +356,18 @@ EOF
         $this->assertEquals('sample value', $div->attr('non-empty-attr'), '->attr() reads non-empty attributes correctly');
         $this->assertEquals('', $div->attr('empty-attr'), '->attr() reads empty attributes correctly');
         $this->assertNull($div->attr('missing-attr'), '->attr() reads missing attributes correctly');
+    }
+
+    public function testNodeName()
+    {
+        $this->assertEquals('li', $this->createTestCrawler()->filterXPath('//li')->nodeName(), '->nodeName() returns the node name of the first element of the node list');
+
+        try {
+            $this->createTestCrawler()->filterXPath('//ol')->nodeName();
+            $this->fail('->nodeName() throws an \InvalidArgumentException if the node list is empty');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->nodeName() throws an \InvalidArgumentException if the node list is empty');
+        }
     }
 
     public function testText()
@@ -926,16 +948,42 @@ HTML;
         }
     }
 
-    public function testBaseTag()
+    /**
+     * @dataProvider getBaseTagData
+     */
+    public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = null)
     {
-        $crawler = new Crawler('<html><base href="http://base.com"><a href="link"></a></html>');
-        $this->assertEquals('http://base.com/link', $crawler->filterXPath('//a')->link()->getUri());
+        $crawler = new Crawler('<html><base href="'.$baseValue.'"><a href="'.$linkValue.'"></a></html>', $currentUri);
+        $this->assertEquals($expectedUri, $crawler->filterXPath('//a')->link()->getUri(), $description);
+    }
 
-        $crawler = new Crawler('<html><base href="//base.com"><a href="link"></a></html>', 'https://domain.com');
-        $this->assertEquals('https://base.com/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can use a schema-less URL');
+    public function getBaseTagData()
+    {
+        return array(
+            array('http://base.com', 'link', 'http://base.com/link'),
+            array('//base.com', 'link', 'https://base.com/link', 'https://domain.com', '<base> tag can use a schema-less URL'),
+            array('path/', 'link', 'https://domain.com/path/link', 'https://domain.com', '<base> tag can set a path'),
+            array('http://base.com', '#', 'http://base.com#', 'http://domain.com/path/link', '<base> tag does work with links to an anchor'),
+            array('http://base.com', '', 'http://base.com', 'http://domain.com/path/link', '<base> tag does work with empty links'),
+        );
+    }
 
-        $crawler = new Crawler('<html><base href="path/"><a href="link"></a></html>', 'https://domain.com');
-        $this->assertEquals('https://domain.com/path/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can set a path');
+    /**
+     * @dataProvider getBaseTagWithFormData
+     */
+    public function testBaseTagWithForm($baseValue, $actionValue, $expectedUri, $currentUri = null, $description = null)
+    {
+        $crawler = new Crawler('<html><base href="'.$baseValue.'"><form method="post" action="'.$actionValue.'"><button type="submit" name="submit"/></form></html>', $currentUri);
+        $this->assertEquals($expectedUri, $crawler->filterXPath('//button')->form()->getUri(), $description);
+    }
+
+    public function getBaseTagWithFormData()
+    {
+        return array(
+            array('/basepath', '/registration', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and form action'),
+            array('/basepath', '', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and empty form action'),
+            array('http://base.com', '', 'http://domain.com/path/form', 'http://domain.com/path/form', '<base> tag does work with a URL and an empty form action'),
+        );
     }
 
     public function createTestCrawler($uri = null)

@@ -19,11 +19,15 @@
         <service id="tb_connection" class="Api\PayoutBundle\Model\TBConnectionModel">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="queue" class="Api\PayoutBundle\Model\QueueModel">            
+        <service id="queue" class="Api\PayoutBundle\Model\Queue">            
             <argument type="service" id="service_container" />         
         </service>
 
         <service id="bdo" class="Api\PayoutBundle\Model\BDO">            
+            <argument type="service" id="service_container" />         
+        </service>
+
+        <service id="parser" class="Api\PayoutBundle\Model\Parser">            
             <argument type="service" id="service_container" />         
         </service>
 
@@ -33,10 +37,10 @@
         <service id="mock" class="Api\PayoutBundle\Model\MOCK">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="connection" class="Api\PayoutBundle\Model\DatabaseOperationModel">            
+        <service id="connection" class="Api\PayoutBundle\Model\DB">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="bts" class="Api\PayoutBundle\Model\BTSModel"> 
+        <service id="bts" class="Api\PayoutBundle\Model\BTS"> 
             <argument type="service" id="service_container" /> 
          <!--    <argument type="string">Suraj</argument>
             <argument>%testing.array%</argument> -->
