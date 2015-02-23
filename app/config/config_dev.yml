@@ -1,0 +1,95 @@
+imports:
+    - { resource: config.yml }
+
+framework:
+    router:
+        resource: "%kernel.root_dir%/config/routing_dev.yml"
+        strict_requirements: true
+    profiler: { only_exceptions: false }
+
+web_profiler:
+    toolbar: %debug_toolbar%
+    intercept_redirects: %debug_redirects%
+
+monolog:
+    handlers:
+        main:
+            type:   stream
+            path:   "%kernel.logs_dir%/%kernel.environment%.log"
+            level:  debug
+        console:
+            type:   console
+            bubble: false
+        # uncomment to get logging in your browser
+        # you may have to allow bigger header sizes in your Web server configuration
+        #firephp:
+        #    type:   firephp
+        #    level:  info
+        #chromephp:
+        #    type:   chromephp
+        #    level:  info
+
+assetic:
+    use_controller: %use_assetic_controller%
+
+#swiftmailer:
+#    delivery_address: me@example.com
+#Besimple SOAP Configuration
+be_simple_soap:
+    services:
+        MyDemoApi:
+            namespace:    http://api.firstglobalmoney.com.local/ws/MyDemoApi/1.0/
+            binding:    rpc-literal
+            resource:    "@AcmeDemoBundle/Controller/MyDemoController.php"
+            resource_type:   annotation
+
+        MLhuillier:
+            namespace:    http://api.firstglobalmoney.com.local/mlhuillier/
+            binding:    rpc-literal
+            resource:    "@ApiWebServiceBundle/Controller/MLhuillierController.php"
+            resource_type:   annotation
+
+        GCash:
+            namespace:    http://api.firstglobalmoney.com.local/gcash/
+            binding:    rpc-literal
+            resource:    "@ApiWebServiceBundle/Controller/GCashController.php"
+            resource_type:   annotation
+
+sensio_framework_extra:
+    view:      { annotations: false }
+    router:      { annotations: true }
+
+
+# fos_rest:
+#     routing_loader:
+#         default_format: json
+#         include_format: true
+#     param_fetcher_listener: force
+#     body_listener: true
+#     allowed_methods_listener: true
+#     view:
+#         view_response_listener: 'force'
+#         formats:
+#             json: true
+#             xml: true
+#     format_listener:
+#         rules:
+#             - { path: '^/api', priorities: ['json'], fallback_format: json, prefer_extension: true }
+fos_rest:
+    routing_loader:
+        default_format: json
+        include_format: true
+    view:
+        view_response_listener: 'force'
+        failed_validation: HTTP_BAD_REQUEST
+        default_engine: php
+        formats:
+            json: true    
+    body_listener:
+        decoders:
+            json: fos_rest.decoder.json
+
+sensio_framework_extra:
+    view:    { annotations: false }
+    router:  { annotations: true }
+

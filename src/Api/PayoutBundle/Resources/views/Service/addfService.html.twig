@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">CDEX API</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class=""><a href="{{ url('dashboard') }}">Transactions</a></li>               
+              <li class=""><a href="{{ url('service') }}">Services</a></li>
+              <li class="active"><a href="{{ url('fService') }}">FTP Services</a></li> 
+            </ul>                       
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h2>FTP Third Party Service List</h2>
+        <a href="{{ url('addfService')}}" class='btn btn-primary'>Add</a>
+        <br>
+        <br>
+        <form action='{{ url('addfService')}}' method='POST' name='form' id='form'>
+          <div class="form-group">
+            <label for="username">Service Name</label>
+            <input type="text" class="form-control " id="service_name" name="service_name" placeholder="Enter Service Name" 
+            value="{% if service_name is defined %}{{service_name}}{% endif %}">
+            <input type='hidden'  name='service_id' value='{% if service_id is defined %}{{ service_id }}{% endif %}' >
+          </div>          
+          <button type="submit" class="btn btn-default" name='submit'>Submit</button> <a href="{{url('fService')}}">Back</a>
+        </form>
+        
+        
+      </div>
+
+    </div>
+{% endblock %}
