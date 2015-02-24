@@ -14,4 +14,8 @@ composer.lock
 #Ignore web/
 #web/**/*
 
+#Ignore SVN
+.svn/**/*
 
+#Ignore .idea
+.idea/**/*
