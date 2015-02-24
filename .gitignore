@@ -19,3 +19,6 @@ composer.lock
 
 #Ignore .idea
 .idea/**/*
+
+app/config/parameters.yml
+app/bootstrap.php.cache
