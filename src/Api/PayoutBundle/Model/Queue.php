@@ -178,6 +178,8 @@ class Queue
                     unset($rows[$total]);
                     $count=count($rows);                 
                 } catch (\Exception $e) {
+                    unset($results[0]['id']);                                        
+                    $connection->insert('file_queue',$results[0]);                                      
                     $log->addError('File Parsing Failed',array('Exception At'=>$e->getMessage(),'Filename'=>$file_name,'ServiceName'=>$service_name,'Action'=>$action));
                 }
                 
@@ -198,13 +200,15 @@ class Queue
                 }
                               
             } 
+            
+            /**
+             * @todo  OUT case implementation
+             */
             if($action=="OUT")
             {
                 $result=array('msg'=>"OUT action implementation in progress... ");
             } 
-        /**
-         * @todo  OUT case implementation
-         */
+        
                 
         $connection->update(
             'file_queue',
