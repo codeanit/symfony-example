@@ -364,29 +364,4 @@ class DB
         return;
     }
 
-    public function updateCdexStatus($data){
-        $conn = $this->container->get('database_connection');
-        $total=count($data)-1;
-        unset($data[0]);
-        unset($data[$total]);
-        $count=count($data); 
-        for ($txn=1; $txn < $count+1; $txn++) { 
-            $result =$conn->update('transactions',array('status'=>$data[$txn][8]), array('transaction_code' => $data[$txn][0]));
-            if($result==1){
-                $queueData = array(
-                        'transaction_source' => 'CDEX',
-                        'transaction_service' => 'TB',
-                        'operation' => 'notify', 
-                        'parameter' => json_encode(array('code'=>'200','operation'=>'modify','confirmation_number'=>$data[$txn][0],'status'=>'successful','change_status'=>$data[$txn][8])),
-                        'is_executed' => 0,
-                        'creation_datetime' => date('Y-m-d H:i:s')
-                        );
-                $check_queue = $conn->insert('operations_queue', $queueData);
-            }                    
-        }
-        return $check_queue;
-    }
-
-
-
 }

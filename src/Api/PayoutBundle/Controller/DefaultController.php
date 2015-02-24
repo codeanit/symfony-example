@@ -33,14 +33,8 @@ class DefaultController extends Controller
      */
     public function fileAction()
     {         
-        $Q=$this->get('queue');
-        $DB=$this->get('connection'); 
-        $excel=$this->get('parser'); 
-        $path= $this->get('request')->server->get('DOCUMENT_ROOT').'/upload/green.xlsx';      
-        $reader = $excel->load($path);
-        $ws = $reader->getSheet(0);
-        $rows = $ws->toArray();       
-        $DB->updateCdexStatus($rows);       
+        $Q=$this->get('queue'); 
+        print_r($Q->executeFileOperation());       
         die; 
     }
 

@@ -16,6 +16,8 @@ namespace Api\PayoutBundle\Model;
 use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 /**
  * Bridge to call TB DBAL
@@ -127,13 +129,87 @@ class Queue
             }   
         } catch (\Exception $e) {
             //$e->getMessage();
-            $result=array('code'=>'400','message'=>'Service Not Found.');
+            $result=array('code'=>'400','message'=>'Error in Queue Processing.');
         }
 
         $connection->update(
             'operations_queue',
             array('is_executed' => '1'),
             array('id' => $id)
+        );     
+        return $result;   
+    }
+
+    public function executeFileOperation()
+    {   
+        $log = new \Symfony\Bridge\Monolog\Logger('FILE_QUEUE');
+        $log->pushHandler(new StreamHandler(__DIR__ . '/Logs/FILE_QUEUE_LOG.txt' , Logger::INFO));   
+        $connection = $this->container->get('database_connection');
+        $getUnexecutedOp = "SELECT * FROM file_queue"
+            . "  WHERE is_executed = 0  ORDER BY id ASC LIMIT 1 ";
+        $results = $connection->fetchAll($getUnexecutedOp);  
+        if(count($results)<1)
+        {
+            return array('code'=>'400','message'=>'No Operation Found In Queue');
+        }    
+        $operation = '';
+        $parameter = '';
+       
+        foreach ($results as $result) {
+            $file_id=$result['id'];
+            $id = $result['service_id'];
+            $action = $result['action'];
+            $service_name= $result['service_name'];       
+            $file_name=$result['file'];            
+        }
+
+        /**
+         * Parse File Data
+         */
+        if($action == "IN"){
+                try {
+                    $excel=$this->container->get('parser'); 
+                    $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/upload/'.$file_name;      
+                    $reader = $excel->load($path);
+                    $ws = $reader->getSheet(0);
+                    $rows = $ws->toArray();
+                    $total=count($rows)-1;
+                    unset($rows[0]);
+                    unset($rows[$total]);
+                    $count=count($rows);                 
+                } catch (\Exception $e) {
+                    $log->addError('File Parsing Failed',array('Exception At'=>$e->getMessage(),'Filename'=>$file_name,'ServiceName'=>$service_name,'Action'=>$action));
+                }
+                
+                try {
+                    for ($txn=1; $txn < $count+1; $txn++) {
+                    $queueData = array(
+                            'transaction_source' => 'CDEX',
+                            'transaction_service' => $service_name,
+                            'operation' => 'update', 
+                            'parameter' => json_encode(array('code'=>'200','operation'=>'modify','confirmation_number'=>$rows[$txn][0],'status'=>'successful','change_status'=>$rows[$txn][8])),
+                            'is_executed' => 0,
+                            'creation_datetime' => date('Y-m-d H:i:s')
+                            );
+                    $check_queue = $connection->insert('operations_queue', $queueData);
+                    }
+                } catch (\Exception $e) {
+                    $log->addError('Queue Adding Failed',array('Exception At'=>$e->getMessage(),'Filename'=>$file_name,'ServiceName'=>$service_name,'Action'=>$action));
+                }
+                              
+            } 
+            if($action=="OUT")
+            {
+                $result=array('msg'=>"OUT action implementation in progress... ");
+            } 
+        /**
+         * @todo  OUT case implementation
+         */
+                
+        $connection->update(
+            'file_queue',
+            array('is_executed' => '1'),
+            array('id' => $file_id)
         );     
         return $result;   
     }
