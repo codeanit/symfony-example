@@ -304,14 +304,10 @@ class DB
             } catch ( \Exception $e) {
                   $e->getMessage();
             }  
-        $enc=base64_encode(json_encode($cred));    
-        if($count > 0 ) {
-         $result =$conn->update('services',array('service_name'=>$service,'credentials'=>$enc,'is_ftp_service'=>$ftp), array('service_name' => $service));
-         
-        }else{
-         $result = $conn->insert('services',array('service_name'=>$service,'status'=>'1','credentials'=>$enc,'is_ftp_service'=>$ftp));
-        }
-        
+        $enc=base64_encode(json_encode($cred));      
+       // if($count < 0 ) {
+         $result =$conn->update('services',array('service_name'=>$service,'credentials'=>$enc,'is_ftp_service'=>$ftp), array('id' => $id));
+        //} 
         return $result;
     }
     public function saveService($serviceName,$fields,$ftp)
@@ -367,7 +363,5 @@ class DB
         $result = $conn->insert('ftp_services',array('service_id'=>$id,'file'=>$name,'action'=>'OUT','service_name'=>$sName));      
         return;
     }
-
-
 
 }

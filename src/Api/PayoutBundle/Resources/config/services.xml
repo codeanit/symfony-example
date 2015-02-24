@@ -37,6 +37,9 @@
         <service id="mock" class="Api\PayoutBundle\Model\MOCK">            
             <argument type="service" id="service_container" />         
         </service>
+        <service id="greenbelt" class="Api\PayoutBundle\Model\Greenbelt">            
+            <argument type="service" id="service_container" />         
+        </service>
         <service id="connection" class="Api\PayoutBundle\Model\DB">            
             <argument type="service" id="service_container" />         
         </service>

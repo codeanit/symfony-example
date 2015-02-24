@@ -28,28 +28,14 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/greenbelt/", name="greenbelt")
+     * @Route("/fqueue/", name="fqueue")
      * 
      */
-    public function testAction()
-    {        
-        $excel=$this->get('parser'); 
-        $DB=$this->get('connection'); 
-        $path= $this->get('request')->server->get('DOCUMENT_ROOT').'/upload/green.xlsx';      
-        $reader = $excel->load($path);
-        $ws = $reader->getSheet(0);
-        $rows = $ws->toArray();
-        
-        /*@TODO
-        1.insert in CDEX transaction for Testing purpose 
-        2.Map the parsed data
-        3.Update CdEX status 
-        4.Insert into queue
-        */
-       
-        //$DB->insertToCDEX($rows);
-       
-        die;      
+    public function fileAction()
+    {         
+        $Q=$this->get('queue'); 
+        print_r($Q->executeFileOperation());       
+        die; 
     }
 
 
@@ -135,7 +121,6 @@ class DefaultController extends Controller
                 
                 $service_id=$request->request->get('service_id');            
                 if($service_id !=''){
-                    // var_dump($request->request->all());die;
                     $status=$DB->editService($service_name,$fields,$service_id,$ftp);
                 }else{
                     $status=$DB->saveService($service_name,$fields,$ftp);
@@ -299,6 +284,14 @@ class DefaultController extends Controller
             
     }
 
+    /**
+     * @Route("/hack/", name="hack")
+     * @Template()
+     */
+    public function hackAction()
+    {
+        return array();
+    }
 
    
 }
