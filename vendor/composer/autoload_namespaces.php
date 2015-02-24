@@ -21,7 +21,7 @@ return array(
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'PhpOption\\' => array($vendorDir . '/phpoption/phpoption/src'),
     'PhpCollection' => array($vendorDir . '/phpcollection/phpcollection/src'),
-    'PHPExcel' => array($vendorDir . '/codeplex/phpexcel'),
+    'PHPExcel' => array($vendorDir . '/codeplex/phpexcel', $vendorDir . '/phpoffice/phpexcel/Classes'),
     'Negotiation' => array($vendorDir . '/willdurand/negotiation/src'),
     'Metadata\\' => array($vendorDir . '/jms/metadata/src'),
     'JsonpCallbackValidator' => array($vendorDir . '/willdurand/jsonp-callback-validator/src'),

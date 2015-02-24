@@ -168,10 +168,11 @@ class Queue
          */
         if($action == "IN"){
                 try {
-                    $excel=$this->container->get('parser'); 
                     $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/upload/'.$file_name;      
-                    $reader = $excel->load($path);
-                    $ws = $reader->getSheet(0);
+                    $inputFileType = \PHPExcel_IOFactory::identify($path);
+                    $objReader = \PHPExcel_IOFactory::createReader($inputFileType);
+                    $objPHPExcel = $objReader->load($path);  
+                    $ws = $objPHPExcel->getSheet(0);              
                     $rows = $ws->toArray();
                     $total=count($rows)-1;
                     unset($rows[0]);

@@ -38,6 +38,23 @@ class DefaultController extends Controller
         die; 
     }
 
+    /**
+     * @Route("/xls/", name="xls")
+     * 
+     */
+    public function xlsAction()
+    {   
+
+        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/upload/green.xlsx';      
+        $inputFileType = \PHPExcel_IOFactory::identify($path);
+        $objReader = \PHPExcel_IOFactory::createReader($inputFileType);
+        $objPHPExcel = $objReader->load($path);  
+        $sheet = $objPHPExcel->getSheet(0); 
+        var_dump($sheet->ToArray());
+       echo "flaskdf";
+       die;
+    }
+
 
     /**
      * @Route("/notification/", name="notification")
