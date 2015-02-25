@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">CDEX API</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class=""><a href="#">Transactions</a></li>               
+            </ul>           
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h2>Transactions List</h2>
+        <br>
+         
+        <table class="table table-hover">
+            <tr>
+                <th>S.N</th>
+                <th>Transaction Key</th>
+                <th>Transaction Code</th>
+                <th>Transaction Source</th>
+                <th>Transaction Service</th>
+                <th>Transaction Status</th>
+                <th>Sender</th>
+                <th>Sender Country</th>
+                <th>Receiver</th>
+                <th>Receiver Country</th>
+            </tr>
+            
+            {% for entry in transactions %}
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>{{ entry.transaction_key }}</td>               
+                <td>{{ entry.transaction_code }}</td>               
+                <td>{{ entry.transaction_source }}</td>               
+                <td>{{ entry.transaction_service }}</td>               
+                <td>{{ entry.transaction_status }}</td>               
+                <td>{{ entry.sender_first_name }} {{ entry.sender_last_name }}</td>               
+                <td>{{ entry.sender_country }}</td>               
+                <td>{{ entry.receiver_first_name }} {{ entry.receiver_last_name }}</td>               
+                <td>{{ entry.receiver_country }}</td>               
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+
+    </div>
+{% endblock %}
