@@ -19,11 +19,8 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {         
-        $Q=$this->get('queue');
-        //$result=$Q->executeQueuedOperation();       
-        print_r($Q->executeQueuedOperation());
-        // $TB=$this->get('tb_connection');
-        // $TB->curlTransborder($result);
+        $Q=$this->get('queue');        
+        print_r($Q->executeQueuedOperation());        
         die;      
     }
 
@@ -36,6 +33,23 @@ class DefaultController extends Controller
         $Q=$this->get('queue'); 
         print_r($Q->executeFileOperation());       
         die; 
+    }
+
+    /**
+     * @Route("/xls/", name="xls")
+     * 
+     */
+    public function xlsAction()
+    {   
+
+        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/upload/green.xlsx';      
+        $inputFileType = \PHPExcel_IOFactory::identify($path);
+        $objReader = \PHPExcel_IOFactory::createReader($inputFileType);
+        $objPHPExcel = $objReader->load($path);  
+        $sheet = $objPHPExcel->getSheet(0); 
+        var_dump($sheet->ToArray());
+       echo "flaskdf";
+       die;
     }
 
 
