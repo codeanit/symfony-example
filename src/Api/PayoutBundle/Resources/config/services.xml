@@ -16,34 +16,30 @@
     </parameters> -->
         
     <services>
-        <service id="tb_connection" class="Api\PayoutBundle\Model\TBConnectionModel">            
-            <argument type="service" id="service_container" />         
-        </service>
+        
         <service id="queue" class="Api\PayoutBundle\Model\Queue">            
             <argument type="service" id="service_container" />         
         </service>
-
-        <service id="bdo" class="Api\PayoutBundle\Model\BDO">            
+         <service id="connection" class="Api\PayoutBundle\Model\DB">            
             <argument type="service" id="service_container" />         
         </service>
 
-        <service id="parser" class="Api\PayoutBundle\Model\Parser">            
+        <service id="bdo" class="Api\PayoutBundle\Library\BDO">            
             <argument type="service" id="service_container" />         
         </service>
-
-         <service id="tb" class="Api\PayoutBundle\Model\TB">            
+         <service id="tb" class="Api\PayoutBundle\Library\TB">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="mock" class="Api\PayoutBundle\Model\MOCK">            
+        <service id="mock" class="Api\PayoutBundle\Library\MOCK">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="greenbelt" class="Api\PayoutBundle\Model\Greenbelt">            
+        <service id="greenbelt" class="Api\PayoutBundle\Library\Greenbelt">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="connection" class="Api\PayoutBundle\Model\DB">            
+        <service id="tb_connection" class="Api\PayoutBundle\Library\TBConnectionModel">            
             <argument type="service" id="service_container" />         
-        </service>
-        <service id="bts" class="Api\PayoutBundle\Model\BTS"> 
+        </service>       
+        <service id="bts" class="Api\PayoutBundle\Library\BTS"> 
             <argument type="service" id="service_container" /> 
          <!--    <argument type="string">Suraj</argument>
             <argument>%testing.array%</argument> -->
