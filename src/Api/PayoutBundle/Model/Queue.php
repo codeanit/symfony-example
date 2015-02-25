@@ -35,7 +35,7 @@ class Queue
 
     protected $container;    
 
-    function __construct(ContainerInterface $container) {
+    function __construct(ContainerInterface $container) {       
         $this->container = $container;
     }
 
@@ -74,8 +74,7 @@ class Queue
 
         $serviceObj = null;
         try {
-            $serviceObj=$this->container->get($service);       
-
+            $serviceObj=$this->container->get($service);
             if($serviceObj != '') {            
                 if(strtolower($service)=='bts') {                
                     $result=$serviceObj->process($operation, $parameter);
@@ -127,9 +126,8 @@ class Queue
                 }            
                     
             }   
-        } catch (\Exception $e) {
-            //$e->getMessage();
-            $result=array('code'=>'400','message'=>'Error in Queue Processing.');
+        } catch (\Exception $e) {            
+            $result=array('code'=>'400','message'=>'Error in Queue Processing.','error'=>$e->getMessage());
         }
 
         $connection->update(

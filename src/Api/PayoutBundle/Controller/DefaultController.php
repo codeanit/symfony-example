@@ -19,11 +19,8 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {         
-        $Q=$this->get('queue');
-        //$result=$Q->executeQueuedOperation();       
-        print_r($Q->executeQueuedOperation());
-        // $TB=$this->get('tb_connection');
-        // $TB->curlTransborder($result);
+        $Q=$this->get('queue');        
+        print_r($Q->executeQueuedOperation());        
         die;      
     }
 
