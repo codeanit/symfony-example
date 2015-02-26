@@ -1,45 +1,47 @@
-<?php 
+<?php
 
 /**
- * First Global Data
+ * First Global Data.
  *
  * @category DEX_API
- * @package  Api\WebServiceBundle\Tests\Controller
+ *
  * @author   Anit Shrestha Manandhar <ashrestha@firstglobalmoney.com>
  * @license  http://firstglobalmoney.com/license description
+ *
  * @version  v1.0.0
+ *
  * @link     (remittanceController, http://firsglobaldata.com)
  */
-
 namespace Api\WebServiceBundle\Model;
 
 /**
- * Bridge to call TB DBAL
+ * Bridge to call TB DBAL.
  *
  * @category DEX_API
- * @package  Api\WebServiceBundle\Tests\Controller
+ *
  * @author   Anit Shrestha Manandhar <ashrestha@firstglobalmoney.com>
  * @license  http://firstglobalmoney.com/license Usage License
+ *
  * @version  v1.0.0
+ *
  * @link     (remittanceController, http://firsglobaldata.com)
  */
-
 class TBConnectionModel
 {
-
     /**
-     * Push the received request to the DBAL
-     * 
-     * @param array $postedData array(
-            'model' => 'Transaction',
-            'operation' => 'transactionTest',            
-            'sessionID' => '$sessionID',
-            'username' => '$username',
-            'password' => '$password',
-            'refNo' => '$refno',
-            'signature'=> '$signature');
-     * 
-     * @return String 
+     * Push the received request to the DBAL.
+     *
+     * @param array $postedData
+     *                          array('model' => 'Transaction',
+     *                          'operation' => 'transactionTest',
+     *                          'sessionID' => '$sessionID',
+     *                          'username' => '$username',
+     *                          'password' => '$password',
+     *                          'refNo' => '$refno',
+     *                          'signature'=> '$signature'
+     *                          );
+     *
+     * @return String
      */
     public function curlTransborder(array $postedData)
     {
