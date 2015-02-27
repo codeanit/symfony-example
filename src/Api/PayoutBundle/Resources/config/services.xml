@@ -36,6 +36,9 @@
         <service id="greenbelt" class="Api\PayoutBundle\Library\Greenbelt">            
             <argument type="service" id="service_container" />         
         </service>
+        <service id="olympic" class="Api\PayoutBundle\Library\Olympic">            
+            <argument type="service" id="service_container" />         
+        </service>
         <service id="tb_connection" class="Api\PayoutBundle\Library\TBConnectionModel">            
             <argument type="service" id="service_container" />         
         </service>       

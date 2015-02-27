@@ -30,7 +30,7 @@ use Monolog\Logger;
  * @link     (remittanceController, http://firsglobaldata.com)
  */
 
-class Greenbelt
+class Olympic
 {
     protected $container;
     /**
@@ -82,11 +82,11 @@ class Greenbelt
                     $inputFileType = \PHPExcel_IOFactory::identify($path);
                     $objReader = \PHPExcel_IOFactory::createReader($inputFileType);
                     $objPHPExcel = $objReader->load($path);  
-                    $ws = $objPHPExcel->getSheet(0);              
+                    $ws = $objPHPExcel->getSheet(0);
                     $rows = $ws->toArray();
                     $total=count($rows)-1;
                     unset($rows[0]);
-                    unset($rows[$total]);
+                    // unset($rows[$total]);
                     $count=count($rows);                 
                 } catch (\Exception $e) {
                     unset($results[0]['id']);                                        
