@@ -29,3 +29,8 @@ backend:
   resource: "@BackendBundle/Controller/"
   type: annotation
   prefix: /
+
+library:
+  resource: "@LibraryBundle/Controller/"
+  type: annotation
+  prefix: /

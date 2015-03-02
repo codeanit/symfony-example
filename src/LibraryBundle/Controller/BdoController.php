@@ -5,16 +5,18 @@ namespace LibraryBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+
 
 class BdoController extends Controller
 {
     /**
-     * @Route("/bdo/", name="bdo")
+     * @Route("/abdo/", name="abdo")
      * @Template()
      */
-    public function bdoAction(Request $request)
+    public function myBdoAction(Request $request)
     {
         // if ($request->request->has('username') && $request->request->has('password')) {
         //     try {

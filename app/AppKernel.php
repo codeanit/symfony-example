@@ -15,12 +15,12 @@ class AppKernel extends Kernel
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
-            new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),  
+            new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new FOS\RestBundle\FOSRestBundle() ,
             new JMS\SerializerBundle\JMSSerializerBundle($this),
             new BeSimple\SoapBundle\BeSimpleSoapBundle(),
-            new Api\WebServiceBundle\ApiWebServiceBundle(),             
-            new Api\PayoutBundle\ApiPayoutBundle()
+            new Api\WebServiceBundle\ApiWebServiceBundle(),
+            new Api\PayoutBundle\ApiPayoutBundle(),
 
         );
 

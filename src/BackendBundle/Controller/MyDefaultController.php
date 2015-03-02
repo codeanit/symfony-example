@@ -5,54 +5,49 @@ namespace BackendBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
-use LibraryBundle\BusinessLogics\TestBL;
+use LibraryBundle\BusinessLogic\BDO\BdoBL;
 
 class MyDefaultController extends Controller
 {
     /**
      * @Route("/queue/", name="queue")
-     * 
      */
     public function indexAction()
-    {         
-        $Q=$this->get('queue');
-        //$result=$Q->executeQueuedOperation();       
+    {
+        $Q = $this->get('queue');
+        //$result=$Q->executeQueuedOperation();
         print_r($Q->executeQueuedOperation());
         // $TB=$this->get('tb_connection');
         // $TB->curlTransborder($result);
-        die;      
+        die;
     }
 
     /**
      * @Route("/fqueue/", name="fqueue")
-     * 
      */
     public function fileAction()
-    {         
-        $Q=$this->get('queue');
-        $DB=$this->get('connection'); 
-        $excel=$this->get('parser'); 
-        $path= $this->get('request')->server->get('DOCUMENT_ROOT').'/upload/green.xlsx';      
+    {
+        $Q = $this->get('queue');
+        $DB = $this->get('connection');
+        $excel = $this->get('parser');
+        $path = $this->get('request')->server->get('DOCUMENT_ROOT').'/upload/green.xlsx';
         $reader = $excel->load($path);
         $ws = $reader->getSheet(0);
-        $rows = $ws->toArray();       
-        $DB->updateCdexStatus($rows);       
-        die; 
+        $rows = $ws->toArray();
+        $DB->updateCdexStatus($rows);
+        die;
     }
-
 
     /**
      * @Route("/notification/", name="notification")
-     * 
      */
     public function notificationAction()
-    {        
-        $Q=$this->get('queue');
-        print_r($Q->noti());     
-        die;      
+    {
+        $Q = $this->get('queue');
+        print_r($Q->noti());
+        die;
     }
 
     /**
@@ -61,17 +56,10 @@ class MyDefaultController extends Controller
      */
     public function transactionAction()
     {
-        $testBL = new TestBL();
-        $testBL->testMe(); die;
+        $testBL = new BdoBL();
+        $vData = $testBL->getEncryptedPassword("test");
+        return array('vData' => $vData);
 
-        if($this->get('session')->get('username')){
-            $DB=$this->get('connection');
-            $transactions=$DB->getTransactions();      
-            return array('transactions'=>$transactions);  
-        }else{
-            return $this->redirect($this->generateUrl('login'));            
-        }
-           
     }
 
     /**
@@ -79,71 +67,67 @@ class MyDefaultController extends Controller
      * @Template()
      */
     public function serviceAction()
-    { 
-        if($this->get('session')->get('username')){
-            $DB=$this->get('connection');
-            $services=$DB->getServices();
-            return array('services'=>$services);
-        }else{
-            return $this->redirect($this->generateUrl('login'));            
+    {
+        if ($this->get('session')->get('username')) {
+            $DB = $this->get('connection');
+            $services = $DB->getServices();
+
+            return array('services' => $services);
+        } else {
+            return $this->redirect($this->generateUrl('login'));
         }
-        
     }
-     /**
+    /**
      * @Route("/addService/{name}/{id}", name="addService")
      * @Template()
      */
-    public function addServiceAction(Request $request,$name=null,$id=null)
-    {   
-        if($this->get('session')->get('username')){
+    public function addServiceAction(Request $request, $name = null, $id = null)
+    {
+        if ($this->get('session')->get('username')) {
             $DB = $this->get('connection');
-            if($request->request->get('service_name'))
-            {             
-                $service_name=$request->request->get('service_name');
-                $ftp=($request->request->get('ftp_service'))?$request->request->get('ftp_service'):'0';
-                $fieldsArray=$request->request->get('fields');
+            if ($request->request->get('service_name')) {
+                $service_name = $request->request->get('service_name');
+                $ftp = ($request->request->get('ftp_service')) ? $request->request->get('ftp_service') : '0';
+                $fieldsArray = $request->request->get('fields');
                 $fields = array_map('strtolower', $fieldsArray);
-                if(is_null($fields))
-                {
-                    return array('error_msg'=>'Fields Are Needed','service_name'=>$service_name,'service_id'=>$id);                
+                if (is_null($fields)) {
+                    return array('error_msg' => 'Fields Are Needed','service_name' => $service_name,'service_id' => $id);
                 }
-                
-                if(!is_null($request->request->get('service_id')))
-                {
-                    $id=$request->request->get('service_id');
-                    $duplicateServiceCheck=$DB->checkDuplicateServiceName($service_name,$id);                
-                    if(count($duplicateServiceCheck)>1){
-                        return array('error_msg'=>'Service Name Already Exists','service_name'=>$service_name,'service_id'=>$id,'fields'=>$fields);
+
+                if (!is_null($request->request->get('service_id'))) {
+                    $id = $request->request->get('service_id');
+                    $duplicateServiceCheck = $DB->checkDuplicateServiceName($service_name, $id);
+                    if (count($duplicateServiceCheck)>1) {
+                        return array('error_msg' => 'Service Name Already Exists','service_name' => $service_name,'service_id' => $id,'fields' => $fields);
                     }
-                }           
-                
-                if(in_array('', $fields)){
-                    return array('error_msg'=>'Empty Fields Found','service_name'=>$service_name,'service_id'=>$id,'fields'=>$fields);                
                 }
-                                      
-                $check=array_diff_assoc($fields, array_unique($fields));
 
-                if(count($check)>0){
-                    return array('error_msg'=>'Duplicate Fields Found','service_name'=>$service_name,'service_id'=>$id,'fields'=>$fields,'case'=>'duplicate');
+                if (in_array('', $fields)) {
+                    return array('error_msg' => 'Empty Fields Found','service_name' => $service_name,'service_id' => $id,'fields' => $fields);
                 }
-                
-                $service_id=$request->request->get('service_id');            
-                if($service_id !=''){
-                    $status=$DB->editService($service_name,$fields,$service_id,$ftp);
-                }else{
-                    $status=$DB->saveService($service_name,$fields,$ftp);
+
+                $check = array_diff_assoc($fields, array_unique($fields));
+
+                if (count($check)>0) {
+                    return array('error_msg' => 'Duplicate Fields Found','service_name' => $service_name,'service_id' => $id,'fields' => $fields,'case' => 'duplicate');
                 }
+
+                $service_id = $request->request->get('service_id');
+                if ($service_id != '') {
+                    $status = $DB->editService($service_name, $fields, $service_id, $ftp);
+                } else {
+                    $status = $DB->saveService($service_name, $fields, $ftp);
+                }
+
                 return $this->redirect($this->generateUrl('service'));
+            } else {
+                $field = $DB->getFields($id);
 
-            }else{
-                $field=$DB->getFields($id);
-                return array('service_name'=>$name,'fields'=>$field[0],'service_id'=>$field[1],'is_ftp'=>$field[2]);
+                return array('service_name' => $name,'fields' => $field[0],'service_id' => $field[1],'is_ftp' => $field[2]);
             }
-  
-        }else{
-            return $this->redirect($this->generateUrl('login'));            
+        } else {
+            return $this->redirect($this->generateUrl('login'));
         }
-        
     }
 
     /**
@@ -151,22 +135,20 @@ class MyDefaultController extends Controller
      * @Template()
      */
     public function credentialAction($id)
-    {    
-        if($this->get('session')->get('username')){
-            $DB=$this->get('connection');        
-            $services=$DB->getServiceCredentials($id);
-            if($services)
-            {
-                $d=(array)json_decode(base64_decode($services[2]));                   
-                return array('name'=>$id,'values'=>$d);
-            }else{
-                return $this->redirect($this->generateUrl('service'));            
+    {
+        if ($this->get('session')->get('username')) {
+            $DB = $this->get('connection');
+            $services = $DB->getServiceCredentials($id);
+            if ($services) {
+                $d = (array) json_decode(base64_decode($services[2]));
+
+                return array('name' => $id,'values' => $d);
+            } else {
+                return $this->redirect($this->generateUrl('service'));
             }
-        }else{
-            return $this->redirect($this->generateUrl('login'));            
-        }   
-        
-             
+        } else {
+            return $this->redirect($this->generateUrl('login'));
+        }
     }
 
     /**
@@ -174,38 +156,34 @@ class MyDefaultController extends Controller
      * @Template()
      */
     public function addCredentialAction(Request $request)
-    {   
-        if($this->get('session')->get('username')){
-            if($request->request->get('service_name'))
-            {            
-                $fields=$request->request->get('fields');
-                $service_name=$request->request->get('service_name');
+    {
+        if ($this->get('session')->get('username')) {
+            if ($request->request->get('service_name')) {
+                $fields = $request->request->get('fields');
+                $service_name = $request->request->get('service_name');
                 $DB = $this->get('connection');
-                $status=$DB->saveCredentials($service_name,$fields);
+                $status = $DB->saveCredentials($service_name, $fields);
+
                 return $this->redirect($this->generateUrl('service'));
             }
-        }else{
-            return $this->redirect($this->generateUrl('login'));            
+        } else {
+            return $this->redirect($this->generateUrl('login'));
         }
-
-        
     }
 
     /**
      * @Route("/status/{id}/{status}", name="status")
-     * 
      */
-    public function statusAction($id,$status)
-    {   
-        if($this->get('session')->get('username')){
+    public function statusAction($id, $status)
+    {
+        if ($this->get('session')->get('username')) {
             $DB = $this->get('connection');
-            $DB->changeStatus($id,$status);
-            return $this->redirect($this->generateUrl('service'));
-        }else{
-            return $this->redirect($this->generateUrl('login'));            
-        }
-       
+            $DB->changeStatus($id, $status);
 
+            return $this->redirect($this->generateUrl('service'));
+        } else {
+            return $this->redirect($this->generateUrl('login'));
+        }
     }
 
     /**
@@ -213,83 +191,75 @@ class MyDefaultController extends Controller
      * @Template()
      */
     public function loginAction(Request $request)
-    {  
-        if($request->request->has('username') && $request->request->has('password'))
-        {
+    {
+        if ($request->request->has('username') && $request->request->has('password')) {
             try {
-                $username=$request->request->get('username');
-                $password=$request->request->get('password');
-                $DB=$this->get('connection');
-                $result=$DB->getUser(array($username,$password));
-                if($result>1){
+                $username = $request->request->get('username');
+                $password = $request->request->get('password');
+                $DB = $this->get('connection');
+                $result = $DB->getUser(array($username, $password));
+                if ($result>1) {
                     $session = new Session();
                     $session->start();
 
                     // set and get session attributes
                     $session->set('username', $username);
+
                     return $this->redirect($this->generateUrl('dashboard'));
-
-                }else{
-                    return array('error_msg' => 'Incorrect Username or Password','username'=>$username,'password'=>$password);
+                } else {
+                    return array('error_msg' => 'Incorrect Username or Password','username' => $username,'password' => $password);
                 }
-
             } catch (\Exception $e) {
                 $e->getMessage();
             }
-           
         }
     }
 
     /**
      * @Route("/logout/", name="logout")
-     * 
      */
     public function logout()
-    {   
+    {
         $this->get('session')->clear();
+
         return $this->redirect($this->generateUrl('login'));
-
     }
-
 
     /**
      * @Route("/upload/{name}/{id}", name="upload")
      * @Template()
      */
-    public function uploadAction($name,$id)
+    public function uploadAction($name, $id)
     {
-        if($this->get('session')->get('username')){
-            $DB=$this->get('connection');
-            return array('service_name'=>$name,'service_id'=>$id);        
-            
-        }else{
-            return $this->redirect($this->generateUrl('login'));            
+        if ($this->get('session')->get('username')) {
+            $DB = $this->get('connection');
+
+            return array('service_name' => $name,'service_id' => $id);
+        } else {
+            return $this->redirect($this->generateUrl('login'));
         }
-             
     }
 
     /**
      * @Route("/uploadFile/", name="uploadFile")
-     * 
      */
     public function uploadFileAction(Request $request)
     {
-            $path=$this->get('request')->server->get('DOCUMENT_ROOT').'/upload/';
-            $DB=$this->get('connection');
-            if($request->files){
-                foreach ($request->files as $uploadedFile) {                
-                   $file = $uploadedFile->move($path,$uploadedFile->getClientOriginalName());                                 
-                   if(file_exists($path.$uploadedFile->getClientOriginalName()))
-                   {
+        $path = $this->get('request')->server->get('DOCUMENT_ROOT').'/upload/';
+        $DB = $this->get('connection');
+        if ($request->files) {
+            foreach ($request->files as $uploadedFile) {
+                $file = $uploadedFile->move($path, $uploadedFile->getClientOriginalName());
+                if (file_exists($path.$uploadedFile->getClientOriginalName())) {
                     $DB->saveUploadData($uploadedFile->getClientOriginalName(),
                                         $request->request->get('service_id'),
                                         $request->request->get('service_name')
                                        );
-                    return $this->redirect($this->generateUrl('service')); 
-                   }
+
+                    return $this->redirect($this->generateUrl('service'));
                 }
             }
-            
+        }
     }
 
     /**
@@ -300,6 +270,4 @@ class MyDefaultController extends Controller
     {
         return array();
     }
-
-   
 }
