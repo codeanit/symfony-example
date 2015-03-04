@@ -90,7 +90,7 @@ class Queue
                     }
                 }
 
-                if($operation=='modify'){ 
+                if($operation=='modify' || $operation=='update'){ 
                     if($result['code']==200){
                         // change status to complete 
                         $updateTransaction=$connection->update('transactions',$result['data'], array('transaction_code' => $result['confirmation_number']));                                              
