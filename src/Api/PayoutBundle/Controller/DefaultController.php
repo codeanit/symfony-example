@@ -25,6 +25,18 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/generate/", name="generate")
+     * 
+     */
+    public function generateAction()
+    {         
+        // $Q=$this->get('consultoria');        
+        $Q=$this->get('sanmartin');        
+        print_r($Q->generate());        
+        die;      
+    }
+
+    /**
      * @Route("/fqueue/", name="fqueue")
      * 
      */
