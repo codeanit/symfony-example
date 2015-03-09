@@ -2,6 +2,7 @@
 #var/**/*
 
 #Ignore app folder
+app/logs
 app/cache/*
 app/logs/*
 
