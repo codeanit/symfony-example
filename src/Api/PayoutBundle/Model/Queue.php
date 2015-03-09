@@ -90,7 +90,7 @@ class Queue
                     }
                 }
 
-                if($operation=='modify'){ 
+                if($operation=='modify' || $operation=='update'){ 
                     if($result['code']==200){
                         // change status to complete 
                         $updateTransaction=$connection->update('transactions',$result['data'], array('transaction_code' => $result['confirmation_number']));                                              
@@ -107,7 +107,7 @@ class Queue
                     }
                 }
 
-                if($operation == 'create' || $operation == 'modify' || $operation == 'cancel'){
+                if($operation == 'create' || $operation == 'modify' || $operation == 'cancel'){                   
                     // add queue to notify to source
                     if(array_key_exists('change_status', $result)){
                         $change_status=$result['change_status'];
@@ -118,10 +118,10 @@ class Queue
                         'transaction_source' => 'CDEX',
                         'transaction_service' => $result['notify_source'],
                         'operation' => 'notify', 
-                        'parameter' => json_encode(array('code'=>$result['code'],'operation'=>$result['operation'],'confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'],'change_status'=>$change_status)),
+                        'parameter' => json_encode(array('code'=>$result['code'],'operation'=>$result['operation'],'confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'],'change_status'=>$change_status,'data'=> isset($result['data'])?$result['data']:'')),
                         'is_executed' => 0,
                         'creation_datetime' => date('Y-m-d H:i:s')
-                        );
+                        );               
                     $check_queue = $connection->insert('operations_queue', $queueData);
                 }            
                     
@@ -139,9 +139,7 @@ class Queue
     }
 
     public function executeFileOperation()
-    {   
-        $log = new \Symfony\Bridge\Monolog\Logger('FILE_QUEUE');
-        $log->pushHandler(new StreamHandler(__DIR__ . '/Logs/FILE_QUEUE_LOG.txt' , Logger::INFO));   
+    {          
         $connection = $this->container->get('database_connection');
         $getUnexecutedOp = "SELECT * FROM file_queue"
             . "  WHERE is_executed = 0  ORDER BY id ASC LIMIT 1 ";
@@ -149,71 +147,21 @@ class Queue
         if(count($results)<1)
         {
             return array('code'=>'400','message'=>'No Operation Found In Queue');
-        }    
-        $operation = '';
-        $parameter = '';
-       
-        foreach ($results as $result) {
-            $file_id=$result['id'];
-            $id = $result['service_id'];
-            $action = $result['action'];
-            $service_name= $result['service_name'];       
-            $file_name=$result['file'];            
         }
 
-        /**
-         * Parse File Data
-         */
-        if($action == "IN"){
-                try {
-                    $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/upload/'.$file_name;      
-                    $inputFileType = \PHPExcel_IOFactory::identify($path);
-                    $objReader = \PHPExcel_IOFactory::createReader($inputFileType);
-                    $objPHPExcel = $objReader->load($path);  
-                    $ws = $objPHPExcel->getSheet(0);              
-                    $rows = $ws->toArray();
-                    $total=count($rows)-1;
-                    unset($rows[0]);
-                    unset($rows[$total]);
-                    $count=count($rows);                 
-                } catch (\Exception $e) {
-                    unset($results[0]['id']);                                        
-                    $connection->insert('file_queue',$results[0]);                                      
-                    $log->addError('File Parsing Failed',array('Exception At'=>$e->getMessage(),'Filename'=>$file_name,'ServiceName'=>$service_name,'Action'=>$action));
-                }
-                
-                try {
-                    for ($txn=1; $txn < $count+1; $txn++) {
-                    $queueData = array(
-                            'transaction_source' => 'CDEX',
-                            'transaction_service' => $service_name,
-                            'operation' => 'update', 
-                            'parameter' => json_encode(array('code'=>'200','operation'=>'modify','confirmation_number'=>$rows[$txn][0],'status'=>'successful','change_status'=>$rows[$txn][8])),
-                            'is_executed' => 0,
-                            'creation_datetime' => date('Y-m-d H:i:s')
-                            );
-                    $check_queue = $connection->insert('operations_queue', $queueData);
-                    }
-                } catch (\Exception $e) {
-                    $log->addError('Queue Adding Failed',array('Exception At'=>$e->getMessage(),'Filename'=>$file_name,'ServiceName'=>$service_name,'Action'=>$action));
-                }
-                              
-            } 
-            
-            /**
-             * @todo  OUT case implementation
-             */
-            if($action=="OUT")
-            {
-                $result=array('msg'=>"OUT action implementation in progress... ");
-            } 
-        
-                
+        try {
+            $service=$this->container->get(strtolower($results[0]['service_name']));
+            $result=$service->parse($results);
+
+        } catch (\Exception $e) {
+            throw $e;
+            // echo $e->getMessage();
+        }
         $connection->update(
             'file_queue',
             array('is_executed' => '1'),
-            array('id' => $file_id)
-        );     
+            array('id' => $results[0]['id'])
+        );
         return $result;   
     }
 }

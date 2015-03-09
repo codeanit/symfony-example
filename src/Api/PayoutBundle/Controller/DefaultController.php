@@ -256,8 +256,7 @@ class DefaultController extends Controller
         return $this->redirect($this->generateUrl('login'));
 
     }
-
-
+    
     /**
      * @Route("/upload/{name}/{id}", name="upload")
      * @Template()
@@ -266,7 +265,7 @@ class DefaultController extends Controller
     {
         if($this->get('session')->get('username')){
             $DB=$this->get('connection');
-            return array('service_name'=>$name,'service_id'=>$id);        
+            return array('service_name'=>$name,'service_id'=>$id);     
             
         }else{
             return $this->redirect($this->generateUrl('login'));            
