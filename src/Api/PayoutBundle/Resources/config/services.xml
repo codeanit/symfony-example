@@ -36,6 +36,9 @@
         <service id="greenbelt" class="Api\PayoutBundle\Library\Greenbelt">            
             <argument type="service" id="service_container" />         
         </service>
+        <service id="sanmartin" class="Api\PayoutBundle\Library\Sanmartin">            
+            <argument type="service" id="service_container" />         
+        </service>
         <service id="consultoria" class="Api\PayoutBundle\Library\Consultoria">            
             <argument type="service" id="service_container" />         
         </service>

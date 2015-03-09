@@ -5,7 +5,7 @@ use Api\PayoutBundle\Library\Greenbelt;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class GreenbeltTest extends WebTestCase
+class SanmartinTest extends WebTestCase
 {
 
   private $GB; 
@@ -17,17 +17,17 @@ class GreenbeltTest extends WebTestCase
     $this->path='/var/www/dex-api/web/upload/';  
     $client = $this->createClient(); 
     $this->container = $client->getContainer();
-    $this->GB=$this->container->get('greenbelt');
+    $this->GB=$this->container->get('sanmartin');
   }
 
   public function testParserWithGoodData()
   { 
     $result=array(array(
                     'id' => '4',
-                    'service_id' =>'8',
+                    'service_id' =>'10',
                     'action' =>'IN',
-                    'file' =>'green.xlsx',
-                    'service_name' => 'greenbelt',
+                    'file' =>'san.txt',
+                    'service_name' => 'sanmartin',
                     'creation_date' => null,
                     'is_executed' =>'0'));      
  
@@ -42,10 +42,10 @@ class GreenbeltTest extends WebTestCase
   { 
     $result=array(array(
                     'id' => '4',
-                    'service_id' =>'8',
+                    'service_id' =>'10',
                     'action' =>'IN',
-                    'file' =>'green123.xlsx',
-                    'service_name' => 'greenbelt',
+                    'file' =>'san123.txt',
+                    'service_name' => 'sanmartin',
                     'creation_date' => null,
                     'is_executed' =>'0'));      
  

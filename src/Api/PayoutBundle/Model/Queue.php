@@ -107,7 +107,7 @@ class Queue
                     }
                 }
 
-                if($operation == 'create' || $operation == 'modify' || $operation == 'cancel'){
+                if($operation == 'create' || $operation == 'modify' || $operation == 'cancel'){                   
                     // add queue to notify to source
                     if(array_key_exists('change_status', $result)){
                         $change_status=$result['change_status'];
@@ -118,10 +118,10 @@ class Queue
                         'transaction_source' => 'CDEX',
                         'transaction_service' => $result['notify_source'],
                         'operation' => 'notify', 
-                        'parameter' => json_encode(array('code'=>$result['code'],'operation'=>$result['operation'],'confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'],'change_status'=>$change_status)),
+                        'parameter' => json_encode(array('code'=>$result['code'],'operation'=>$result['operation'],'confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'],'change_status'=>$change_status,'data'=> isset($result['data'])?$result['data']:'')),
                         'is_executed' => 0,
                         'creation_datetime' => date('Y-m-d H:i:s')
-                        );
+                        );               
                     $check_queue = $connection->insert('operations_queue', $queueData);
                 }            
                     
@@ -150,16 +150,18 @@ class Queue
         }
 
         try {
-        $service=$this->container->get(strtolower($results[0]['service_name']));
-        $result=$service->parse($results);            
+            $service=$this->container->get(strtolower($results[0]['service_name']));
+            $result=$service->parse($results);
+
         } catch (\Exception $e) {
-            echo $e->getMessage();die;
+            throw $e;
+            // echo $e->getMessage();
         }
         $connection->update(
             'file_queue',
             array('is_executed' => '1'),
             array('id' => $results[0]['id'])
-        );     
+        );
         return $result;   
     }
 }

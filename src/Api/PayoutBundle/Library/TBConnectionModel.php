@@ -46,94 +46,16 @@ class TBConnectionModel
      *        
      * @return  array
      */
-    public function curlTransborder(array $postedData)
+    public function notify(array $postedData)
     { 
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "http://firstglobalmoney.com.local/secure/cdex");
+        curl_setopt($curl, CURLOPT_URL, "http://172.16.1.50/secure/cdex");
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $postedData);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $resultPOST = curl_exec($curl);       
 
         return (array) json_decode($resultPOST);    
-    }
-
-    public function addLog(array $data)
-    {        
-        $logData=array(
-                                'transaction_key'=>$data['transaction']->transaction_key,
-                                'transaction_source'=>$data['source'],
-                                'transaction_service'=>$data['service'],
-                                'transaction_status'=>'pending',
-                                'transaction_code'=>$data['transaction']->transaction_code,
-                                'transaction_type'=>$data['transaction']->transaction_type,
-                                'payment_type'=>$data['transaction']->payment_type,
-                                'receiver_id_number'=>$data['transaction']->receiver_id_number,
-                                'receiver_id_type'=>$data['transaction']->receiver_id_type,
-                                'receiver_id_issued_country'=>$data['transaction']->receiver_id_issued_country,
-                                'receiver_first_name'=>$data['transaction']->receiver_first_name,
-                                'receiver_middle_name'=>$data['transaction']->receiver_middle_name,
-                                'receiver_last_name'=>$data['transaction']->receiver_last_name,
-                                'receiver_email'=>$data['transaction']->receiver_email,
-                                'receiver_account_type'=>$data['transaction']->receiver_account_type,
-                                'receiver_currency'=>$data['transaction']->receiver_currency,
-                                'receiver_city'=>'',
-                                'receiver_country'=>$data['transaction']->receiver_country,
-                                'receiver_state'=>$data['transaction']->receiver_state,
-                                'receiver_phone_mobile'=>$data['transaction']->receiver_phone_mobile,
-                                'receiver_phone_landline'=>$data['transaction']->receiver_phone_landline,
-                                'receiver_postal_code'=>$data['transaction']->receiver_postal_code,
-                                'receiver_account_number'=>$data['transaction']->receiver_account_number,
-                                'receiver_bank_routing_no'=>$data['transaction']->receiver_bank_routing_no,
-                                'receiver_bank_branch'=>$data['transaction']->receiver_bank_branch,
-                                'receiver_bank_name'=>$data['transaction']->receiver_bank_name,
-                                'sender_id_number'=>$data['transaction']->sender_id_number,
-                                'sender_id_type'=>$data['transaction']->sender_id_type,
-                                'sender_id_issued_country'=>$data['transaction']->sender_id_issued_country,
-                                'sender_first_name'=>$data['transaction']->sender_first_name,
-                                'sender_middle_name'=>$data['transaction']->sender_middle_name,
-                                'sender_last_name'=>$data['transaction']->sender_last_name,
-                                'sender_email'=>$data['transaction']->sender_email,
-                                'sender_account_type'=>$data['transaction']->sender_account_type,
-                                'sender_currency'=>$data['transaction']->sender_currency,
-                                'sender_city'=>'',
-                                'sender_country'=>$data['transaction']->sender_country,
-                                'sender_state'=>$data['transaction']->sender_state,
-                                'sender_phone_mobile'=>$data['transaction']->sender_phone_mobile,
-                                'sender_phone_landline'=>$data['transaction']->sender_phone_landline,
-                                'sender_postal_code'=>$data['transaction']->sender_postal_code,
-                                'sender_account_number'=>$data['transaction']->sender_account_number,
-                                'sender_bank_routing_number'=>$data['transaction']->sender_bank_routing_no,
-                                'sender_bank_branch'=>$data['transaction']->sender_bank_branch,
-                                'sender_bank_name'=>$data['transaction']->sender_bank_name,
-                                'additional_informations'=>' '
-                                );
-
-
-        $conn = $this->container->get('database_connection');
-        $check = 0;
-
-        try {
-
-            $qb = $conn->createQueryBuilder()
-                                    ->select('count(t.id)')
-                                    ->from('cdex_log', 't')
-                                    ->where('t.transaction_key = :transaction_key')
-                                    ->setParameter('transaction_key', $data['transaction']->transaction_key);
-           
-            if ($qb->execute()->fetchColumn() <= 0) {
-                $check= $conn->insert('cdex_log', $logData);            
-                
-            }else{
-                $check=2;
-            }
-                                    
-        } catch (\Exception $e) {
-
-            echo $e->getMessage();die;     
-
-        }
-        return $check;
-    }     
+    }   
 
 }
