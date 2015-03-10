@@ -69,9 +69,26 @@ class Sanmartin extends Common
             return;
         }
 
-        public function generate($data=null)
-        {
-            return;
+         public function generate($data=null,$p=null){          
+            $output='';
+            if($p==null){
+            $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.'Sanmartin.txt';                 
+                }
+            else{
+                  $path= $p.'Sanmartin.txt';
+                }    
+            
+            foreach ($data as $key => $value) {                
+                $output .= $value.'|';
+            }        
+            file_put_contents($path,$output.PHP_EOL,FILE_APPEND | LOCK_EX);           
+            $check=file_exists($path);
+            return $check;
+
+            /**
+             * @todo  validate output data
+             */
+            //$this->validate($output);
         }
 
 

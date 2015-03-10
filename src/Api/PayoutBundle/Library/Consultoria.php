@@ -72,9 +72,44 @@ class Consultoria extends Common
                             'creation_datetime' => date('Y-m-d H:i:s')
                             );
                     $check_queue = $this->connection->insert('operations_queue', $queueData);
-                }  
-                
+                }
             return;
+        }
+
+        public function generate($data=null,$p=null){          
+            $output='';
+            if($p==null){
+            $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.'Consultoria.txt';                 
+                }
+            else{
+                  $path= $p.'Consultoria.txt';
+                }    
+            
+            foreach ($data as $key => $value) {                
+                $output .= $value.'|';
+            }        
+            file_put_contents($path,$output.PHP_EOL,FILE_APPEND | LOCK_EX);           
+            $check=file_exists($path);
+            return $check;
+
+            /**
+             * @todo  validate output data
+             */
+            //$this->validate($output);
+        }
+        public function generator()
+        {  
+            //     grab data from database
+            //     foreach ($testData as $key => $value) {
+            //     var_dump($value['TRANSMMITER CODE']);
+            //     var_dump($value['CORRESPONDENT CODE']);
+            //     var_dump($value['ORDER CLAIM REFERENCE']);
+            //     die;
+            //     prepare array
+            //     $this->generate($data)
+            //     update MArker to 1 for making transaction as generated one                
+            }
+            die;
         }
 
 
