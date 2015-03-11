@@ -53,6 +53,10 @@ class Olympic extends Common
             return $result;        
         }
     }
+
+    public function generate($data=null,$p=null){        
+        
+    }  
    
 }
 

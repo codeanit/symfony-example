@@ -31,7 +31,8 @@ class DefaultController extends Controller
     public function generateAction()
     {         
         // $Q=$this->get('consultoria');        
-        $Q=$this->get('sanmartin');        
+        // $Q=$this->get('sanmartin');        
+        $Q=$this->get('greenbelt');        
         print_r($Q->generate());        
         die;      
     }
