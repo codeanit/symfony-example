@@ -1,18 +1,36 @@
 #Ignore var folder
+<<<<<<< HEAD
 #var/**/*
 
 #Ignore app folder
 app/logs
+=======
+var/**/*
+
+#Ignore app folder
+>>>>>>> bdo-integration
 app/cache/*
 app/logs/*
 
 #Ignore vendor folder
+<<<<<<< HEAD
 #vendor/**
 
 #Ignore composer files
 composer.*
+=======
+vendor/**
+
+#Ignore composer files
+composer.lock
+>>>>>>> bdo-integration
 
 #Ignore web/
 #web/**/*
 
+<<<<<<< HEAD
 
+=======
+app/bootstrap.php.cache
+app/config/parameters.yml
+>>>>>>> bdo-integration

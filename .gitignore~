@@ -1,13 +1,23 @@
 #Ignore var folder
+<<<<<<< HEAD
 #var/**/*
 
 #Ignore app folder
 app/logs
+=======
+var/**/*
+
+#Ignore app folder
+>>>>>>> bdo-integration
 app/cache/*
 app/logs/*
 
 #Ignore vendor folder
+<<<<<<< HEAD
 #vendor/**
+=======
+vendor/**
+>>>>>>> bdo-integration
 
 #Ignore composer files
 composer.*

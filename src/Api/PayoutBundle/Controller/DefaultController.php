@@ -31,7 +31,12 @@ class DefaultController extends Controller
     public function generateAction()
     {         
         // $Q=$this->get('consultoria');        
+<<<<<<< HEAD
         $Q=$this->get('sanmartin');        
+=======
+        // $Q=$this->get('sanmartin');        
+        $Q=$this->get('greenbelt');        
+>>>>>>> bdo-integration
         print_r($Q->generate());        
         die;      
     }
