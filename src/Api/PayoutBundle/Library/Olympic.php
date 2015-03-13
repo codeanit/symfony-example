@@ -53,13 +53,10 @@ class Olympic extends Common
             return $result;        
         }
     }
-<<<<<<< HEAD
-=======
 
     public function generate($data=null,$p=null){        
         
     }  
->>>>>>> bdo-integration
    
 }
 

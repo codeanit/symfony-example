@@ -53,9 +53,6 @@ class Greenbelt extends Common
                 }                              
             } 
         return $result;        
-<<<<<<< HEAD
-    }   
-=======
     } 
 
     public function generate($data=null,$p=null){        
@@ -120,7 +117,6 @@ class Greenbelt extends Common
         return $check;
 
     }  
->>>>>>> bdo-integration
    
 }
 

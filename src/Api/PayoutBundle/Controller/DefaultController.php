@@ -31,13 +31,22 @@ class DefaultController extends Controller
     public function generateAction()
     {         
         // $Q=$this->get('consultoria');        
-<<<<<<< HEAD
-        $Q=$this->get('sanmartin');        
-=======
         // $Q=$this->get('sanmartin');        
         $Q=$this->get('greenbelt');        
->>>>>>> bdo-integration
         print_r($Q->generate());        
+        die;      
+    }
+
+     /**
+     * @Route("/intermex/", name="intermex")
+     * 
+     */
+    public function intermexAction()
+    {         
+        // $Q=$this->get('consultoria');        
+        // $Q=$this->get('sanmartin');        
+        $Q=$this->get('intermex');        
+        print_r($Q->AltaEnvioN());        
         die;      
     }
 

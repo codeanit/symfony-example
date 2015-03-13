@@ -76,7 +76,7 @@ class Queue
         try {
             $serviceObj=$this->container->get($service);
             if($serviceObj != '') {            
-                if(strtolower($service)=='bts') {                
+                if(strtolower($service)=='bts' || strtolower($service)=='intermex' ) {                
                     $result=$serviceObj->process($operation, $parameter);
                 }else {                
                     $result=$serviceObj->{$operation}($parameter);
