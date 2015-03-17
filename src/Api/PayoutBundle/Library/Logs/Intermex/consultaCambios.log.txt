@@ -1,0 +1,1 @@
+[2015-03-17 13:09:34] Intermex.ERROR: Changes Failed {"Parameter":{"iIdAgencia":"F1CE4ED5-88AE-4A55-B601-2127E981B81D"},"Response":[]} []

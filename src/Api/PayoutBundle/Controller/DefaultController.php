@@ -23,7 +23,6 @@ class DefaultController extends Controller
         print_r($Q->executeQueuedOperation());        
         die;      
     }
-
     /**
      * @Route("/generate/", name="generate")
      * 

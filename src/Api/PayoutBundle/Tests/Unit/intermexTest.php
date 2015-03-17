@@ -19,13 +19,12 @@ class IntermexTest extends WebTestCase
     $this->container = $client->getContainer();
     $this->GB=$this->container->get('intermex');
   }
-
-  public function testForBankAccountPayment()
+  public function ptestForBankAccountPayment()
   {
     $param=array("source"=> "tb",
                  "service"=> "intermex",
                  "transaction"=>(object) array(     
-                    "transaction_code"=> rand(1,10000),    
+                    "transaction_code"=> '7897897890',    
                     "receiver_first_name"=> "Alejandro",
                     "receiver_mother_name"=> "Test",
                     "receiver_last_name"=> "Rodriguez",
@@ -65,7 +64,46 @@ class IntermexTest extends WebTestCase
     $expected='200';
     $this->assertEquals($expected,$resultData['code']);
   }
-  public function testForNotBankAccountType()
+  public function ptestconectar()
+  {
+    $resultData=$this->GB->conectar();
+  }
+  public function testconsultaCambios()
+  {
+    $resultData=$this->GB->consultaCambios();
+  }
+
+  public function ptestcambieTelBeneficiario()
+  {
+    $resultData=$this->GB->cambiaTelBeneficiario('7897897890','55555555','qwrwqrqwr'); 
+  }
+
+  public function ptestCambiaRemitente()
+  {
+    $resultData=$this->GB->cambiaRemitente('7897897890','qwewqrqw','faqwrwqrqsdfsdf');  
+  }
+
+  public function ptestcambiaBeneficiario()
+  {
+    $resultData=$this->GB->cambiaBeneficiario('7897897890','Fog','asfas asfsafreason');
+  }
+
+  public function ptestconfirmaPagado()
+  {
+    $resultData=$this->GB->confirmaPagado('7897897890','12345678');   
+  }
+
+  public function ptestConsultaPagados()
+  {
+    $resultData=$this->GB->consultaPagados();    
+  }
+  public function ptestanulaEnvio()
+  {
+    $resultData=$this->GB->anulaEnvio('7897897890','124241');
+    
+  }
+  
+  public function ptestForNotBankAccountType()
   {
      $param=array("source"=> "tb",
                  "service"=> "intermex",
@@ -109,41 +147,6 @@ class IntermexTest extends WebTestCase
    $resultData=$this->GB->process('create',$param);
    $expected='200';
    $this->assertEquals($expected,$resultData['code']);
-  }
-
-  public function ptestParserWithGoodData()
-  { 
-    $result=array(array(
-                    'id' => '4',
-                    'service_id' =>'11',
-                    'action' =>'IN',
-                    'file' =>'intermex-paid.txt',
-                    'service_name' => 'intermex',
-                    'creation_date' => null,
-                    'is_executed' =>'0'));      
- 
-    $result=$this->GB->parse($result,$this->path);    
-    $expected='200';
-    $actual=$result['code'];
-    $this->assertEquals($expected, $actual);
-  }
-
-  
-  public function ptestParserWithBadData()
-  { 
-    $result=array(array(
-                    'id' => '4',
-                    'service_id' =>'11',
-                    'action' =>'IN',
-                    'file' =>'intermex-paid123.txt',
-                    'service_name' => 'intermex',
-                    'creation_date' => null,
-                    'is_executed' =>'0'));      
- 
-    $result=$this->GB->parse($result,$this->path);      
-    $expected='400';
-    $actual=$result['code'];
-    $this->assertEquals($expected, $actual);
   }
 
 }
