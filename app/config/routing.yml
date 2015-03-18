@@ -24,8 +24,10 @@ landing_page:
 #     type: rest
 #     resource: Acme\BlogBundle\Controller\PageController
 
-
-
+api_payout:
+    resource: "@ApiPayoutBundle/Controller/"
+    type:     annotation
+    prefix:   /
 
 
 

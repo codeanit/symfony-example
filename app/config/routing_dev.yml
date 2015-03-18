@@ -24,3 +24,13 @@ api_web_service_mlhuillier:
 api_web_service_gcash:
     resource: "@ApiWebServiceBundle/Controller/GCashController.php"
     type:     annotation
+
+backend:
+  resource: "@BackendBundle/Controller/"
+  type: annotation
+  prefix: /
+
+library:
+  resource: "@LibraryBundle/Controller/"
+  type: annotation
+  prefix: /
