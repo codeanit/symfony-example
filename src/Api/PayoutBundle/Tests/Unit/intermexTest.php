@@ -19,12 +19,12 @@ class IntermexTest extends WebTestCase
     $this->container = $client->getContainer();
     $this->GB=$this->container->get('intermex');
   }
-  public function ptestForBankAccountPayment()
+  public function testForBankAccountPayment()
   {
     $param=array("source"=> "tb",
                  "service"=> "intermex",
                  "transaction"=>(object) array(     
-                    "transaction_code"=> '7897897890',    
+                    "transaction_code"=> rand(1,10000),    
                     "receiver_first_name"=> "Alejandro",
                     "receiver_mother_name"=> "Test",
                     "receiver_last_name"=> "Rodriguez",
@@ -64,42 +64,42 @@ class IntermexTest extends WebTestCase
     $expected='200';
     $this->assertEquals($expected,$resultData['code']);
   }
-  public function ptestconectar()
+  public function ptestConectar()
   {
     $resultData=$this->GB->conectar();
   }
-  public function testconsultaCambios()
+  public function testConsultaCambios()
   {
     $resultData=$this->GB->consultaCambios();
   }
 
-  public function ptestcambieTelBeneficiario()
+  public function testCambieTelBeneficiario()
   {
-    $resultData=$this->GB->cambiaTelBeneficiario('7897897890','55555555','qwrwqrqwr'); 
+    $resultData=$this->GB->cambiaTelBeneficiario('789456123','464654654','cwetewtwe'); 
   }
 
-  public function ptestCambiaRemitente()
+  public function testCambiaRemitente()
   {
-    $resultData=$this->GB->cambiaRemitente('7897897890','qwewqrqw','faqwrwqrqsdfsdf');  
+    $resultData=$this->GB->cambiaRemitente('789456123','manman','qfasdfwerwet');  
   }
 
-  public function ptestcambiaBeneficiario()
+  public function testCambiaBeneficiario()
   {
-    $resultData=$this->GB->cambiaBeneficiario('7897897890','Fog','asfas asfsafreason');
+    $resultData=$this->GB->cambiaBeneficiario('789456123','assswerer','hjlhjlhj');
   }
 
-  public function ptestconfirmaPagado()
+  public function testConfirmaPagado()
   {
-    $resultData=$this->GB->confirmaPagado('7897897890','12345678');   
+    $resultData=$this->GB->confirmaPagado('789456123','12345678');   
   }
 
-  public function ptestConsultaPagados()
+  public function testConsultaPagados()
   {
     $resultData=$this->GB->consultaPagados();    
   }
-  public function ptestanulaEnvio()
+  public function testAnulaEnvio()
   {
-    $resultData=$this->GB->anulaEnvio('7897897890','124241');
+    $resultData=$this->GB->anulaEnvio('789456132','124241');
     
   }
   

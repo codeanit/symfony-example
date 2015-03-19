@@ -365,4 +365,17 @@ class DB
         return;
     }
 
+    public function getServiceId($name){
+        $conn = $this->container->get('database_connection');        
+        $result = $conn->fetchArray('SELECT id FROM services WHERE service_name = ?', array(strtolower($name)));
+        return $result;
+    }
+
+    public function getLogList($service_name,$service_id)
+    {
+        $conn = $this->container->get('database_connection');        
+        $data = $conn->fetchAll('SELECT * FROM log WHERE Service = ? ORDER BY id DESC', array(ucfirst($service_id)));      
+        return $data;
+    }
+
 }
