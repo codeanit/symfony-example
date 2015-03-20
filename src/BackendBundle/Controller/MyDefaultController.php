@@ -63,7 +63,7 @@ class MyDefaultController extends Controller
     }
 
     /**
-     * @Route("/service/", name="service")
+     * @Route("/xservice/", name="xservice")
      * @Template()
      */
     public function serviceAction()
