@@ -29,7 +29,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * @Route("/addfService/", name="addfService")
+     * @Route("/xaddfService/", name="xaddfService")
      * @Template()
      */
     public function addfServiceAction(Request $request)
