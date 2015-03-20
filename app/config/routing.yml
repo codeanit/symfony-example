@@ -15,11 +15,8 @@ payout:
 
 landing_page:
     path:     /
-<<<<<<< HEAD
-    defaults: { _controller: 'ApiPayoutBundle:Default:hack'}
-=======
     defaults: { _controller: 'ApiPayoutBundle:Default:transaction'}
->>>>>>> bdo-integration
+
 # pages:
 #     type: rest
 #     resource: Acme\BlogBundle\Controller\PageController

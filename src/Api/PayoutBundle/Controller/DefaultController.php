@@ -34,20 +34,7 @@ class DefaultController extends Controller
         $Q=$this->get('greenbelt');        
         print_r($Q->generate());        
         die;      
-    }
-
-     /**
-     * @Route("/intermex/", name="intermex")
-     * 
-     */
-    public function intermexAction()
-    {         
-        // $Q=$this->get('consultoria');        
-        // $Q=$this->get('sanmartin');        
-        $Q=$this->get('intermex');        
-        print_r($Q->AltaEnvioN());        
-        die;      
-    }
+    }     
 
     /**
      * @Route("/fqueue/", name="fqueue")
@@ -323,13 +310,19 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/hack/", name="hack")
+     * @Route("/logs/{name}/{id}", name="logs")
      * @Template()
      */
-    public function hackAction()
+    public function logAction($name,$id)
     {
-        return array();
+        if($this->get('session')->get('username')){
+            $DB=$this->get('connection');
+            $data=$DB->getLogList($name,$id);
+            return array('logs'=>$data,'service_name'=>$name);
+        }else{
+            return $this->redirect($this->generateUrl('login'));            
+        }
+             
     }
-
    
 }

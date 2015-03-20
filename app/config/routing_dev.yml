@@ -25,10 +25,10 @@ api_web_service_gcash:
     resource: "@ApiWebServiceBundle/Controller/GCashController.php"
     type:     annotation
 
-backend:
-  resource: "@BackendBundle/Controller/"
-  type: annotation
-  prefix: /
+#backend:
+#  resource: "@BackendBundle/Controller/"
+#  type: annotation
+#  prefix: /
 
 library:
   resource: "@LibraryBundle/Controller/"

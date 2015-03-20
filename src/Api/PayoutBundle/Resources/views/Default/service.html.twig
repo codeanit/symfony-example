@@ -47,7 +47,8 @@
                   <a href="{{url('addService', {'name': entry.service_name,'id':entry.id})}}" class='btn btn-primary btn-xs'>Edit</a>
                   <a href="{{url('status',{'id':entry.id,'status':entry.status})}}" class='btn btn-primary btn-xs' 
                   value='{{entry.id}}' name='status'>{{(status in entry.status)?'Deactivate':'Activate'}}</a>
-                  {% if entry.is_ftp_service == 1 %}  
+                  <a href="{{url('logs', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-default btn-xs'>Logs</a>
+                  {% if entry.is_ftp_service == 2 %}  
                     <a href="{{url('upload', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-primary btn-xs'>Upload</a>
                   {% endif %}
                 </td>

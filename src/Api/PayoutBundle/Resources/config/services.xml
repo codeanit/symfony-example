@@ -20,6 +20,9 @@
         <service id="queue" class="Api\PayoutBundle\Model\Queue">            
             <argument type="service" id="service_container" />         
         </service>
+        <service id="log" class="Api\PayoutBundle\Model\Log">            
+            <argument type="service" id="service_container" />         
+        </service>
          <service id="connection" class="Api\PayoutBundle\Model\DB">            
             <argument type="service" id="service_container" />         
         </service>
