@@ -14,9 +14,9 @@ class Intermex
     protected $service_id;
     protected $operationMap = array(
         'create' => 'altaEnvioT',
-        'modify' => '',
-        'update' => '',
-        'cancel' => ''
+        'modify' => 'processUpdate',
+        'update' => 'processUpdate',
+        'cancel' => 'anulaEnvio'
     );
 
     public function __construct(ContainerInterface $container)
@@ -472,9 +472,34 @@ class Intermex
       return $arr;
     }
 
+
     public function process($operation, $args)
     {
         return call_user_func_array(array($this, $this->operationMap[$operation]), [$args]);
+    }
+
+    /**
+     * Used to map to specific update method according to
+     * modified data
+     * 
+     * @param  Array $txn [fields must be('refNo','newData','reason for change')]
+     * @return void
+     */
+    public function processUpdate($txn=null)
+    {
+        if(isset($txn['receiver_first_name']))
+        {
+          $this->cambiaBeneficiario($txn['confirmation_number'],$txn['receiver_first_name'],$txn['reason']);
+        }
+        if(isset($txn['sender_first_name']))
+        {
+          $this->cambiaRemitente($txn['confirmation_number'],$txn['sender_first_name'],$txn['reason']);
+        }
+        if(isset($txn['sender_phone_mobile']))
+        {
+          $this->cambiaTelBeneficiario($txn['confirmation_number'],$txn['sender_phone_mobile'],$txn['reason']);          
+        }
+
     }
 
 }
