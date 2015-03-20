@@ -14,5 +14,6 @@ composer.*
 #web/**/*
 
 #ignore logs
-app/logs/*
+app/logs/dev.log
+app/logs/**
 
