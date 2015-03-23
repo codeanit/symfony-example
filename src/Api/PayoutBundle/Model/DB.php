@@ -39,8 +39,7 @@ class DB
     }
 
     public function operateTransaction(array $data,$jsonData,$operation)
-    { 
-
+    {        
         if(isset($data['transaction_status']))
         {
             $status=$data['transaction_status'];
@@ -50,73 +49,81 @@ class DB
 
         $logData = array(
                         'transaction_key'=> mt_rand(1, 9999999),
-                        'transaction_source'=>$data['source'],
-                        'transaction_service'=>$data['service'],
+                        'transaction_source'=>isset($data['source'])?$data['source']:'',
+                        'transaction_service'=>isset($data['service'])?$data['service']:'',
                         'transaction_status'=>$status,
                         'status'=>'approved',
-                        'transaction_code'=>$data['transaction']->transaction_code,
-                        'transaction_type'=>$data['transaction']->transaction_type,
-                        'transaction_payment_type'=>$data['transaction']->payment_type,
-                        'transaction_payment_type_code'=>$data['transaction']->payment_type_code,
-                        'receiver_id_number'=>$data['transaction']->receiver_id_number,
-                        'receiver_id_type'=>$data['transaction']->receiver_id_type,
-                        'receiver_id_issued_country'=>$data['transaction']->receiver_id_issued_country,
-                        'receiver_first_name'=>$data['transaction']->receiver_first_name,
-                        'receiver_middle_name'=>$data['transaction']->receiver_mother_name,
-                        'receiver_last_name'=>$data['transaction']->receiver_last_name,
-                        'receiver_email'=>$data['transaction']->receiver_email,
-                        'receiver_account_type'=>$data['transaction']->receiver_account_type,
-                        'receiver_currency'=>$data['transaction']->receiver_currency,
+                        'transaction_code'=>isset($data['transaction']->transaction_code)?$data['transaction']->transaction_code:'',
+                        'transaction_type'=>isset($data['transaction']->transaction_type)?$data['transaction']->transaction_type:'',
+                        'transaction_payment_type'=>isset($data['transaction']->payment_type)?$data['transaction']->payment_type:'',
+                        'transaction_payment_type_code'=>isset($data['transaction']->payment_type_code)?$data['transaction']->payment_type_code:'',
+                        'receiver_id_number'=>isset($data['transaction']->receiver_id_number)?$data['transaction']->receiver_id_number:'',
+                        'receiver_id_type'=>isset($data['transaction']->receiver_id_type)?$data['transaction']->receiver_id_type:'',
+                        'receiver_id_issued_country'=>isset($data['transaction']->receiver_id_issued_country)?$data['transaction']->receiver_id_issued_country:'',
+                        'receiver_first_name'=>isset($data['transaction']->receiver_first_name)?$data['transaction']->receiver_first_name:'',
+                        'receiver_middle_name'=>isset($data['transaction']->receiver_mother_name)?$data['transaction']->receiver_mother_name:'',
+                        'receiver_last_name'=>isset($data['transaction']->receiver_last_name)?$data['transaction']->receiver_last_name:'',
+                        'receiver_email'=>isset($data['transaction']->receiver_email)?$data['transaction']->receiver_email:'',
+                        'receiver_account_type'=>isset($data['transaction']->receiver_account_type)?$data['transaction']->receiver_account_type:'',
+                        'receiver_currency'=>isset($data['transaction']->receiver_currency)?$data['transaction']->receiver_currency:'',
                         'receiver_city'=>'',
-                        'receiver_country'=>$data['transaction']->receiver_country,
-                        'receiver_state'=>$data['transaction']->receiver_state,
-                        'receiver_phone_mobile'=>$data['transaction']->receiver_phone_mobile,
-                        'receiver_phone_landline'=>$data['transaction']->receiver_phone_landline,
-                        'receiver_postal_code'=>$data['transaction']->receiver_postal_code,
-                        'receiver_account_number'=>$data['transaction']->receiver_account_number,
-                        'receiver_bank_routing_no'=>$data['transaction']->receiver_bank_routing_no,
-                        'receiver_bank_branch'=>$data['transaction']->receiver_bank_branch,
-                        'receiver_bank_name'=>$data['transaction']->receiver_bank_name,
-                        'sender_id_number'=>$data['transaction']->sender_id_number,
-                        'sender_id_type'=>$data['transaction']->sender_id_type,
-                        'sender_id_issued_country'=>$data['transaction']->sender_id_issued_country,
-                        'sender_first_name'=>$data['transaction']->sender_first_name,
-                        'sender_middle_name'=>$data['transaction']->sender_mother_name,
-                        'sender_last_name'=>$data['transaction']->sender_last_name,
-                        'sender_email'=>$data['transaction']->sender_email,
-                        'sender_account_type'=>$data['transaction']->sender_account_type,
-                        'sender_currency'=>$data['transaction']->sender_currency,
+                        'receiver_country'=>isset($data['transaction']->receiver_country)?$data['transaction']->receiver_country:'',
+                        'receiver_state'=>isset($data['transaction']->receiver_state)?$data['transaction']->receiver_state:'',
+                        'receiver_phone_mobile'=>isset($data['transaction']->receiver_phone_mobile)?$data['transaction']->receiver_phone_mobile:'',
+                        'receiver_phone_landline'=>isset($data['transaction']->receiver_phone_landline)?$data['transaction']->receiver_phone_landline:'',
+                        'receiver_postal_code'=>isset($data['transaction']->receiver_postal_code)?$data['transaction']->receiver_postal_code:'',
+                        'receiver_account_number'=>isset($data['transaction']->receiver_account_number)?$data['transaction']->receiver_account_number:'',
+                        'receiver_bank_routing_no'=>isset($data['transaction']->receiver_bank_routing_no)?$data['transaction']->receiver_bank_routing_no:'',
+                        'receiver_bank_branch'=>isset($data['transaction']->receiver_bank_branch)?$data['transaction']->receiver_bank_branch:'',
+                        'receiver_bank_name'=>isset($data['transaction']->receiver_bank_name)?$data['transaction']->receiver_bank_name:'',
+                        'sender_id_number'=>isset($data['transaction']->sender_id_number)?$data['transaction']->sender_id_number:'',
+                        'sender_id_type'=>isset($data['transaction']->sender_id_type)?$data['transaction']->sender_id_type:'',
+                        'sender_id_issued_country'=>isset($data['transaction']->sender_id_issued_country)?$data['transaction']->sender_id_issued_country:'',
+                        'sender_first_name'=>isset($data['transaction']->sender_first_name)?$data['transaction']->sender_first_name:'',
+                        'sender_middle_name'=>isset($data['transaction']->sender_mother_name)?$data['transaction']->sender_mother_name:'',
+                        'sender_last_name'=>isset($data['transaction']->sender_last_name)?$data['transaction']->sender_last_name:'',
+                        'sender_email'=>isset($data['transaction']->sender_email)?$data['transaction']->sender_email:'',
+                        'sender_account_type'=>isset($data['transaction']->sender_account_type)?$data['transaction']->sender_account_type:'',
+                        'sender_currency'=>isset($data['transaction']->sender_currency)?$data['transaction']->sender_currency:'',
                         'sender_city'=>'',
-                        'sender_country'=>$data['transaction']->sender_country,
-                        'sender_state'=>$data['transaction']->sender_state,
-                        'sender_phone_mobile'=>$data['transaction']->sender_phone_mobile,
-                        'sender_phone_landline'=>$data['transaction']->sender_phone_landline,
-                        'sender_postal_code'=>$data['transaction']->sender_postal_code,
-                        'sender_account_number'=>$data['transaction']->sender_account_number,
-                        'sender_bank_routing_number'=>$data['transaction']->sender_bank_routing_no,
-                        'sender_bank_branch'=>$data['transaction']->sender_bank_branch,
-                        'sender_bank_name'=>$data['transaction']->sender_bank_name,
+                        'sender_country'=>isset($data['transaction']->sender_country)?$data['transaction']->sender_country:'',
+                        'sender_state'=>isset($data['transaction']->sender_state)?$data['transaction']->sender_state:'',
+                        'sender_phone_mobile'=>isset($data['transaction']->sender_phone_mobile)?$data['transaction']->sender_phone_mobile:'',
+                        'sender_phone_landline'=>isset($data['transaction']->sender_phone_landline)?$data['transaction']->sender_phone_landline:'',
+                        'sender_postal_code'=>isset($data['transaction']->sender_postal_code)?$data['transaction']->sender_postal_code:'',
+                        'sender_account_number'=>isset($data['transaction']->sender_account_number)?$data['transaction']->sender_account_number:'',
+                        'sender_bank_routing_number'=>isset($data['transaction']->sender_bank_routing_no)?$data['transaction']->sender_bank_routing_no:'',
+                        'sender_bank_branch'=>isset($data['transaction']->sender_bank_branch)?$data['transaction']->sender_bank_branch:'',
+                        'sender_bank_name'=>isset($data['transaction']->sender_bank_name)?$data['transaction']->sender_bank_name:'',
                         'additional_informations'=>''
                         );        
         $queueData = array(
-                        'transaction_source' => $data['source'],
-                        'transaction_service' => $data['service'],
+                        'transaction_source' => isset($data['source'])?$data['source']:'',
+                        'transaction_service' => isset($data['service'])?$data['service']:'',
                         'operation' => $operation, 
                         'parameter' => $jsonData,
                         'is_executed' => 0,
                         'creation_datetime' => date('Y-m-d H:i:s')
-                        );
+                        );       
         $conn = $this->container->get('database_connection');
         $check = 0;
         $check_queue = 0;
 
 
-        try { 
+        try {              
+                if(isset($data['confirmation_number']))
+                {
+                    $num = $data['confirmation_number'];
+                }
+                if(isset($data['transaction']->transaction_code))
+                {
+                    $num = $data['transaction']->transaction_code;                    
+                }
                 $qb = $conn->createQueryBuilder()
                                ->select('count(t.id)')
                                ->from('transactions', 't')
                                ->where('t.transaction_code = :transaction_code')
-                               ->setParameter('transaction_code', $data['transaction']->transaction_code);
+                               ->setParameter('transaction_code', $num);
                 $count=$qb->execute()->fetchColumn();
                                
                 if($operation=='modify') {
@@ -375,6 +382,13 @@ class DB
     {
         $conn = $this->container->get('database_connection');        
         $data = $conn->fetchAll('SELECT * FROM log WHERE Service = ? ORDER BY id DESC', array(ucfirst($service_id)));      
+        return $data;
+    }
+
+    public function getCred($service_name)
+    {
+        $conn = $this->container->get('database_connection');        
+        $data = $conn->fetchAll('SELECT * FROM services WHERE service_name = ? ', array(strtolower($service_name)));      
         return $data;
     }
 

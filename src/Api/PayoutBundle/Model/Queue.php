@@ -80,8 +80,9 @@ class Queue
                     $result=$serviceObj->process($operation, $parameter);
                 }else {                
                     $result=$serviceObj->{$operation}($parameter);
-                }
-
+                } 
+                
+                              
                 if($operation=='create'){
                     if($result['code']==200){
                         $check=$connection->update('transactions',array('transaction_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                           
@@ -91,12 +92,11 @@ class Queue
                 }
 
                 if($operation=='modify' || $operation=='update'){ 
-                    if($result['code']==200){
-                        // change status to complete 
+                    if($result['code']==200){                  
                         $updateTransaction=$connection->update('transactions',$result['data'], array('transaction_code' => $result['confirmation_number']));                                              
                     }else{                
                         $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
-                    }
+                    }               
                 }
 
                 if($operation=='cancel'){                
@@ -118,15 +118,22 @@ class Queue
                         'transaction_source' => 'CDEX',
                         'transaction_service' => $result['notify_source'],
                         'operation' => 'notify', 
-                        'parameter' => json_encode(array('code'=>$result['code'],'operation'=>$result['operation'],'confirmation_number'=>$result['confirmation_number'],'status'=>$result['status'],'change_status'=>$change_status,'data'=> isset($result['data'])?$result['data']:'')),
+                        'parameter' => json_encode(array('code'=>$result['code'],
+                                                         'operation'=>$result['operation'],
+                                                         'confirmation_number'=>$result['confirmation_number'],
+                                                         'status'=>$result['status'],
+                                                         'change_status'=>$change_status,
+                                                         'message'=>$result['message'],
+                                                         'data'=> (isset($result['data'])?$result['data']:''))),
                         'is_executed' => 0,
                         'creation_datetime' => date('Y-m-d H:i:s')
-                        );               
+                        );      
+
                     $check_queue = $connection->insert('operations_queue', $queueData);
                 }            
                     
             }   
-        } catch (\Exception $e) {            
+        } catch (\Exception $e) { 
             $result=array('code'=>'400','message'=>'Error in Queue Processing.','error'=>$e->getMessage());
         }
 
