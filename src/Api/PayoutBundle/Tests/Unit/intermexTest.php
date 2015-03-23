@@ -59,7 +59,8 @@ class IntermexTest extends WebTestCase
                     "payout_channel"=>"bank",
                     "payer_id"=>"135",
                     "remittance_date"=>"14/03/2015",
-                    "additional_information"=> ""));    
+                    "additional_information"=> ""));
+     
     $resultData=$this->GB->process('create',$param);
     $expected='200';
     $this->assertEquals($expected,$resultData['code']);
@@ -68,36 +69,37 @@ class IntermexTest extends WebTestCase
   {
     $resultData=$this->GB->conectar();
   }
-  public function testConsultaCambios()
+  public function ptestConsultaCambios()
   {
     $resultData=$this->GB->consultaCambios();
+
   }
 
-  public function testCambieTelBeneficiario()
+  public function ptestCambieTelBeneficiario()
   {
     $resultData=$this->GB->cambiaTelBeneficiario('789456123','464654654','cwetewtwe'); 
   }
 
-  public function testCambiaRemitente()
+  public function ptestCambiaRemitente()
   {
     $resultData=$this->GB->cambiaRemitente('789456123','manman','qfasdfwerwet');  
   }
 
-  public function testCambiaBeneficiario()
+  public function ptestCambiaBeneficiario()
   {
     $resultData=$this->GB->cambiaBeneficiario('789456123','assswerer','hjlhjlhj');
   }
 
-  public function testConfirmaPagado()
+  public function ptestConfirmaPagado()
   {
     $resultData=$this->GB->confirmaPagado('789456123','12345678');   
   }
 
-  public function testConsultaPagados()
+  public function ptestConsultaPagados()
   {
     $resultData=$this->GB->consultaPagados();    
   }
-  public function testAnulaEnvio()
+  public function ptestAnulaEnvio()
   {
     $resultData=$this->GB->anulaEnvio('789456132','124241');
     

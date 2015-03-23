@@ -29,7 +29,10 @@ class Intermex
         $this->database = json_decode(base64_decode($result[0]['credentials']));        
         $this->url=$this->database->url;        
         $this->service_id=$result[0]['id'];
+<<<<<<< HEAD
 
+=======
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
     }
 
     /**
@@ -267,7 +270,11 @@ class Intermex
                               'data' => array('receiver_first_name'=>$vNuevoBeneficiario) ,
                               'confirmation_number' => $vReferencia,
                            );
+<<<<<<< HEAD
               $this->log->addInfo($this->service_id, 'cambiaBeneficiario', $param, $response_main);
+=======
+              $this->log->addInfo($this->service_id[0], 'cambiaBeneficiario', $param, $response_main);
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;         
         } else {
               $this->log->addError($this->service_id, 'cambiaBeneficiario', $param, $response_main);
@@ -331,7 +338,11 @@ class Intermex
                               'data' => array('sender_first_name'=>$vNuevoRemitente) ,
                               'confirmation_number' => $vReferencia,
                            );
+<<<<<<< HEAD
               $this->log->addInfo($this->service_id, 'cambiaRemitente', $param, $response_main);
+=======
+              $this->log->addInfo($this->service_id[0], 'cambiaRemitente', $param, $response_main);
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;
         } else {
               $this->log->addError($this->service_id, 'cambiaRemitente', $param, $response_main);
@@ -394,7 +405,11 @@ class Intermex
                               'data' => array('receiver_phone_mobile'=>$vNuevoTelefon) ,
                               'confirmation_number' => $vReferencia,
                            );
+<<<<<<< HEAD
               $this->log->addInfo($this->service_id, 'cambiaTelBeneficiario', $param, $response_main); 
+=======
+              $this->log->addInfo($this->service_id[0], 'cambiaTelBeneficiario', $param, $response_main); 
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;           
         } else {
               $this->log->addError($this->service_id, 'cambiaTelBeneficiario', $param, $response_main);            
@@ -456,7 +471,11 @@ class Intermex
                               'data' => array('status'=>'canceled') ,
                               'confirmation_number' => $vReferencia,
                            );
+<<<<<<< HEAD
               $this->log->addInfo($this->service_id, 'anulaEnvio', $param, $response_main);
+=======
+              $this->log->addInfo($this->service_id[0], 'anulaEnvio', $param, $response_main);
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;
         } else {
               $this->log->addError($this->service_id, 'anulaEnvio', $param, $response_main);
@@ -473,7 +492,12 @@ class Intermex
                       'status' => 'failed' ,
                       'data' => '' ,
                       'confirmation_number' => $vReferencia,
+<<<<<<< HEAD
                      );
+=======
+                           );
+
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
       return $return;
 
     }
@@ -587,4 +611,8 @@ class Intermex
         }
     }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
