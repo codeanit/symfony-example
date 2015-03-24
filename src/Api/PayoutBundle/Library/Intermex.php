@@ -29,10 +29,7 @@ class Intermex
         $this->database = json_decode(base64_decode($result[0]['credentials']));        
         $this->url=$this->database->url;        
         $this->service_id=$result[0]['id'];
-<<<<<<< HEAD
 
-=======
->>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
     }
 
     /**
@@ -270,11 +267,7 @@ class Intermex
                               'data' => array('receiver_first_name'=>$vNuevoBeneficiario) ,
                               'confirmation_number' => $vReferencia,
                            );
-<<<<<<< HEAD
               $this->log->addInfo($this->service_id, 'cambiaBeneficiario', $param, $response_main);
-=======
-              $this->log->addInfo($this->service_id[0], 'cambiaBeneficiario', $param, $response_main);
->>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;         
         } else {
               $this->log->addError($this->service_id, 'cambiaBeneficiario', $param, $response_main);
@@ -338,11 +331,7 @@ class Intermex
                               'data' => array('sender_first_name'=>$vNuevoRemitente) ,
                               'confirmation_number' => $vReferencia,
                            );
-<<<<<<< HEAD
               $this->log->addInfo($this->service_id, 'cambiaRemitente', $param, $response_main);
-=======
-              $this->log->addInfo($this->service_id[0], 'cambiaRemitente', $param, $response_main);
->>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;
         } else {
               $this->log->addError($this->service_id, 'cambiaRemitente', $param, $response_main);
@@ -405,11 +394,7 @@ class Intermex
                               'data' => array('receiver_phone_mobile'=>$vNuevoTelefon) ,
                               'confirmation_number' => $vReferencia,
                            );
-<<<<<<< HEAD
               $this->log->addInfo($this->service_id, 'cambiaTelBeneficiario', $param, $response_main); 
-=======
-              $this->log->addInfo($this->service_id[0], 'cambiaTelBeneficiario', $param, $response_main); 
->>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;           
         } else {
               $this->log->addError($this->service_id, 'cambiaTelBeneficiario', $param, $response_main);            
@@ -471,11 +456,7 @@ class Intermex
                               'data' => array('status'=>'canceled') ,
                               'confirmation_number' => $vReferencia,
                            );
-<<<<<<< HEAD
               $this->log->addInfo($this->service_id, 'anulaEnvio', $param, $response_main);
-=======
-              $this->log->addInfo($this->service_id[0], 'anulaEnvio', $param, $response_main);
->>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;
         } else {
               $this->log->addError($this->service_id, 'anulaEnvio', $param, $response_main);
@@ -492,12 +473,7 @@ class Intermex
                       'status' => 'failed' ,
                       'data' => '' ,
                       'confirmation_number' => $vReferencia,
-<<<<<<< HEAD
                      );
-=======
-                           );
-
->>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
       return $return;
 
     }
@@ -508,7 +484,7 @@ class Intermex
      * @return void
      */
     public function consultaCambios()
-    {
+    {      
       $iIdAgencia=$this->conectar();
       $param=array('iIdAgencia'=>$iIdAgencia);
       $soap_client = new \SoapClient(
@@ -527,14 +503,14 @@ class Intermex
       $response = json_decode(json_encode((array) $xmlFinal), true);
       if (isset($response['NewDataSet']['CAMBIOS'])) {
         $output=$response['NewDataSet']['CAMBIOS'];
-        foreach ($output as $key => $value) {
-           $data=$this->confirmaCambio($value['iIdOrden']);
+        foreach ($output as $key => $value) {          
+           $data=$this->confirmaCambio($value['iIdOrden'],$value['tiIdTipoOrden'],$value['vReferencia']);
            if ($data=='200') {
               $this->log->addInfo($this->service_id, 'consultaCambios', $param, $data);              
             } else {
               $this->log->addError($this->service_id, 'consultaCambios', $param, $data);               
-            }
-        }
+            }           
+        }    
       } else {
         $this->log->addError($this->service_id, 'consultaCambios', $param, 'No paid remittance today from this iIdAgencia');
       }
@@ -546,8 +522,14 @@ class Intermex
      *
      * @return void
      */
-    public function confirmaCambio($iIdOrden=null)
+    public function confirmaCambio($iIdOrden=null,$id=null,$ref=null)
     {
+      $type = array(
+                  '5'=>'Receiver Name change',
+                  '6'=>'Sender Name change',
+                  '7'=>'Receiver phone Number change',
+                  '10'=>'remittance Cancellation',
+                  );
       $iIdAgencia=$this->conectar();
       $param=array('iIdAgencia'=>$iIdAgencia,'iIdOrden'=>$iIdOrden);
       $soap_client = new \SoapClient(
@@ -567,12 +549,13 @@ class Intermex
       if (isset($response['NewDataSet']['CONFIRMADOS'])) {
         $output=$response['NewDataSet']['CONFIRMADOS'];
         if ($output['tiExito']=='1') {
-            $arr=array('code'=>'200','iIdOrden'=>$iIdOrden,'msg'=>'Successful');            
+            $arr=array('code'=>'200','confirmation_number'=>$ref,'iIdOrden'=>$iIdOrden,'msg'=>$type[$id].' Successful');
+            $this->addToQueue($arr);            
         } else {
-            $arr=array('code'=>'400','iIdOrden'=>$iIdOrden,'msg'=>'Failed');
+            $arr=array('code'=>'400','confirmation_number'=>$ref,'iIdOrden'=>$iIdOrden,'msg'=>$type[$id].' Failed');
         }
       } else {
-        $arr=array('code'=>'400','iIdOrden'=>$iIdOrden,'msg'=>'Failed');
+        $arr=array('code'=>'400','confirmation_number'=>$ref,'iIdOrden'=>$iIdOrden,'msg'=>$type[$id].' Failed');
       }
 
       return $arr;
@@ -598,21 +581,39 @@ class Intermex
         {
           $data =  $this->cambiaBeneficiario($txn['confirmation_number'],$txn['receiver_first_name'],$txn['reason']);
           return $data;
-        }
-        if(isset($txn['sender_first_name']))
+        }elseif(isset($txn['sender_first_name']))
         {
           $data =  $this->cambiaRemitente($txn['confirmation_number'],$txn['sender_first_name'],$txn['reason']);
           return $data;
-        }
-        if(isset($txn['receiver_phone_mobile']))
+        }elseif(isset($txn['receiver_phone_mobile']))
         {
-          $data =  $this->cambiaTelBeneficiario($txn['confirmation_number'],$txn['receiver_phone_mobile'],$txn['reason']);     
+          $data =  $this->cambiaTelBeneficiario($txn['confirmation_number'],$txn['receiver_phone_mobile'],$txn['reason']); 
           return $data;
+        }else{
+           $return = array('code' => '400',
+                          'operation'=>'modify',
+                          'message' => 'Transaction Update Failed.' ,
+                          'notify_source'=>'tb',
+                          'status' => 'failed' ,
+                          'data' => '' ,
+                          'confirmation_number' => $txn['confirmation_number'],
+                         );
+          return $return;
         }
     }
 
-<<<<<<< HEAD
+    public function addToQueue($data)
+    {
+        $conn=$this->container->get('database_connection');
+        $queueData = array(
+                            'transaction_source' => 'CDEX',
+                            'transaction_service' => 'tb',
+                            'operation' => 'notify', 
+                            'parameter' => json_encode(array('code'=>'200','operation'=>'confirmation','confirmation_number'=>$data['confirmation_number'],'status'=>'successful','message'=>$data['msg'])),
+                            'is_executed' => 0,
+                            'creation_datetime' => date('Y-m-d H:i:s')
+                            );
+        $check_queue = $conn->insert('operations_queue', $queueData);
+    }
+
 }
-=======
-}
->>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd

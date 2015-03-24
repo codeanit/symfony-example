@@ -19,7 +19,7 @@ class IntermexTest extends WebTestCase
     $this->container = $client->getContainer();
     $this->GB=$this->container->get('intermex');
   }
-  public function testForBankAccountPayment()
+  public function ptestForBankAccountPayment()
   {
     $param=array("source"=> "tb",
                  "service"=> "intermex",
@@ -69,10 +69,9 @@ class IntermexTest extends WebTestCase
   {
     $resultData=$this->GB->conectar();
   }
-  public function ptestConsultaCambios()
+  public function testConsultaCambios()
   {
     $resultData=$this->GB->consultaCambios();
-
   }
 
   public function ptestCambieTelBeneficiario()
