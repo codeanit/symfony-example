@@ -29,6 +29,10 @@ class Intermex
         $this->database = json_decode(base64_decode($result[0]['credentials']));        
         $this->url=$this->database->url;        
         $this->service_id=$result[0]['id'];
+<<<<<<< HEAD
+
+=======
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
     }
 
     /**
@@ -49,10 +53,10 @@ class Intermex
           $cred =array('vUsuario'=>$this->database->username, 'vPassword'=>$this->database->password);
           $actual = $soap_client->Conectar($cred);      
         if ($actual->ConectarResult) {
-            $this->log->addInfo($this->service_id[0], 'Conectar', $cred, $actual->ConectarResult);
+            $this->log->addInfo($this->service_id, 'Conectar', $cred, $actual->ConectarResult);
             return $actual->ConectarResult;
         } else {           
-            $this->log->addError($this->service_id[0], 'Conectar', $cred, 'Null');
+            $this->log->addError($this->service_id, 'Conectar', $cred, 'Null');
             return;
         }
     }
@@ -133,7 +137,7 @@ class Intermex
                             'confirmation_number' =>
                               $data['transaction']->transaction_code
                            );
-            $this->log->addInfo($this->service_id[0], 'altaEnvioT', $param, $response_main);
+            $this->log->addInfo($this->service_id, 'altaEnvioT', $param, $response_main);
         } else {
             $return = array('code' => '400',
                             'operation'=>'create',
@@ -145,7 +149,7 @@ class Intermex
                             'confirmation_number' =>
                               $data['transaction']->transaction_code
                            );
-            $this->log->addError($this->service_id[0], 'altaEnvioT', $param, $response);            
+            $this->log->addError($this->service_id, 'altaEnvioT', $param, $response);            
         }
 
       return $return;
@@ -178,10 +182,10 @@ class Intermex
       if (isset($response['NewDataSet']['PAGADOS'])) {
         $output=(object) $response['NewDataSet']['PAGADOS'];
         $arr=array('iIdTipoError'=>$output->iIdTipoError,'error_msg'=>$output->vMensajeError);
-        $this->log->addInfo($this->service_id[0], 'consultaPagados', $param, $response_main);        
+        $this->log->addInfo($this->service_id, 'consultaPagados', $param, $response_main);        
       } else {
         $arr=array('code'=>400,'msg'=>'No paid remittance today from this iIdAgencia');
-        $this->log->addError($this->service_id[0], 'consultaPagados', $param, $response_main);
+        $this->log->addError($this->service_id, 'consultaPagados', $param, $response_main);
 
       }
     }
@@ -214,11 +218,11 @@ class Intermex
       if (isset($response['NewDataSet']['CONFIRMADOS'])) {
         $output=(object) $response['NewDataSet']['CONFIRMADOS'];
         $arr=array('tiExito'=>$output->tiExito,'iIdTipoError'=>$output->iIdTipoError,'error_msg'=>$output->vMensajeError);
-        $this->log->addInfo($this->service_id[0], 'confirmaPagado', $param, $response_main);        
+        $this->log->addInfo($this->service_id, 'confirmaPagado', $param, $response_main);        
         
       } else {
         $arr=array('code'=>400,'msg'=>'confirming paid remittance failed');
-        $this->log->addInfo($this->service_id[0], 'confirmaPagado', $param, $response_main);
+        $this->log->addInfo($this->service_id, 'confirmaPagado', $param, $response_main);
       }
 
     }
@@ -266,15 +270,19 @@ class Intermex
                               'data' => array('receiver_first_name'=>$vNuevoBeneficiario) ,
                               'confirmation_number' => $vReferencia,
                            );
+<<<<<<< HEAD
+              $this->log->addInfo($this->service_id, 'cambiaBeneficiario', $param, $response_main);
+=======
               $this->log->addInfo($this->service_id[0], 'cambiaBeneficiario', $param, $response_main);
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;         
         } else {
-              $this->log->addError($this->service_id[0], 'cambiaBeneficiario', $param, $response_main);
+              $this->log->addError($this->service_id, 'cambiaBeneficiario', $param, $response_main);
         }
 
       } else {
         $arr=array('code'=>400,'msg'=>'confirming paid remittance failed');
-        $this->log->addError($this->service_id[0], 'cambiaBeneficiario', $param, $response_main);        
+        $this->log->addError($this->service_id, 'cambiaBeneficiario', $param, $response_main);        
       }
       $return = array('code' => '400',
                       'operation'=>'modify',
@@ -330,14 +338,18 @@ class Intermex
                               'data' => array('sender_first_name'=>$vNuevoRemitente) ,
                               'confirmation_number' => $vReferencia,
                            );
+<<<<<<< HEAD
+              $this->log->addInfo($this->service_id, 'cambiaRemitente', $param, $response_main);
+=======
               $this->log->addInfo($this->service_id[0], 'cambiaRemitente', $param, $response_main);
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;
         } else {
-              $this->log->addError($this->service_id[0], 'cambiaRemitente', $param, $response_main);
+              $this->log->addError($this->service_id, 'cambiaRemitente', $param, $response_main);
         }
       } else {
         $arr=array('code'=>400,'msg'=>'confirming paid remittance failed');
-              $this->log->addError($this->service_id[0], 'cambiaRemitente', $param, $response_main);
+              $this->log->addError($this->service_id, 'cambiaRemitente', $param, $response_main);
       }
       $return = array('code' => '400',
                       'operation'=>'modify',
@@ -393,14 +405,18 @@ class Intermex
                               'data' => array('receiver_phone_mobile'=>$vNuevoTelefon) ,
                               'confirmation_number' => $vReferencia,
                            );
+<<<<<<< HEAD
+              $this->log->addInfo($this->service_id, 'cambiaTelBeneficiario', $param, $response_main); 
+=======
               $this->log->addInfo($this->service_id[0], 'cambiaTelBeneficiario', $param, $response_main); 
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;           
         } else {
-              $this->log->addError($this->service_id[0], 'cambiaTelBeneficiario', $param, $response_main);            
+              $this->log->addError($this->service_id, 'cambiaTelBeneficiario', $param, $response_main);            
         }
       } else {
         $arr=array('code'=>400,'msg'=>'confirming paid remittance failed');
-        $this->log->addError($this->service_id[0], 'cambiaTelBeneficiario', $param, $response_main);        
+        $this->log->addError($this->service_id, 'cambiaTelBeneficiario', $param, $response_main);        
       }
        $return = array('code' => '400',
                       'operation'=>'modify',
@@ -455,15 +471,19 @@ class Intermex
                               'data' => array('status'=>'canceled') ,
                               'confirmation_number' => $vReferencia,
                            );
+<<<<<<< HEAD
+              $this->log->addInfo($this->service_id, 'anulaEnvio', $param, $response_main);
+=======
               $this->log->addInfo($this->service_id[0], 'anulaEnvio', $param, $response_main);
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
               return $return;
         } else {
-              $this->log->addError($this->service_id[0], 'anulaEnvio', $param, $response_main);
+              $this->log->addError($this->service_id, 'anulaEnvio', $param, $response_main);
         }
         $arr=array('tiExito'=>$output->tiExito,'error_msg'=>$output->vMensajeError);
       } else {
         $arr=array('code'=>400,'msg'=>'Cancellation Failed');
-        $this->log->addError($this->service_id[0], 'anulaEnvio', $param, $response_main);
+        $this->log->addError($this->service_id, 'anulaEnvio', $param, $response_main);
       }
       $return = array('code' => '400',
                       'operation'=>'modify',
@@ -472,8 +492,12 @@ class Intermex
                       'status' => 'failed' ,
                       'data' => '' ,
                       'confirmation_number' => $vReferencia,
+<<<<<<< HEAD
+                     );
+=======
                            );
 
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
       return $return;
 
     }
@@ -506,13 +530,13 @@ class Intermex
         foreach ($output as $key => $value) {
            $data=$this->confirmaCambio($value['iIdOrden']);
            if ($data=='200') {
-              $this->log->addInfo($this->service_id[0], 'consultaCambios', $param, $data);              
+              $this->log->addInfo($this->service_id, 'consultaCambios', $param, $data);              
             } else {
-              $this->log->addError($this->service_id[0], 'consultaCambios', $param, $data);               
+              $this->log->addError($this->service_id, 'consultaCambios', $param, $data);               
             }
         }
       } else {
-        $this->log->addError($this->service_id[0], 'consultaCambios', $param, 'No paid remittance today from this iIdAgencia');
+        $this->log->addError($this->service_id, 'consultaCambios', $param, 'No paid remittance today from this iIdAgencia');
       }
 
     }
@@ -543,7 +567,7 @@ class Intermex
       if (isset($response['NewDataSet']['CONFIRMADOS'])) {
         $output=$response['NewDataSet']['CONFIRMADOS'];
         if ($output['tiExito']=='1') {
-            $arr=array('code'=>'200','iIdOrden'=>$iIdOrden,'msg'=>'Successful');
+            $arr=array('code'=>'200','iIdOrden'=>$iIdOrden,'msg'=>'Successful');            
         } else {
             $arr=array('code'=>'400','iIdOrden'=>$iIdOrden,'msg'=>'Failed');
         }
@@ -587,4 +611,8 @@ class Intermex
         }
     }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 174315bababbb8e89e0bdb1ecd70d29465e8d8dd
