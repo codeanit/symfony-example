@@ -17,12 +17,12 @@ _errors:
 _main:
     resource: routing.yml
 
-# AcmeDemoBundle routes (to be removed)
-#_acme_demo:
-#    resource: "@AcmeDemoBundle/Resources/config/routing.yml"
+# Backend Bundle Route
+_backend:
+    resource: "@BackendBundle/Resources/config/routing.yml"
 
 # Transactions Route
-transactions:
+_transaction:
     type: rest
     resource: ApiBundle\Controller\PayoutController
     prefix: transactions
