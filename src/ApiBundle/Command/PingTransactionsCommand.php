@@ -1,6 +1,6 @@
 <?php 
 
-namespace Api\PayoutBundle\Command;
+namespace ApiBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;

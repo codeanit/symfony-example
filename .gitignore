@@ -1,21 +1,19 @@
 Ignore var folder
-#var/**/*
+var/**/*
 
 #Ignore app folder
 app/cache/*
 
 #Ignore vendor folder
-#vendor/*
 vendor/**/*
 
 #Ignore composer files
 composer.*
 
 #Ignore web/
-#web/**/*
+web/**/*
 
 #ignore logs
-
 app/logs/*
 app/logs/**/*
 app/logs/dev.log

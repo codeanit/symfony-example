@@ -11,7 +11,7 @@
  * @link     (remittanceController, http://firsglobaldata.com)
  */
 
-namespace Api\PayoutBundle\Model;
+namespace ApiBundle\Model;
 
 use Symfony\Component\HttpFoundation\Response;
 

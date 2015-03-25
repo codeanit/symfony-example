@@ -46,3 +46,18 @@ assetic:
 
 #swiftmailer:
 #    delivery_address: me@example.com
+
+fos_rest:
+    routing_loader:
+        default_format: json
+        include_format: true
+    view:
+        view_response_listener: 'force'
+        failed_validation: HTTP_BAD_REQUEST
+        default_engine: php
+        formats:
+            json: true
+        #jsonp_handler: ~
+    body_listener:
+        decoders:
+            json: fos_rest.decoder.json
