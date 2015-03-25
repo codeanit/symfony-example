@@ -1,0 +1,1 @@
+[2015-03-17 13:03:43] Intermex.INFO: requesting modification of Receiver’s name {"Parameter":{"iIdAgencia":"F1CE4ED5-88AE-4A55-B601-2127E981B81D","vReferencia":"7897897890","vNuevoBeneficiario":"Fog","vMotivoModificacion":"asfas asfsafreason"},"Response":{"DocumentElement":{"RESP":{"tiExito":"1","vMensajeError":[]}}}} []
