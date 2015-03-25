@@ -1,31 +1,3 @@
-api_payout:
-    resource: "@ApiPayoutBundle/Controller/"
+app:
+    resource: "@AppBundle/Controller/"
     type:     annotation
-    prefix:   /
-
-# acme_blog:
-#     resource: "@AcmeBlogBundle/Controller/"
-#     type:     annotation
-#     prefix:   /
-
-payout:
-    type: rest
-    resource: Api\PayoutBundle\Controller\PayoutController
-    prefix:  cdex
-
-landing_page:
-    path:     /
-    defaults: { _controller: 'ApiPayoutBundle:Default:transaction'}
-
-# pages:
-#     type: rest
-#     resource: Acme\BlogBundle\Controller\PageController
-
-api_payout:
-    resource: "@ApiPayoutBundle/Controller/"
-    type:     annotation
-    prefix:   /
-
-
-
-

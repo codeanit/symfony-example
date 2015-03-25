@@ -1,4 +1,0 @@
-[2015-02-24 11:08:47] FILE_QUEUE.ERROR: File Parsing Failed {"Exception At":"Could not open /var/www/dex-api/web/upload/green1.xlsx for reading! File does not exist.","Filename":"green1.xlsx","ServiceName":"greenbelt","Action":"IN"} []
-[2015-02-24 11:08:47] FILE_QUEUE.ERROR: Queue Adding Failed {"Exception At":"Notice: Undefined variable: count","Filename":"green1.xlsx","ServiceName":"greenbelt","Action":"IN"} []
-[2015-02-24 11:35:15] FILE_QUEUE.ERROR: File Parsing Failed {"Exception At":"Could not open /var/www/dex-api/web/upload/green1.xlsx for reading! File does not exist.","Filename":"green1.xlsx","ServiceName":"greenbelt","Action":"IN"} []
-[2015-02-24 11:35:15] FILE_QUEUE.ERROR: Queue Adding Failed {"Exception At":"Notice: Undefined variable: count","Filename":"green1.xlsx","ServiceName":"greenbelt","Action":"IN"} []

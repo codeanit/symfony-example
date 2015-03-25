@@ -1,4 +1,0 @@
-_transactions:
-    resource: "@ApiWebServiceBundle/Controller/RemitsController.php"
-    type:     annotation
-    prefix:   /remits

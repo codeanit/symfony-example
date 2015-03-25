@@ -1,1 +1,0 @@
-[2015-03-17 13:03:49] Intermex.INFO: Consulting Paid Remittance {"Parameter":{"iIdAgencia":"F1CE4ED5-88AE-4A55-B601-2127E981B81D","vReferencia":"7897897890","iConsecutivoAgencia":"12345678"},"Response":{"NewDataSet":{"CONFIRMADOS":{"tiExito":"0","iIdTipoError":"22","vMensajeError":"ENVÍO NO DISPONIBLE PARA EFECTUAR CONFIRMACIÓN"}}}} []

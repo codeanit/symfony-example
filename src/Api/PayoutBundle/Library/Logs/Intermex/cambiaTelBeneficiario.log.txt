@@ -1,1 +1,0 @@
-[2015-03-17 13:03:29] Intermex.INFO: requesting modification of Receiver Phone number Successful {"Parameter":{"iIdAgencia":"F1CE4ED5-88AE-4A55-B601-2127E981B81D","vReferencia":"7897897890","vNuevoBeneficiario":"55555555","vMotivoModificacion":"qwrwqrqwr"},"Response":{"DocumentElement":{"RESP":{"tiExito":"1","vMensajeError":[]}}}} []

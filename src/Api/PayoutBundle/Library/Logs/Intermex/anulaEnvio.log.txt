@@ -1,1 +1,0 @@
-[2015-03-17 13:04:09] Intermex.INFO: Cancellation Successful {"Parameter":{"iIdAgencia":"F1CE4ED5-88AE-4A55-B601-2127E981B81D","vReferencia":"7897897890","vMotivoModificacion":"124241"},"Response":{"DocumentElement":{"RESP":{"tiExito":"1","vMensajeError":[]}}}} []
