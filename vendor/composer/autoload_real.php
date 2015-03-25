@@ -23,9 +23,6 @@ class ComposerAutoloaderInitc98ab4f1f8a3ca1878ac85fde944b613
         self::$loader = $loader = new \Composer\Autoload\ClassLoader();
         spl_autoload_unregister(array('ComposerAutoloaderInitc98ab4f1f8a3ca1878ac85fde944b613', 'loadClassLoader'));
 
-        $vendorDir = dirname(__DIR__);
-        $baseDir = dirname($vendorDir);
-
         $includePaths = require __DIR__ . '/include_paths.php';
         array_push($includePaths, get_include_path());
         set_include_path(join(PATH_SEPARATOR, $includePaths));
@@ -49,9 +46,14 @@ class ComposerAutoloaderInitc98ab4f1f8a3ca1878ac85fde944b613
 
         $includeFiles = require __DIR__ . '/autoload_files.php';
         foreach ($includeFiles as $file) {
-            require $file;
+            composerRequirec98ab4f1f8a3ca1878ac85fde944b613($file);
         }
 
         return $loader;
     }
+}
+
+function composerRequirec98ab4f1f8a3ca1878ac85fde944b613($file)
+{
+    require $file;
 }

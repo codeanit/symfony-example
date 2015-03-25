@@ -18,7 +18,7 @@ class DefaultController extends Controller
      * 
      */
     public function indexAction()
-    {         
+    {         die(2222);
         $Q=$this->get('queue');        
         print_r($Q->executeQueuedOperation());        
         die;      

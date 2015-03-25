@@ -47,7 +47,7 @@ class Intermex
                    'exceptions' => 1,
                    'cache_wsdl' => WSDL_CACHE_NONE,)
           );
-          $cred =array('vUsuario'=>$this->database->username, 'vPassword'=>$this->database->password);
+          $cred =array('vUsuario'=>$this->cred->username, 'vPassword'=>$this->database->password);
           $actual = $soap_client->Conectar($cred);      
         if ($actual->ConectarResult) {
             $this->log->addInfo($this->service_id, 'Conectar', $cred, $actual->ConectarResult);
