@@ -5,8 +5,8 @@ Ignore var folder
 app/cache/*
 
 #Ignore vendor folder
-vendor/
-vendor/**
+vendor/*
+vendor/**/*
 
 #Ignore composer files
 composer.*
