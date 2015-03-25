@@ -5,6 +5,7 @@ Ignore var folder
 app/cache/*
 
 #Ignore vendor folder
+vendor/
 vendor/**
 
 #Ignore composer files
@@ -14,11 +15,10 @@ composer.*
 #web/**/*
 
 #ignore logs
-<<<<<<< HEAD
+
 app/logs/*
 app/logs/**/*
-=======
 app/logs/dev.log
-app/logs/**
 
->>>>>>> dev
+
+
