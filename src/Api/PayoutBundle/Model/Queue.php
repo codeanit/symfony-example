@@ -129,12 +129,25 @@ class Queue
                         'creation_datetime' => date('Y-m-d H:i:s')
                         );      
 
-                    $check_queue = $connection->insert('operations_queue', $queueData);
+                    $connection->insert('operations_queue', $queueData);
                 }            
                     
             }   
         } catch (\Exception $e) { 
+            //Re-Queue Error Data
+            $requeueData = array(
+                        'transaction_source' => $result['transaction_source'],
+                        'transaction_service' => $result['transaction_service'],
+                        'operation' => $result['operation'], 
+                        'parameter' => $result['parameter'],
+                        'is_executed' => 0,
+                        'creation_datetime' => date('Y-m-d H:i:s')
+                        ); 
+            $connection->insert('operations_queue', $requeueData);
+            $log=$this->container->get('log');
+            $log->addError('Operation Queue', 'queue', $result['parameter'], $e->getMessage()); 
             $result=array('code'=>'400','message'=>'Error in Queue Processing.','error'=>$e->getMessage());
+
         }
 
         $connection->update(
