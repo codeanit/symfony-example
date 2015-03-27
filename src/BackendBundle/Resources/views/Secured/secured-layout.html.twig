@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}
+            <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+            <link href="{{ asset('assets/css/jquery-ui.css') }}" rel="stylesheet">
+        {% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body>
+        <div class="container">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">CDEX API</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="{{ path('_demo_secured_transactions') }}">Transactions</a></li>               
+              <li><a href="{{ path('_demo_secured_services') }}">Services</a></li>               
+            </ul> 
+            <ul class="nav navbar-nav pull-right">
+              <li><a href="#">{{ 'Hello, ' ~ app.session.get('username') }}</a></li>               
+               <a href="{{ path('_demo_logout') }}">Logout</a></li>               
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+        {% block body %}
+
+    </div>
+            
+        {% endblock %}
+
+        {% block javascripts %}
+            <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+            <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
+            <script src="{{ asset('assets/js/bootstrap-modal.js') }}"></script>
+        {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,69 @@
+{% extends "BackendBundle:Secured:secured-layout.html.twig" %}
+
+{% block body %}
+      <div class="jumbotron">
+        <h2>{{ service_name | upper }}</h2>
+        <br>
+        <br>
+        <table class="table table-hover">
+            <tr>
+                <th>S.N</th>
+                <th>Method</th>               
+                <th>Status</th>               
+                <th>Date</th>               
+                <th>Action</th>               
+            </tr>          
+            {% set status = 1 %}
+            {% for entry in logs %}            
+            <tr>
+                <td>{{loop.index}}</td>                
+                <td>{{ entry.Method }}</td>
+                <td>{{ entry.Status }}</td>
+                <td>{{ entry.Date }}</td>
+                <td><span id="val{{ entry.id }}" style="display:none" class='modal-x'>
+                      <p style="word-wrap: break-word">
+                          <b>REQUEST</b>
+                          <br><br>                          
+                          {{ entry.Request}} 
+                      </p>
+                      <p style="word-wrap: break-word">
+                          <b>RESPONSE</b>
+                          <br><br>
+                          {{ entry.Response }} 
+                      </p>
+                    </span>
+                    <a href="#" data-key='{{entry.id}}' class='view btn btn-primary btn-xs'>view</a>
+                <td>                
+            </tr>               
+            {% endfor %}
+        </table>
+      </div>
+
+{% endblock %}
+
+{% block javascripts %}            
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery-ui.js') }}"></script>   
+    <script type="text/javascript">   
+        
+      $(document).ready(function() { 
+        $('.modal-x').css('overflow','auto')
+        $('.view').click(function(){
+          var a = $(this).data('key');
+          var popId = 'val'+a;             
+          $("#"+popId).dialog({
+              resizable: true,
+              modal: true,
+              width:700,                                        
+              buttons: {                
+                Cancel: function() {
+                  $( this ).dialog( "close" );
+                }
+              }
+          });
+         });
+            
+      });
+    </script>
+
+{% endblock %}
