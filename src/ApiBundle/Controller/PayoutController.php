@@ -22,12 +22,12 @@ class PayoutController extends Controller
      *
      * @param JSON Post Data     
      * 
-     * */    
+     **/    
     public function postCreateAction(Request $request)
     { 
         $this->DB = $this->get('connection');     
         $postData=$request->getContent();
-        $decodedData=(array) json_decode($postData);      
+        $decodedData=(array) json_decode($postData);
         $status=$this->DB->operateTransaction($decodedData,$postData,'create');        
         if($status[0]==1 && $status[1]==1)
         {
