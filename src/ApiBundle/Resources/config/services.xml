@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+<!-- 
+    <parameters>
+        <parameter key="testing.array" type="collection">
+            <parameter>en</parameter>
+            <parameter>de</parameter>
+            <parameter type="collection">
+                <parameter>en</parameter>
+                <parameter>de</parameter>
+            </parameter>
+        </parameter>
+    </parameters> -->
+        
+    <services>
+        
+        <service id="queue" class="ApiBundle\Model\Queue">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="log" class="ApiBundle\Model\Log">            
+            <argument type="service" id="service_container" />         
+        </service>
+         <service id="connection" class="ApiBundle\Model\DB">            
+            <argument type="service" id="service_container" />         
+        </service>
+
+        <service id="bdo" class="ApiBundle\Library\BDO">            
+            <argument type="service" id="service_container" />         
+        </service>
+         <service id="tb" class="ApiBundle\Library\TB">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="mock" class="ApiBundle\Library\MOCK">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="greenbelt" class="ApiBundle\Library\Greenbelt">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="sanmartin" class="ApiBundle\Library\Sanmartin">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="consultoria" class="ApiBundle\Library\Consultoria">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="intermex" class="ApiBundle\Library\Intermex">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="olympic" class="ApiBundle\Library\Olympic">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="mcb" class="ApiBundle\Library\MCB">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="tb_connection" class="ApiBundle\Library\TBConnectionModel">
+            <argument type="service" id="service_container" />         
+        </service>       
+        <service id="bts" class="ApiBundle\Library\BTS"> 
+            <argument type="service" id="service_container" /> 
+         <!--    <argument type="string">Suraj</argument>
+            <argument>%testing.array%</argument> -->
+        </service>
+    </services>
+    
+</container>

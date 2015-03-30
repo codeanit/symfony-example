@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">CDEX API</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class=""><a href="{{ url('dashboard') }}">Transactions</a></li>               
+              <li class="active"><a href="{{ url('service') }}">Services</a></li>              
+            </ul>                       
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h2>Third Party Service List</h2>
+        <a href="{{ url('addService')}}" class='btn btn-primary'>Add</a>
+        <br>
+        <br>
+         
+        <table class="table table-hover">
+            <tr>
+                <th>S.N</th>
+                <th>Service Name</th>               
+                <th>Add</th>               
+            </tr>          
+            {% set status = 1 %}
+            {% for entry in services %}            
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>{{ entry.service_name | upper }}</td>
+                <td>
+                  <a href="{{url('credential', {'id': entry.service_name})}}" class='btn btn-primary btn-xs'>Credentials</a>
+                  <a href="{{url('addService', {'name': entry.service_name,'id':entry.id})}}" class='btn btn-primary btn-xs'>Edit</a>
+                  <a href="{{url('status',{'id':entry.id,'status':entry.status})}}" class='btn btn-primary btn-xs' 
+                  value='{{entry.id}}' name='status'>{{(status in entry.status)?'Deactivate':'Activate'}}</a>
+                  <a href="{{url('logs', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-default btn-xs'>Logs</a>
+                  {% if entry.is_ftp_service == 2 %}  
+                    <a href="{{url('upload', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-primary btn-xs'>Upload</a>
+                  {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+
+    </div>
+{% endblock %}

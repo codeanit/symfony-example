@@ -10,27 +10,19 @@ _configurator:
     resource: "@SensioDistributionBundle/Resources/config/routing/webconfigurator.xml"
     prefix:   /_configurator
 
+_errors:
+    resource: "@TwigBundle/Resources/config/routing/errors.xml"
+    prefix:   /_error
+
 _main:
     resource: routing.yml
 
-_be_simple_soap:
-    resource: "@BeSimpleSoapBundle/Resources/config/routing/webservicecontroller.xml"
-    prefix:   /
+# Backend Bundle Route
+_backend:
+    resource: "@BackendBundle/Resources/config/routing.yml"
 
-api_web_service_mlhuillier:
-    resource: "@ApiWebServiceBundle/Controller/MLhuillierController.php"
-    type:     annotation
-
-api_web_service_gcash:
-    resource: "@ApiWebServiceBundle/Controller/GCashController.php"
-    type:     annotation
-
-#backend:
-#  resource: "@BackendBundle/Controller/"
-#  type: annotation
-#  prefix: /
-
-library:
-  resource: "@LibraryBundle/Controller/"
-  type: annotation
-  prefix: /
+# Transactions Route
+_transaction:
+    type: rest
+    resource: ApiBundle\Controller\PayoutController
+    prefix: transactions

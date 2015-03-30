@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">CDEX API</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class=""><a href="{{ url('dashboard') }}">Transactions</a></li>               
+              <li class="active"><a href="{{ url('service') }}">Services</a></li> 
+             
+            </ul>           
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h2>Credentials</h2>
+        <span class="bg-danger error" id="err">{% if error_msg is defined %}{{ error_msg }}{% endif %}</span>
+        <br>
+        <style>.form-control{width:40% !important;} .error{color: red}</style> 
+
+        <form action='{{ url('addService')}}' method='POST' name='form' id='form'>
+          <div class="form-group">
+            <label for="username">Service Name</label>
+            <input type="text" class="form-control " id="service_name" name="service_name" placeholder="Enter Service Name" 
+            value="{% if service_name is defined %}{{service_name}}{% endif %}">
+            <input type='hidden'  name='service_id' value='{% if service_id is defined %}{{ service_id }}{% endif %}' >
+          </div>
+          <div class="input_fields_wrap">
+            <label>Fields</label>            
+            <br>
+            <label for="username">
+              <button class="add_field_button btn btn-primary btn-xs">Add More Fields</button>
+            </label>
+            {% if fields is defined %}
+              {% set id=1 %}
+              {% for name in fields %}
+              <div class="form-group">
+                <br>
+                {% if case is defined %}
+                   <input type="text" class="form-control" name="fields[]" value="{{name}}" id="a1">                   
+                {% else %}
+                   <input type="text" class="form-control" name="fields[{{name}}]" value="{{name}}" id="a1">                    
+                {% endif %}
+                <a href="#" class="remove_field">Remove</a>              
+              </div>
+            {% else %}
+              <div class="form-group">
+                <input type="text" class="form-control" name="fields[]" value="" id="a">              
+              </div>  
+              {% set id = id +1 %}
+              {% endfor %}
+            {% endif %}
+          </div>
+          <div class="form-group">
+            {% set checked = 'checked' %}
+            <input type="checkbox" name='ftp_service' value='1' {% if is_ftp == 1 %}{{ checked }}{% endif %}> is FTP
+          </div>
+          <button type="submit" class="btn btn-default" name='submit'>Submit</button> <a href="{{url('service')}}">Back</a>
+        </form>
+       
+      </div>
+
+    </div>    
+    
+{% endblock %}
+
+  
+{% block javascripts %}            
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script type="text/javascript">    
+      $(document).ready(function() {
+        var max_fields      = 10; //maximum input boxes allowed
+        var wrapper         = $(".input_fields_wrap"); //Fields wrapper
+        var add_button      = $(".add_field_button"); //Add button ID
+        
+        var x = 1; //initlal text box count
+        
+        $(add_button).click(function(e){ //on add input button click
+            e.preventDefault();
+            if(x < max_fields){ //max input box allowed
+                x++; //text box increment
+                $(wrapper).append('<div class="form-group"><br><input type="text" class="form-control" name="fields[]" id="b'+x+'" /><a href="#" class="remove_field">Remove</a></div>'); //add input box
+            }
+        });
+      
+        $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+            e.preventDefault(); $(this).parent('div').remove(); x--;
+        })
+
+            
+          $('#form').submit(function() {            
+                if($('#service_name').val()==''){
+                    $("#err").html('Empty Service Name');                                    
+                    return false;
+                }else{
+                  return true;
+                } 
+          });
+
+          $('body').on('change',  'input:text',function() {
+            var current = $(this);  
+
+            $('#form').find('input[type=text]').each(function() {
+
+                if ($(this).val() == current.val() && $(this).attr('id') != current.attr('id'))
+                {
+                    $("#err").html('<small class="error">Duplicate Fields Found</small>');
+                }               
+
+            });
+          });
+
+      });
+    </script>
+{% endblock %}
+      

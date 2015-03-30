@@ -11,7 +11,4 @@ parameters:
     mailer_user: null
     mailer_password: null
     locale: en
-    secret: ThisTokenIsNotSoSecretChangeIt
-    debug_toolbar: true
-    debug_redirects: false
-    use_assetic_controller: true
+    secret: 6c953286a978b308e7a9fa0e1515c68a2efb2d7e
