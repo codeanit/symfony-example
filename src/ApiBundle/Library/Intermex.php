@@ -103,7 +103,7 @@ class Intermex
           'vTelefonoBen'=>$data['transaction']->receiver_phone_mobile,
           'vCiudadBenef'=>$data['transaction']->receiver_country,
           'vEstadoBenef'=>$data['transaction']->receiver_state,
-          'iIdDestino'=> isset($data['transaction']->payer_id),
+          'iIdDestino'=> isset($data['transaction']->payer_id)?,
           'vMensaje'=>'message to receiver',
           'vInstruccionPago'=>'agency comment',
           'vSucursal'=>isset($siIdTipoDeposito)?$siIdTipoDeposito:'',
