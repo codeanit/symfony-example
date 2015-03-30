@@ -216,5 +216,16 @@ class SecuredController extends Controller
             return array('logs'=>$data,'service_name'=>$name);
             
     }
+
+    /**
+     * @Route("/execute/queue", name="_demo_secured_execute_queue")
+     * @Template()
+     */
+    public function indexAction()
+    {
+        $Q=$this->get('queue');        
+        print_r($Q->executeQueuedOperation());        
+        die;      
+    }
 }
 

@@ -14,7 +14,6 @@
 namespace ApiBundle\Model;
 
 use Symfony\Component\HttpFoundation\Response;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

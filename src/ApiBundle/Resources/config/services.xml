@@ -54,7 +54,7 @@
         <service id="mcb" class="ApiBundle\Library\MCB">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="tb_connection" class="ApiBundle\Library\TBConnectionModel">            
+        <service id="tb_connection" class="ApiBundle\Library\TBConnectionModel">
             <argument type="service" id="service_container" />         
         </service>       
         <service id="bts" class="ApiBundle\Library\BTS"> 

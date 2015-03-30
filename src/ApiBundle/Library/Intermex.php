@@ -47,7 +47,7 @@ class Intermex
                    'exceptions' => 1,
                    'cache_wsdl' => WSDL_CACHE_NONE,)
           );
-          $cred =array('vUsuario'=>$this->cred->username, 'vPassword'=>$this->database->password);
+          $cred =array('vUsuario'=>$this->database->username, 'vPassword'=>$this->database->password);
           $actual = $soap_client->Conectar($cred);      
         if ($actual->ConectarResult) {
             $this->log->addInfo($this->service_id, 'Conectar', $cred, $actual->ConectarResult);
@@ -68,10 +68,13 @@ class Intermex
      */
     public function altaEnvioT($txn=null)
     {      
+      // var_dump($txn); die;
+
       $data=$txn;
       $currencyId=(strtoupper($data['transaction']->receiver_currency) == "USD" ||
                    strtoupper($data['transaction']->receiver_currency) == "CAD")?'2':'1';
-      $payoutId=(strtoupper($data['transaction']->payout_channel) == "BANK")?'2':'1';
+
+      $payoutId=(strtoupper($data['transaction']->transaction_type) == "bank")?'2':'1';
 
       if ($payoutId=='2') {
         $siIdTipoDeposito=1;
@@ -81,8 +84,8 @@ class Intermex
       $param=array(
           'iIdAgencia'=>$this->conectar(),
           'vReferencia'=>$data['transaction']->transaction_code,
-          'dtFechaEnvio'=>$data['transaction']->remittance_date,
-          'iConsecutivoAgencia'=>'12345678',
+          'dtFechaEnvio'=> date("Ymd H:i:s"),
+          'iConsecutivoAgencia'=> $data['transaction']->transaction_id,
           'mMonto'=>$data['transaction']->receiver_amount,
           'fTipoCambio'=>$data['transaction']->exchange_rate,
           'mMontoPago'=>$data['transaction']->sender_amount,
@@ -100,7 +103,7 @@ class Intermex
           'vTelefonoBen'=>$data['transaction']->receiver_phone_mobile,
           'vCiudadBenef'=>$data['transaction']->receiver_country,
           'vEstadoBenef'=>$data['transaction']->receiver_state,
-          'iIdDestino'=>$data['transaction']->payer_id,
+          'iIdDestino'=> isset($data['transaction']->payer_id),
           'vMensaje'=>'message to receiver',
           'vInstruccionPago'=>'agency comment',
           'vSucursal'=>isset($siIdTipoDeposito)?$siIdTipoDeposito:'',
@@ -109,7 +112,7 @@ class Intermex
           'siIdTipoDeposito'=>isset($bankAccountNumber)?$bankAccountNumber:'',
           'vNumerotarjeta'=>'',
           'vMontoCom'=>$data['transaction']->fee);
-      
+
         $soap_client = new \SoapClient(
                     $this->url,
                     array(
@@ -302,7 +305,7 @@ class Intermex
         $param=array(
                     'iIdAgencia'=>$iIdAgencia,
                     'vReferencia'=>$vReferencia,
-                    'vNuevoBeneficiario'=>$vNuevoRemitente,
+                    'vNuevoBeneficiario'=>$vNueovRemitente,
                     'vMotivoModificacion'=>$vMotivoModificacion
                     );
         $soap_client = new \SoapClient(
