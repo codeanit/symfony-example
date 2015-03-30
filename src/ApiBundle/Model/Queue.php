@@ -14,6 +14,7 @@
 namespace ApiBundle\Model;
 
 use Symfony\Component\HttpFoundation\Response;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -68,12 +69,12 @@ class Queue
 
         if(isset($parameter['transaction']->transaction_code)){ 
             $CN=$parameter['transaction']->transaction_code; // Confirmation NUmber  
-            $connection->update('transactions',array('transaction_status'=>'inprogress'), array('transaction_code' => $CN));                 
+            $connection->update('transactions',array('processing_status'=>'inprogress'), array('transaction_code' => $CN));                 
         } 
 
         $serviceObj = null;
-        try {            
-            $serviceObj=$this->container->get($service);            
+        try {
+            $serviceObj=$this->container->get($service);
             if($serviceObj != '') {            
                 if(strtolower($service)=='bts' || strtolower($service)=='intermex' ) {                
                     $result=$serviceObj->process($operation, $parameter);
@@ -84,9 +85,9 @@ class Queue
                               
                 if($operation=='create'){
                     if($result['code']==200){
-                        $check=$connection->update('transactions',array('transaction_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                           
+                        $check=$connection->update('transactions',array('processing_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                           
                     }else{                                             
-                        $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));                            
+                        $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));                            
                     }
                 }
 
@@ -94,15 +95,15 @@ class Queue
                     if($result['code']==200){                  
                         $updateTransaction=$connection->update('transactions',$result['data'], array('transaction_code' => $result['confirmation_number']));                                              
                     }else{                
-                        $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
+                        $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
                     }               
                 }
 
                 if($operation=='cancel'){                
                     if($result['code']==200){
-                        $check=$connection->update('transactions',array('transaction_status'=>'successful','status'=>'cancel'), array('transaction_code' => $result['confirmation_number']));                             
+                        $check=$connection->update('transactions',array('processing_status'=>'successful','status'=>'cancel'), array('transaction_code' => $result['confirmation_number']));                             
                     }else{               
-                        $check=$connection->update('transactions',array('transaction_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
+                        $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
                     }
                 }
 
@@ -135,7 +136,7 @@ class Queue
         } catch (\Exception $e) { 
             //Re-Queue Error Data
             $requeueData = array(
-                        'transaction_source' => $result['transaction_source'],
+                        'transaction_source' => isset($result['transaction_source'])?$result['transaction_source']:'CDEX',
                         'transaction_service' => $result['transaction_service'],
                         'operation' => $result['operation'], 
                         'parameter' => $result['parameter'],

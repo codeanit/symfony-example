@@ -68,43 +68,43 @@ class Intermex
      */
     public function altaEnvioT($txn=null)
     {      
-      // var_dump($txn); die;
-
       $data=$txn;
-      $currencyId=(strtoupper($data['transaction']->receiver_currency) == "USD" ||
-                   strtoupper($data['transaction']->receiver_currency) == "CAD")?'2':'1';
-
-      $payoutId=(strtoupper($data['transaction']->transaction_type) == "bank")?'2':'1';
+      $currencyId=(strtoupper($data['transaction']->payout_currency) == "USD" ||
+                   strtoupper($data['transaction']->payout_currency) == "CAD")?'2':'1';
+      $payoutId=(strtoupper($data['transaction']->transaction_type) == "BANK")?'2':'1';
 
       if ($payoutId=='2') {
         $siIdTipoDeposito=1;
-        $bankBranch=$data['transaction']->receiver_bank_branch;
-        $bankAccountNumber=$data['transaction']->receiver_account_number;
+        $bankBranch=$data['transaction']->beneficiary_bank_branch;
+        $bankAccountNumber=$data['transaction']->beneficiary_account_number;
       }
+      $postDate=explode(' ',$data['transaction']->remittance_date);
+      $date=explode('-',$postDate[0]);          
+      
       $param=array(
           'iIdAgencia'=>$this->conectar(),
           'vReferencia'=>$data['transaction']->transaction_code,
-          'dtFechaEnvio'=> date("Ymd H:i:s"),
-          'iConsecutivoAgencia'=> $data['transaction']->transaction_id,
-          'mMonto'=>$data['transaction']->receiver_amount,
+          'dtFechaEnvio'=>$date[2].'/'.$date[1].'/'.$date[0],
+          'iConsecutivoAgencia'=>'12345678',
+          'mMonto'=>$data['transaction']->payout_amount,
           'fTipoCambio'=>$data['transaction']->exchange_rate,
-          'mMontoPago'=>$data['transaction']->sender_amount,
+          'mMontoPago'=>$data['transaction']->remitting_amount,
           'siIdDivisaPago'=>$currencyId,
           'tiIdTipoPagoEnvio'=> $payoutId,
-          'vNomsRemitente'=>$data['transaction']->sender_first_name,
-          'vApedosRemitente'=>$data['transaction']->sender_last_name,
-          'vDireccionRem'=>$data['transaction']->sender_address,
-          'vTelefonoRem'=>$data['transaction']->sender_phone_mobile,
-          'vCondadoRem'=>$data['transaction']->sender_country,
-          'vEstadoRem'=>$data['transaction']->sender_state,
-          'vNomsBeneficiario'=>$data['transaction']->receiver_first_name,
-          'vApedosBeneficiario'=>$data['transaction']->receiver_last_name,
-          'vDireccionBen'=>$data['transaction']->receiver_address,
-          'vTelefonoBen'=>$data['transaction']->receiver_phone_mobile,
-          'vCiudadBenef'=>$data['transaction']->receiver_country,
-          'vEstadoBenef'=>$data['transaction']->receiver_state,
-          'iIdDestino'=> isset($data['transaction']->payer_id)?,
-          'vMensaje'=>'message to receiver',
+          'vNomsRemitente'=>$data['transaction']->remitter_first_name,
+          'vApedosRemitente'=>$data['transaction']->remitter_last_name,
+          'vDireccionRem'=>$data['transaction']->remitter_address,
+          'vTelefonoRem'=>$data['transaction']->remitter_phone_mobile,
+          'vCondadoRem'=>$data['transaction']->remitter_country,
+          'vEstadoRem'=>$data['transaction']->remitter_state,
+          'vNomsBeneficiario'=>$data['transaction']->beneficiary_first_name,
+          'vApedosBeneficiario'=>$data['transaction']->beneficiary_last_name,
+          'vDireccionBen'=>$data['transaction']->beneficiary_address,
+          'vTelefonoBen'=>$data['transaction']->beneficiary_phone_mobile,
+          'vCiudadBenef'=>$data['transaction']->beneficiary_country,
+          'vEstadoBenef'=>$data['transaction']->beneficiary_state,
+          'iIdDestino'=>$data['transaction']->payout_agent_id,
+          'vMensaje'=>'message to beneficiary',
           'vInstruccionPago'=>'agency comment',
           'vSucursal'=>isset($siIdTipoDeposito)?$siIdTipoDeposito:'',
           'vCuenta'=>isset($bankBranch)?$bankBranch:'',
@@ -112,7 +112,7 @@ class Intermex
           'siIdTipoDeposito'=>isset($bankAccountNumber)?$bankAccountNumber:'',
           'vNumerotarjeta'=>'',
           'vMontoCom'=>$data['transaction']->fee);
-
+      // var_dump($param);die;
         $soap_client = new \SoapClient(
                     $this->url,
                     array(
@@ -127,7 +127,7 @@ class Intermex
             'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
         );
 
-      $response = json_decode(json_encode((array) $xmlFinal), true);
+      $response = json_decode(json_encode((array) $xmlFinal), true);      
       if ($xmlFinal->NewDataSet->ENVIO->tiExito == '1') {
             $return = array('code' => '200',
                             'operation'=>'create',
@@ -305,7 +305,7 @@ class Intermex
         $param=array(
                     'iIdAgencia'=>$iIdAgencia,
                     'vReferencia'=>$vReferencia,
-                    'vNuevoBeneficiario'=>$vNueovRemitente,
+                    'vNuevoBeneficiario'=>$vNuevoRemitente,
                     'vMotivoModificacion'=>$vMotivoModificacion
                     );
         $soap_client = new \SoapClient(
@@ -426,8 +426,8 @@ class Intermex
      */
     public function anulaEnvio($txn=null)
     {
-        $vReferencia=$txn['confirmation_number'];
-        $vMotivoCancelacion=$txn['reason'];
+        $vReferencia=$txn['transaction']->transaction_code;
+        $vMotivoCancelacion='cancel from TB';
         $iIdAgencia=$this->conectar();
         $param=array(
                     'iIdAgencia'=>$iIdAgencia,
@@ -580,6 +580,9 @@ class Intermex
      */
     public function processUpdate($txn=null)
     {
+        //$conn=$this->container->get('database_connection');
+
+
         if(isset($txn['receiver_first_name']))
         {
           $data =  $this->cambiaBeneficiario($txn['confirmation_number'],$txn['receiver_first_name'],$txn['reason']);
@@ -618,5 +621,7 @@ class Intermex
                             );
         $check_queue = $conn->insert('operations_queue', $queueData);
     }
+
+}
 
 }
