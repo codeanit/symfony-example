@@ -580,30 +580,45 @@ class Intermex
      */
     public function processUpdate($txn=null)
     {
-        //$conn=$this->container->get('database_connection');
+         $conn=$this->container->get('database_connection');
+        $data = $conn->fetchArray('SELECT * FROM transactions WHERE transaction_code = ?', 
+                                   array($txn['transaction']->transaction_code));
 
-
-        if(isset($txn['receiver_first_name']))
-        {
-          $data =  $this->cambiaBeneficiario($txn['confirmation_number'],$txn['receiver_first_name'],$txn['reason']);
+        if(trim($txn['transaction']->beneficiary_first_name) != trim($data[14])){
+          echo "A";die;
+          $data =  $this->cambiaBeneficiario(
+                                             $txn['transaction']->transaction_code,
+                                             $txn['transaction']->beneficiary_first_name,
+                                             'reason to change'
+                                            );
           return $data;
-        }elseif(isset($txn['sender_first_name']))
-        {
-          $data =  $this->cambiaRemitente($txn['confirmation_number'],$txn['sender_first_name'],$txn['reason']);
+        }elseif(trim($txn['transaction']->remitter_first_name) != trim($data[42])){
+          echo "B";die;
+          $data =   $this->cambiaRemitente(
+                                            $txn['transaction']->transaction_code,
+                                            $txn['transaction']->remitter_first_name,
+                                            'reason to change'
+                                          );
           return $data;
-        }elseif(isset($txn['receiver_phone_mobile']))
-        {
-          $data =  $this->cambiaTelBeneficiario($txn['confirmation_number'],$txn['receiver_phone_mobile'],$txn['reason']); 
+        }elseif(trim($txn['transaction']->beneficiary_phone_mobile) != trim($data[21])){
+          echo "C";die;
+          $data =   $this->cambiaRemitente(
+                                            $txn['transaction']->transaction_code,
+                                            $txn['transaction']->beneficiary_phone_mobile,
+                                            'reason to change'
+                                          );
           return $data;
         }else{
+          echo "D";die;
            $return = array('code' => '400',
                           'operation'=>'modify',
-                          'message' => 'Transaction Update Failed.' ,
+                          'message' => 'Only beneficiary_first_name,remitter_first_name and 
+                                        beneficiary_phone_mobile can be modified.' ,
                           'notify_source'=>'tb',
                           'status' => 'failed' ,
                           'data' => '' ,
-                          'confirmation_number' => $txn['confirmation_number'],
-                         );
+                          'confirmation_number' => $txn['transaction']->transaction_code,
+                          );
           return $return;
         }
     }
