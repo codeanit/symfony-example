@@ -75,80 +75,87 @@ class Queue
         $serviceObj = null;
         try {
             $serviceObj=$this->container->get($service);
-            if($serviceObj != '') {            
-                if(strtolower($service)=='bts' || strtolower($service)=='intermex' ) {                
-                    $result=$serviceObj->process($operation, $parameter);
-                }else {                
-                    $result=$serviceObj->{$operation}($parameter);
-                } 
+            if($serviceObj != '') {           
+                $result=$serviceObj->{$operation}($parameter);
+               // echo $result['operation']; die;
+                if($result != ''){ 
+                    if($operation=='create'){
+                        if($result['code']==200){
+                            $check=$connection->update('transactions',array('processing_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                           
+                        }else{                                             
+                            $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));                            
+                        }
+                    }
+
+                    if ( $result['operation'] == 'update' ) { 
+                        if($result['code']==200){                  
+                            $updateTransaction=$connection->update(
+                                'transactions',
+                                $result['data'],
+                                array('transaction_code' => $result['confirmation_number'])
+                            );
+
+                        } else {                
+                            $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
+                        }               
+                    }
+
+                    if($result['operation']=='cancel'){                
+                        if($result['code']==200){
+                            $check=$connection->update(
+                                'transactions',
+                                array('processing_status'=>'successful'),
+                                array('transaction_code' => $result['confirmation_number'])
+                                );                             
+                        }else{               
+                            $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
+                        }
+                    }
+
+                    if($result['operation'] == 'create' || $result['operation'] == 'update' || $result['operation'] == 'cancel'){                   
+                        // add queue to notify to source
+                        if(array_key_exists('change_status', $result)){
+                            $change_status=$result['change_status'];
+                        }else{
+                            $change_status='';
+                        }
+                        $queueData = array(
+                            'transaction_source' => 'CDEX',
+                            'transaction_service' => $result['notify_source'],
+                            'operation' => 'notify', 
+                            'parameter' => json_encode(array('code'=>$result['code'],
+                                                             'operation'=>$result['operation'],
+                                                             'confirmation_number'=>$result['confirmation_number'],
+                                                             'status'=>$result['status'],
+                                                             'change_status'=>$change_status,
+                                                             'message'=>$result['message'],
+                                                             'data'=> (isset($result['data'])?$result['data']:''))),
+                            'is_executed' => 0,
+                            'creation_datetime' => date('Y-m-d H:i:s')
+                            );
+                        $connection->insert('operations_queue', $queueData);
+                    }            
+                  }//end of result check if                   
+                }   
+            } catch (\Exception $e) { 
+                echo $e->getMessage();die;
+                //Re-Queue Error Data
+                $requeueData = array(
+                            'transaction_source' => isset($result['transaction_source'])?$result['transaction_source']:'CDEX',
+                            'transaction_service' => $result['transaction_service'],
+                            'operation' => $result['operation'], 
+                            'parameter' => $result['parameter'],
+                            'is_executed' => 0,
+                            'creation_datetime' => date('Y-m-d H:i:s')
+                            ); 
+                $connection->insert('operations_queue', $requeueData);
+                $log=$this->container->get('log');
+                $log->addError('Operation Queue', 'queue', $result['parameter'], $e->getMessage()); 
+                $result=array('code'=>'400','message'=>'Error in Queue Processing.','error'=>$e->getMessage());
+
+            }
+
                 
-                              
-                if($operation=='create'){
-                    if($result['code']==200){
-                        $check=$connection->update('transactions',array('processing_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                           
-                    }else{                                             
-                        $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));                            
-                    }
-                }
-
-                if($operation=='modify' || $operation=='update'){ 
-                    if($result['code']==200){                  
-                        $updateTransaction=$connection->update('transactions',$result['data'], array('transaction_code' => $result['confirmation_number']));                                              
-                    }else{                
-                        $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
-                    }               
-                }
-
-                if($operation=='cancel'){                
-                    if($result['code']==200){
-                        $check=$connection->update('transactions',array('processing_status'=>'successful','status'=>'cancel'), array('transaction_code' => $result['confirmation_number']));                             
-                    }else{               
-                        $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
-                    }
-                }
-
-                if($operation == 'create' || $operation == 'modify' || $operation == 'cancel'){                   
-                    // add queue to notify to source
-                    if(array_key_exists('change_status', $result)){
-                        $change_status=$result['change_status'];
-                    }else{
-                        $change_status='';
-                    }
-                    $queueData = array(
-                        'transaction_source' => 'CDEX',
-                        'transaction_service' => $result['notify_source'],
-                        'operation' => 'notify', 
-                        'parameter' => json_encode(array('code'=>$result['code'],
-                                                         'operation'=>$result['operation'],
-                                                         'confirmation_number'=>$result['confirmation_number'],
-                                                         'status'=>$result['status'],
-                                                         'change_status'=>$change_status,
-                                                         'message'=>$result['message'],
-                                                         'data'=> (isset($result['data'])?$result['data']:''))),
-                        'is_executed' => 0,
-                        'creation_datetime' => date('Y-m-d H:i:s')
-                        );      
-
-                    $connection->insert('operations_queue', $queueData);
-                }            
-                    
-            }   
-        } catch (\Exception $e) { 
-            //Re-Queue Error Data
-            $requeueData = array(
-                        'transaction_source' => isset($result['transaction_source'])?$result['transaction_source']:'CDEX',
-                        'transaction_service' => $result['transaction_service'],
-                        'operation' => $result['operation'], 
-                        'parameter' => $result['parameter'],
-                        'is_executed' => 0,
-                        'creation_datetime' => date('Y-m-d H:i:s')
-                        ); 
-            $connection->insert('operations_queue', $requeueData);
-            $log=$this->container->get('log');
-            $log->addError('Operation Queue', 'queue', $result['parameter'], $e->getMessage()); 
-            $result=array('code'=>'400','message'=>'Error in Queue Processing.','error'=>$e->getMessage());
-
-        }
 
         $connection->update(
             'operations_queue',

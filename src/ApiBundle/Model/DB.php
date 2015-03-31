@@ -87,7 +87,7 @@ class DB
                                ->setParameter('transaction_code', $num);
                 $count=$qb->execute()->fetchColumn();
                                
-                if($operation=='modify') {
+                if($operation=='update') {
                     if($count>0) {
                         $check_queue = $conn->insert('operations_queue', $queueData); 
                         $check=3;                    

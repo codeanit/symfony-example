@@ -13,12 +13,11 @@ class Intermex
     protected $log;
     protected $service_id;
     protected $database;
-    protected $operationMap = array(
-        'create' => 'altaEnvioT',
-        'modify' => 'processUpdate',
-        'update' => 'processUpdate',
-        'cancel' => 'anulaEnvio'
-    );
+    // protected $operationMap = array(
+    //     'create' => 'altaEnvioT',
+    //     'update' => 'processUpdate',
+    //     'cancel' => 'anulaEnvio'
+    // );
 
     public function __construct(ContainerInterface $container)
     {
@@ -66,7 +65,7 @@ class Intermex
      *
      * @return [Array] [which is added to queue]
      */
-    public function altaEnvioT($txn=null)
+    public function create($txn=null)
     {      
       $data=$txn;
       $currencyId=(strtoupper($data['transaction']->payout_currency) == "USD" ||
@@ -234,14 +233,14 @@ class Intermex
      * @param  string  $vMotivoModificacion [Reason for changing]
      * @return void
      */
-    public function cambiaBeneficiario($vReferencia=null,$vNuevoBeneficiario=null,$vMotivoModificacion=null)
-    {
+    public function cambiaBeneficiario($txn = null)
+    {     
         $iIdAgencia=$this->conectar();
         $param=array(
-                    'iIdAgencia'=>$iIdAgencia,
-                    'vReferencia'=>$vReferencia,
-                    'vNuevoBeneficiario'=>$vNuevoBeneficiario,
-                    'vMotivoModificacion'=>$vMotivoModificacion
+                    'iIdAgencia' => $iIdAgencia,
+                    'vReferencia' => $txn['transaction']->transaction_code,
+                    'vNuevoBeneficiario' => $txn['transaction']->beneficiary_first_name,
+                    'vMotivoModificacion' => 'reason to change'
                     );
         $soap_client = new \SoapClient(
                     $this->url,
@@ -263,12 +262,14 @@ class Intermex
 
         if ($output->tiExito=='1') {
               $return = array('code' => '200',
-                              'operation'=>'modify',
+                              'operation'=>'update',
                               'message' => 'Receiver Name Change Successful.' ,
                               'notify_source'=>'tb',
                               'status' => 'complete' ,
-                              'data' => array('receiver_first_name'=>$vNuevoBeneficiario) ,
-                              'confirmation_number' => $vReferencia,
+                              'data' => array(
+                                        'beneficiary_first_name'=>$txn['transaction']->beneficiary_first_name
+                                        ),
+                              'confirmation_number' => $txn['transaction']->transaction_code,
                            );
               $this->log->addInfo($this->service_id, 'cambiaBeneficiario', $param, $response_main);
               return $return;         
@@ -281,13 +282,13 @@ class Intermex
         $this->log->addError($this->service_id, 'cambiaBeneficiario', $param, $response_main);        
       }
       $return = array('code' => '400',
-                      'operation'=>'modify',
+                      'operation'=>'update',
                       'message' => 'Receiver Name Change Failed.' ,
                       'notify_source'=>'tb',
                       'status' => 'failed' ,
                       'data' => '' ,
-                      'confirmation_number' => $vReferencia,
-                           );
+                      'confirmation_number' => $txn['transaction']->transaction_code,
+                      );
 
       return $return;
     }
@@ -299,8 +300,11 @@ class Intermex
      * @param  string  $vMotivoModificacion [Reason for changing]
      * @return void
      */
-    public function cambiaRemitente($vReferencia=null,$vNuevoRemitente=null,$vMotivoModificacion=null)
+    public function cambiaRemitente($txn=null)
     {
+        $vReferencia=$txn['transaction']->transaction_code;
+        $vNuevoRemitente=$txn['transaction']->remitter_first_name;
+        $vMotivoModificacion='reason to change ';
         $iIdAgencia=$this->conectar();
         $param=array(
                     'iIdAgencia'=>$iIdAgencia,
@@ -327,11 +331,11 @@ class Intermex
         $arr=array('tiExito'=>$output->tiExito,'error_msg'=>$output->vMensajeError);
         if ($output->tiExito=='1') {
               $return = array('code' => '200',
-                              'operation'=>'modify',
+                              'operation'=>'update',
                               'message' => 'Sender Name Change Successful.' ,
                               'notify_source'=>'tb',
                               'status' => 'complete' ,
-                              'data' => array('sender_first_name'=>$vNuevoRemitente) ,
+                              'data' => array('remitter_first_name'=>$vNuevoRemitente) ,
                               'confirmation_number' => $vReferencia,
                            );
               $this->log->addInfo($this->service_id, 'cambiaRemitente', $param, $response_main);
@@ -344,7 +348,7 @@ class Intermex
               $this->log->addError($this->service_id, 'cambiaRemitente', $param, $response_main);
       }
       $return = array('code' => '400',
-                      'operation'=>'modify',
+                      'operation'=>'update',
                       'message' => 'Sender Name Change Failed.' ,
                       'notify_source'=>'tb',
                       'status' => 'failed' ,
@@ -362,8 +366,11 @@ class Intermex
      * @param  string  $vMotivoModificacion [Reason for changing]
      * @return void
      */
-    public function cambiaTelBeneficiario($vReferencia=null,$vNuevoTelefon=null,$vMotivoModificacion=null)
+    public function cambiaTelBeneficiario($txn=null)
     {
+        $vReferencia=$txn['transaction']->transaction_code;
+        $vNuevoTelefon=$txn['transaction']->beneficiary_phone_mobile;
+        $vMotivoModificacion='reason to change ';
         $iIdAgencia=$this->conectar();      
         $param=array(
                     'iIdAgencia'=>$iIdAgencia,
@@ -390,11 +397,11 @@ class Intermex
         $arr=array('tiExito'=>$output->tiExito,'error_msg'=>$output->vMensajeError);
         if ($output->tiExito=='1') {
                $return = array('code' => '200',
-                              'operation'=>'modify',
+                              'operation'=>'update',
                               'message' => 'Receiver Phone Number Change Successful.' ,
                               'notify_source'=>'tb',
                               'status' => 'complete' ,
-                              'data' => array('receiver_phone_mobile'=>$vNuevoTelefon) ,
+                              'data' => array('beneficiary_phone_mobile'=>$vNuevoTelefon) ,
                               'confirmation_number' => $vReferencia,
                            );
               $this->log->addInfo($this->service_id, 'cambiaTelBeneficiario', $param, $response_main); 
@@ -407,14 +414,13 @@ class Intermex
         $this->log->addError($this->service_id, 'cambiaTelBeneficiario', $param, $response_main);        
       }
        $return = array('code' => '400',
-                      'operation'=>'modify',
+                      'operation'=>'update',
                       'message' => 'Receiver Phone Number Change Failed.' ,
                       'notify_source'=>'tb',
                       'status' => 'failed' ,
                       'data' => '' ,
                       'confirmation_number' => $vReferencia,
                            );
-
       return $return;
     }
 
@@ -424,7 +430,7 @@ class Intermex
      * @param  string  $vMotivoCancelacion [Reason for changing]
      * @return void
      */
-    public function anulaEnvio($txn=null)
+    public function cancel($txn=null)
     {
         $vReferencia=$txn['transaction']->transaction_code;
         $vMotivoCancelacion='cancel from TB';
@@ -452,11 +458,11 @@ class Intermex
         $output=(object) $response['DocumentElement']['RESP'];
         if ($output->tiExito=='1') {
               $return = array('code' => '200',
-                              'operation'=>'modify',
+                              'operation'=>'update',
                               'message' => 'Transaction Successfully Cancelled.' ,
                               'notify_source'=>'tb',
                               'status' => 'complete' ,
-                              'data' => array('status'=>'canceled') ,
+                              'data' => array('processing_status'=>'cancel') ,
                               'confirmation_number' => $vReferencia,
                            );
               $this->log->addInfo($this->service_id, 'anulaEnvio', $param, $response_main);
@@ -470,7 +476,7 @@ class Intermex
         $this->log->addError($this->service_id, 'anulaEnvio', $param, $response_main);
       }
       $return = array('code' => '400',
-                      'operation'=>'modify',
+                      'operation'=>'update',
                       'message' => 'Transaction Cancel Failed.' ,
                       'notify_source'=>'tb',
                       'status' => 'failed' ,
@@ -507,7 +513,11 @@ class Intermex
       if (isset($response['NewDataSet']['CAMBIOS'])) {
         $output=$response['NewDataSet']['CAMBIOS'];
         foreach ($output as $key => $value) {          
-           $data=$this->confirmaCambio($value['iIdOrden'],$value['tiIdTipoOrden'],$value['vReferencia']);
+           $data=$this->confirmaCambio(
+                                      $value['iIdOrden'],
+                                      $value['tiIdTipoOrden'],
+                                      $value['vReferencia']
+                                      );
            if ($data=='200') {
               $this->log->addInfo($this->service_id, 'consultaCambios', $param, $data);              
             } else {
@@ -515,7 +525,11 @@ class Intermex
             }           
         }    
       } else {
-        $this->log->addError($this->service_id, 'consultaCambios', $param, 'No paid remittance today from this iIdAgencia');
+        $this->log->addError($this->service_id,
+                             'consultaCambios', 
+                             $param, 
+                             'No paid remittance today from this iIdAgencia'
+                            );
       }
 
     }
@@ -552,23 +566,38 @@ class Intermex
       if (isset($response['NewDataSet']['CONFIRMADOS'])) {
         $output=$response['NewDataSet']['CONFIRMADOS'];
         if ($output['tiExito']=='1') {
-            $arr=array('code'=>'200','confirmation_number'=>$ref,'iIdOrden'=>$iIdOrden,'msg'=>$type[$id].' Successful');
+            $arr=array(
+                      'code'=>'200',
+                      'confirmation_number'=>$ref,
+                      'iIdOrden'=>$iIdOrden,
+                      'msg'=>$type[$id].' Successful'
+                      );
             $this->addToQueue($arr);            
         } else {
-            $arr=array('code'=>'400','confirmation_number'=>$ref,'iIdOrden'=>$iIdOrden,'msg'=>$type[$id].' Failed');
+            $arr=array(
+                      'code'=>'400',
+                      'confirmation_number'=>$ref,
+                      'iIdOrden'=>$iIdOrden,
+                      'msg'=>$type[$id].' Failed'
+                      );
         }
       } else {
-        $arr=array('code'=>'400','confirmation_number'=>$ref,'iIdOrden'=>$iIdOrden,'msg'=>$type[$id].' Failed');
+        $arr=array(
+                  'code'=>'400',
+                  'confirmation_number'=>$ref,
+                  'iIdOrden'=>$iIdOrden,
+                  'msg'=>$type[$id].' Failed'
+                  );
       }
 
       return $arr;
     }
 
 
-    public function process($operation, $args)
-    {
-        return call_user_func_array(array($this, $this->operationMap[$operation]), [$args]);
-    }
+    // public function process($operation, $args)
+    // {
+    //     return call_user_func_array(array($this, $this->operationMap[$operation]), [$args]);
+    // }
 
     /**
      * Used to map to specific update method according to
@@ -578,65 +607,65 @@ class Intermex
      * 
      * @return void
      */
-    public function processUpdate($txn=null)
+    public function update($txn = null)
     {
-         $conn=$this->container->get('database_connection');
+        $conn=$this->container->get('database_connection');
         $data = $conn->fetchArray('SELECT * FROM transactions WHERE transaction_code = ?', 
                                    array($txn['transaction']->transaction_code));
 
         if(trim($txn['transaction']->beneficiary_first_name) != trim($data[14])){
-          echo "A";die;
-          $data =  $this->cambiaBeneficiario(
-                                             $txn['transaction']->transaction_code,
-                                             $txn['transaction']->beneficiary_first_name,
-                                             'reason to change'
-                                            );
-          return $data;
-        }elseif(trim($txn['transaction']->remitter_first_name) != trim($data[42])){
-          echo "B";die;
-          $data =   $this->cambiaRemitente(
-                                            $txn['transaction']->transaction_code,
-                                            $txn['transaction']->remitter_first_name,
-                                            'reason to change'
-                                          );
-          return $data;
-        }elseif(trim($txn['transaction']->beneficiary_phone_mobile) != trim($data[21])){
-          echo "C";die;
-          $data =   $this->cambiaRemitente(
-                                            $txn['transaction']->transaction_code,
-                                            $txn['transaction']->beneficiary_phone_mobile,
-                                            'reason to change'
-                                          );
-          return $data;
-        }else{
-          echo "D";die;
-           $return = array('code' => '400',
-                          'operation'=>'modify',
-                          'message' => 'Only beneficiary_first_name,remitter_first_name and 
-                                        beneficiary_phone_mobile can be modified.' ,
+            $this->addToQueue($txn,'cambiaBeneficiario','intermex');
+        }
+        
+        if(trim($txn['transaction']->remitter_first_name) != trim($data[42])){
+            $this->addToQueue($txn,'cambiaRemitente','intermex');          
+        }
+
+        if(trim($txn['transaction']->beneficiary_phone_mobile) != trim($data[21])){
+            $this->addToQueue($txn,'cambiaTelBeneficiario','intermex');
+        }
+
+        if(trim($txn['transaction']->beneficiary_phone_mobile) == trim($data[21]) &&
+           trim($txn['transaction']->remitter_first_name) == trim($data[42])&&
+           trim($txn['transaction']->beneficiary_first_name) == trim($data[14]))
+        {
+          $return = array('code' => '400',
+                          'operation'=>'notify',
+                          'message' => 'Only beneficiary_first_name,remitter_first_name and beneficiary_phone_mobile can be modified.' ,
                           'notify_source'=>'tb',
                           'status' => 'failed' ,
                           'data' => '' ,
                           'confirmation_number' => $txn['transaction']->transaction_code,
                           );
-          return $return;
+          $this->addToQueue($return,'notify','tb');
         }
+        return;
     }
 
-    public function addToQueue($data)
-    {
+    public function addToQueue($data , $type=null , $service=null)
+    {      
         $conn=$this->container->get('database_connection');
-        $queueData = array(
-                            'transaction_source' => 'CDEX',
-                            'transaction_service' => 'tb',
-                            'operation' => 'notify', 
-                            'parameter' => json_encode(array('code'=>'200','operation'=>'confirmation','confirmation_number'=>$data['confirmation_number'],'status'=>'successful','message'=>$data['msg'])),
-                            'is_executed' => 0,
-                            'creation_datetime' => date('Y-m-d H:i:s')
-                            );
+        if($type == ''){
+            $queueData = array(
+                                'transaction_source' => 'CDEX',
+                                'transaction_service' => 'tb',
+                                'operation' => 'notify', 
+                                'parameter' => json_encode(array('code'=>'200','operation'=>'confirmation','confirmation_number'=>$data['confirmation_number'],'status'=>'successful','message'=>$data['msg'])),
+                                'is_executed' => 0,
+                                'creation_datetime' => date('Y-m-d H:i:s')
+                                );
+        }else{
+            $queueData = array(
+                                'transaction_source' => 'cdex',
+                                'transaction_service' => $service,
+                                'operation' => $type, 
+                                'parameter' => json_encode($data),
+                                'is_executed' => 0,
+                                'creation_datetime' => date('Y-m-d H:i:s')
+                                );
+        }        
         $check_queue = $conn->insert('operations_queue', $queueData);
+        return $check_queue;
     }
-
-}
 
 }

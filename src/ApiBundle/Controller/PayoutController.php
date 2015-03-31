@@ -58,7 +58,7 @@ class PayoutController extends Controller
         $postData=$request->getContent();
         $decodedData=(array) json_decode($postData);
 
-        $status=$this->DB->operateTransaction($decodedData,$postData,'modify');
+        $status=$this->DB->operateTransaction($decodedData,$postData,'update');
 
        if($status[0]==3 && $status[1]==3) {
 
