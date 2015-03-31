@@ -11,7 +11,7 @@ vendor/**/*
 composer.*
 
 #Ignore web/
-web/**/*
+web/bundles/**/*
 
 #ignore logs
 app/logs/*
