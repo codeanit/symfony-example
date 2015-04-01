@@ -132,7 +132,7 @@ class Intermex
                             'message' => 'Transaction Create Successful.' ,
                             'notify_source'=>$data['source'],
                             'status' => 'complete' , 
-                            'change_status'=>'paid',                           
+                            'change_status'=>'',                           
                             'confirmation_number' =>
                               $data['transaction']->transaction_code
                            );
