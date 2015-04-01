@@ -17,47 +17,47 @@
         
     <services>
         
-        <service id="queue" class="ApiBundle\Model\Queue">            
+        <service id="queue" class="Api\PayoutBundle\Model\Queue" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="log" class="ApiBundle\Model\Log">            
+        <service id="log" class="Api\PayoutBundle\Model\Log" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-         <service id="connection" class="ApiBundle\Model\DB">            
+         <service id="connection" class="Api\PayoutBundle\Model\DB" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
 
-        <service id="bdo" class="ApiBundle\Library\BDO">            
+        <service id="bdo" class="Api\PayoutBundle\Library\BDO" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-         <service id="tb" class="ApiBundle\Library\TB">            
+         <service id="tb_mock" class="Api\PayoutBundle\Library\TB" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="mock" class="ApiBundle\Library\MOCK">            
+        <service id="mock" class="Api\PayoutBundle\Library\MOCK" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="greenbelt" class="ApiBundle\Library\Greenbelt">            
+        <service id="greenbelt" class="Api\PayoutBundle\Library\Greenbelt" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="sanmartin" class="ApiBundle\Library\Sanmartin">            
+        <service id="sanmartin" class="Api\PayoutBundle\Library\Sanmartin" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="consultoria" class="ApiBundle\Library\Consultoria">            
+        <service id="consultoria" class="Api\PayoutBundle\Library\Consultoria" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="intermex" class="ApiBundle\Library\Intermex">            
+        <service id="intermex" class="Api\PayoutBundle\Library\Intermex" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="olympic" class="ApiBundle\Library\Olympic">            
+        <service id="olympic" class="Api\PayoutBundle\Library\Olympic" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="mcb" class="ApiBundle\Library\MCB">            
+        <service id="mcb" class="Api\PayoutBundle\Library\MCB" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="tb_connection" class="ApiBundle\Library\TBConnectionModel">
+        <service id="tb" class="Api\PayoutBundle\Library\TBConnectionModel" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>       
-        <service id="bts" class="ApiBundle\Library\BTS"> 
+        <service id="bts" class="Api\PayoutBundle\Library\BTS" lazy="true"> 
             <argument type="service" id="service_container" /> 
          <!--    <argument type="string">Suraj</argument>
             <argument>%testing.array%</argument> -->
