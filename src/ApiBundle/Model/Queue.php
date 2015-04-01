@@ -69,7 +69,10 @@ class Queue
 
         if(isset($parameter['transaction']->transaction_code)){ 
             $CN=$parameter['transaction']->transaction_code; // Confirmation NUmber  
-            $connection->update('transactions',array('processing_status'=>'inprogress'), array('transaction_code' => $CN));                 
+            $connection->update('transactions',
+                                array('processing_status'=>'inprogress'), 
+                                array('transaction_code' => $CN)
+                               );                 
         } 
 
         $serviceObj = null;
@@ -77,13 +80,19 @@ class Queue
             $serviceObj=$this->container->get($service);
             if($serviceObj != '') {           
                 $result=$serviceObj->{$operation}($parameter);
-               // echo $result['operation']; die;
+            
                 if($result != ''){ 
                     if($operation=='create'){
                         if($result['code']==200){
-                            $check=$connection->update('transactions',array('processing_status'=>'successful'), array('transaction_code' => $result['confirmation_number']));                           
+                            $check=$connection->update('transactions',
+                                                       array('processing_status'=>'successful'), 
+                                                       array('transaction_code' => $result['confirmation_number'])
+                                                      );                           
                         }else{                                             
-                            $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));                            
+                            $check=$connection->update('transactions',
+                                                       array('processing_status'=>'failed'), 
+                                                       array('transaction_code' => $result['confirmation_number'])
+                                                      );                            
                         }
                     }
 
@@ -96,7 +105,10 @@ class Queue
                             );
 
                         } else {                
-                            $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
+                            $check=$connection->update('transactions',
+                                                        array('processing_status'=>'failed'), 
+                                                        array('transaction_code' => $result['confirmation_number'])
+                                                      );
                         }               
                     }
 
@@ -108,7 +120,10 @@ class Queue
                                 array('transaction_code' => $result['confirmation_number'])
                                 );                             
                         }else{               
-                            $check=$connection->update('transactions',array('processing_status'=>'failed'), array('transaction_code' => $result['confirmation_number']));
+                            $check=$connection->update('transactions',
+                                                        array('processing_status'=>'failed'), 
+                                                        array('transaction_code' => $result['confirmation_number'])
+                                                      );
                         }
                     }
 
