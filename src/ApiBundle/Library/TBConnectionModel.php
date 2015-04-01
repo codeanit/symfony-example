@@ -54,7 +54,7 @@ class TBConnectionModel
         curl_setopt($curl, CURLOPT_POSTFIELDS, $postedData);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $resultPOST = curl_exec($curl);       
-
+        var_dump($resultPOST);die;
         return (array) json_decode($resultPOST);    
     }   
 

@@ -28,7 +28,6 @@ class Intermex
         $this->database = json_decode(base64_decode($result[0]['credentials']));        
         $this->url=$this->database->url;        
         $this->service_id=$result[0]['id'];
-
     }
 
     /**
@@ -111,7 +110,7 @@ class Intermex
           'siIdTipoDeposito'=>isset($bankAccountNumber)?$bankAccountNumber:'',
           'vNumerotarjeta'=>'',
           'vMontoCom'=>$data['transaction']->fee);
-      // var_dump($param);die;
+      
         $soap_client = new \SoapClient(
                     $this->url,
                     array(
@@ -132,7 +131,8 @@ class Intermex
                             'operation'=>'create',
                             'message' => 'Transaction Create Successful.' ,
                             'notify_source'=>$data['source'],
-                            'status' => 'complete' ,                            
+                            'status' => 'complete' , 
+                            'change_status'=>'paid',                           
                             'confirmation_number' =>
                               $data['transaction']->transaction_code
                            );
@@ -458,11 +458,12 @@ class Intermex
         $output=(object) $response['DocumentElement']['RESP'];
         if ($output->tiExito=='1') {
               $return = array('code' => '200',
-                              'operation'=>'update',
+                              'operation'=>'cancel',
                               'message' => 'Transaction Successfully Cancelled.' ,
                               'notify_source'=>'tb',
                               'status' => 'complete' ,
-                              'data' => array('processing_status'=>'cancel') ,
+                              'change_status'=>'cancel',
+                              'data' => '' ,
                               'confirmation_number' => $vReferencia,
                            );
               $this->log->addInfo($this->service_id, 'anulaEnvio', $param, $response_main);
@@ -476,7 +477,7 @@ class Intermex
         $this->log->addError($this->service_id, 'anulaEnvio', $param, $response_main);
       }
       $return = array('code' => '400',
-                      'operation'=>'update',
+                      'operation'=>'cancel',
                       'message' => 'Transaction Cancel Failed.' ,
                       'notify_source'=>'tb',
                       'status' => 'failed' ,
@@ -609,6 +610,7 @@ class Intermex
      */
     public function update($txn = null)
     {
+      
         $conn=$this->container->get('database_connection');
         $data = $conn->fetchArray('SELECT * FROM transactions WHERE transaction_code = ?', 
                                    array($txn['transaction']->transaction_code));
