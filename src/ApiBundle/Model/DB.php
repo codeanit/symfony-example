@@ -136,7 +136,7 @@ class DB
     public function getTransactions()
     {
         $conn = $this->container->get('database_connection');
-        $data=$conn->fetchAll('SELECT * FROM transactions');
+        $data=$conn->fetchAll('SELECT * FROM transactions ORDER BY id DESC LIMIT 25 ');        
         return $data;
     }
 
