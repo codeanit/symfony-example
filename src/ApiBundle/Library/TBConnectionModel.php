@@ -46,16 +46,16 @@ class TBConnectionModel
      *        
      * @return  array
      */
-    public function notify(array $postedData)
+    public function notify($postedData)
     { 
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "http://172.16.1.50/secure/cdex");
+        curl_setopt($curl, CURLOPT_URL, "http://172.16.1.50/fgm/secure/cdex");
         curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $postedData);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($postedData));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $resultPOST = curl_exec($curl);       
-        var_dump($resultPOST);die;
-        return (array) json_decode($resultPOST);    
+         // var_dump($resultPOST);die;
+        // return (array) json_decode($resultPOST);    
     }   
 
 }
