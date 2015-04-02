@@ -153,7 +153,7 @@ class Queue
                   }//end of result check if                   
                 }   
             } catch (\Exception $e) { 
-                echo $e->getMessage();die;
+                // echo $e->getMessage();die;
                 //Re-Queue Error Data
                 $requeueData = array(
                             'transaction_source' => isset($result['transaction_source'])?$result['transaction_source']:'CDEX',
