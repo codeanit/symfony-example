@@ -54,6 +54,9 @@
         <service id="mcb" class="Api\PayoutBundle\Library\MCB" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
+         <service id="transnetwork" class="Api\PayoutBundle\Library\TransNetwork" lazy="true">            
+            <argument type="service" id="service_container" />         
+        </service>
         <service id="tb" class="Api\PayoutBundle\Library\TBConnectionModel" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>       
