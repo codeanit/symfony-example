@@ -1,0 +1,38 @@
+BackendBundle\Entity\Services:
+    type: entity
+    table: services
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            comment: ''
+            id: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        serviceName:
+            type: string
+            nullable: false
+            length: 45
+            fixed: false
+            comment: 'Name of third party service'
+            column: service_name
+        credentials:
+            type: string
+            nullable: false
+            length: 255
+            fixed: false
+            comment: 'encoded credentials fields'
+        status:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: ''
+        isFtpService:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: '0 for not FTP type of service and 1 for FTP type'
+            column: is_ftp_service
+    lifecycleCallbacks: {  }

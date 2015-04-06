@@ -1,0 +1,57 @@
+BackendBundle\Entity\OperationsQueue:
+    type: entity
+    table: operations_queue
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: true
+            comment: ''
+            id: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        transactionSource:
+            type: string
+            nullable: false
+            length: 10
+            fixed: false
+            comment: 'Defines which business logic class to execute'
+            column: transaction_source
+        transactionService:
+            type: string
+            nullable: false
+            length: 45
+            fixed: false
+            comment: ''
+            column: transaction_service
+        operation:
+            type: string
+            nullable: false
+            length: 25
+            fixed: false
+            comment: 'Which operation to perform'
+        parameter:
+            type: text
+            nullable: true
+            length: null
+            fixed: false
+            comment: 'Parameter for the operation'
+        isExecuted:
+            type: boolean
+            nullable: true
+            comment: 'Identifies if the operation is performed or not'
+            default: '0'
+            column: is_executed
+        creationDatetime:
+            type: datetime
+            nullable: true
+            comment: 'Date time of operation inserted in queue'
+            column: creation_datetime
+        executionTimestamp:
+            type: datetime
+            nullable: false
+            comment: 'Operation executed date time'
+            default: CURRENT_TIMESTAMP
+            column: execution_timestamp
+    lifecycleCallbacks: {  }

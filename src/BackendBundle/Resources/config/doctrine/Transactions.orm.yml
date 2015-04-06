@@ -1,0 +1,496 @@
+BackendBundle\Entity\Transactions:
+    type: entity
+    table: transactions
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            comment: ''
+            id: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        transactionSource:
+            type: string
+            nullable: false
+            length: 10
+            fixed: false
+            comment: 'Transaction originating end identified by string ie. transborder'
+            column: transaction_source
+        transactionService:
+            type: string
+            nullable: false
+            length: 20
+            fixed: false
+            comment: 'Third party service requested by the source'
+            column: transaction_service
+        sourceTransactionId:
+            type: string
+            nullable: true
+            length: 11
+            fixed: false
+            comment: 'Transaction ID of the Source'
+            column: source_transaction_id
+        transactionCode:
+            type: string
+            nullable: false
+            length: 50
+            fixed: false
+            comment: 'Primary transaction identifier'
+            column: transaction_code
+        trackingNumber:
+            type: string
+            nullable: true
+            length: 50
+            fixed: false
+            comment: 'Transaction Tracking Number'
+            column: tracking_number
+        transactionType:
+            type: string
+            nullable: false
+            length: 10
+            fixed: true
+            comment: 'Type of channel to be used for Payout. Ex: BANK for Bank Account, CASH payout for Agent services. Field Values= cash/bank/credit_card'
+            column: transaction_type
+        remittingCurrency:
+            type: string
+            nullable: true
+            length: 3
+            fixed: false
+            comment: ''
+            column: remitting_currency
+        payoutCurrency:
+            type: string
+            nullable: true
+            length: 3
+            fixed: false
+            comment: ''
+            column: payout_currency
+        remittingAmount:
+            type: decimal
+            nullable: true
+            precision: 10
+            scale: 2
+            comment: ''
+            column: remitting_amount
+        payoutAmount:
+            type: decimal
+            nullable: true
+            precision: 10
+            scale: 2
+            comment: ''
+            column: payout_amount
+        exchangeRate:
+            type: decimal
+            nullable: true
+            precision: 10
+            scale: 2
+            comment: ''
+            column: exchange_rate
+        fee:
+            type: decimal
+            nullable: true
+            precision: 10
+            scale: 2
+            comment: ''
+        remittanceDate:
+            type: datetime
+            nullable: true
+            comment: 'Date of remittance date at Source'
+            column: remittance_date
+        beneficiaryFirstName:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_first_name
+        beneficiaryMiddleName:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_middle_name
+        beneficiaryLastName:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_last_name
+        beneficiaryEmail:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_email
+        beneficiaryCity:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_city
+        beneficiaryState:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_state
+        beneficiaryCountry:
+            type: string
+            nullable: true
+            length: 20
+            fixed: false
+            comment: ''
+            column: beneficiary_country
+        beneficiaryAddress:
+            type: string
+            nullable: true
+            length: 100
+            fixed: false
+            comment: ''
+            column: beneficiary_address
+        beneficiaryPhoneMobile:
+            type: string
+            nullable: true
+            length: 15
+            fixed: false
+            comment: ''
+            column: beneficiary_phone_mobile
+        beneficiaryPhoneLandline:
+            type: string
+            nullable: true
+            length: 15
+            fixed: false
+            comment: ''
+            column: beneficiary_phone_landline
+        beneficiaryPostalCode:
+            type: string
+            nullable: true
+            length: 10
+            fixed: false
+            comment: ''
+            column: beneficiary_postal_code
+        beneficiaryAccountNumber:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: ''
+            column: beneficiary_account_number
+        beneficiaryBankRoutingNo:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: ''
+            column: beneficiary_bank_routing_no
+        beneficiaryBankBranch:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_bank_branch
+        beneficiaryBankName:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_bank_name
+        beneficiaryBankAccountType:
+            type: string
+            nullable: true
+            length: 6
+            fixed: false
+            comment: 'Receiver Account Type. Field Values= debit or credit'
+            column: beneficiary_bank_account_type
+        beneficiaryIdNumber:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: 'Receiver Id Number. Passport Number, Citizenship Number etc.'
+            column: beneficiary_id_number
+        beneficiaryIdType:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: 'Receiver Id type. Values= passport or citizenship  or driving_license)'
+            column: beneficiary_id_type
+        beneficiaryIdIssuedCountry:
+            type: string
+            nullable: true
+            length: 20
+            fixed: false
+            comment: 'Receiver Id Issued Country'
+            column: beneficiary_id_issued_country
+        beneficiaryIdIssuedCity:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_id_issued_city
+        beneficiaryIdIssuedState:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_id_issued_state
+        beneficiaryIdIssuedDate:
+            type: datetime
+            nullable: true
+            comment: 'Date of remittance date at Source'
+            column: beneficiary_id_issued_date
+        beneficiaryIdExpiryDate:
+            type: datetime
+            nullable: true
+            comment: 'Date of remittance date at Source'
+            column: beneficiary_id_expiry_date
+        payoutAgentId:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: ''
+            column: payout_agent_id
+        payoutAgentName:
+            type: string
+            nullable: true
+            length: 25
+            fixed: false
+            comment: ''
+            column: payout_agent_name
+        payoutAgentCity:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: payout_agent_city
+        payoutAgentState:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: payout_agent_state
+        payoutAgentCountry:
+            type: string
+            nullable: true
+            length: 20
+            fixed: false
+            comment: ''
+            column: payout_agent_country
+        remitterFirstName:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_first_name
+        remitterMiddleName:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_middle_name
+        remitterLastName:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_last_name
+        remitterEmail:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_email
+        remitterCity:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_city
+        remitterCountry:
+            type: string
+            nullable: true
+            length: 20
+            fixed: false
+            comment: ''
+            column: remitter_country
+        remitterState:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_state
+        remitterAddress:
+            type: string
+            nullable: true
+            length: 100
+            fixed: false
+            comment: ''
+            column: remitter_address
+        remitterPhoneMobile:
+            type: string
+            nullable: true
+            length: 15
+            fixed: false
+            comment: ''
+            column: remitter_phone_mobile
+        remitterPhoneLandline:
+            type: string
+            nullable: true
+            length: 15
+            fixed: false
+            comment: ''
+            column: remitter_phone_landline
+        remitterPostalCode:
+            type: string
+            nullable: true
+            length: 10
+            fixed: false
+            comment: ''
+            column: remitter_postal_code
+        remitterAccountNumber:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: ''
+            column: remitter_account_number
+        remitterBankRoutingNo:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: ''
+            column: remitter_bank_routing_no
+        remitterBankBranch:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_bank_branch
+        remitterBankName:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_bank_name
+        remitterBankAccountType:
+            type: string
+            nullable: true
+            length: 6
+            fixed: false
+            comment: 'Receiver Account Type. Field Values= debit or credit'
+            column: remitter_bank_account_type
+        remitterIdNumber:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: 'Id Number of Either Passport Number, Citizenship Number etc.'
+            column: remitter_id_number
+        remitterIdType:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: 'Id type. Values= passport or citizenship  or driving_license)'
+            column: remitter_id_type
+        remitterIdIssuedCountry:
+            type: string
+            nullable: true
+            length: 20
+            fixed: false
+            comment: 'Receiver Id Issued Country'
+            column: remitter_id_issued_country
+        remitterIdIssuedCity:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_id_issued_city
+        remitterIdIssuedState:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_id_issued_state
+        remitterIdIssuedDate:
+            type: datetime
+            nullable: true
+            comment: 'Date of remittance date at Source'
+            column: remitter_id_issued_date
+        remitterIdExpiryDate:
+            type: datetime
+            nullable: true
+            comment: 'Date of remittance date at Source'
+            column: remitter_id_expiry_date
+        remittingAgentId:
+            type: integer
+            nullable: true
+            unsigned: false
+            comment: ''
+            column: remitting_agent_id
+        remittingAgentName:
+            type: string
+            nullable: true
+            length: 25
+            fixed: false
+            comment: ''
+            column: remitting_agent_name
+        remittingAgentCity:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitting_agent_city
+        remittingAgentState:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitting_agent_state
+        remittingAgentCountry:
+            type: string
+            nullable: true
+            length: 20
+            fixed: false
+            comment: ''
+            column: remitting_agent_country
+        processingStatus:
+            type: string
+            nullable: false
+            length: 25
+            fixed: false
+            comment: 'Transaction Processing status at CDEX. Filed values = completed, pending, cancelled, ambiguous'
+            column: processing_status
+        createdAt:
+            type: datetime
+            nullable: true
+            comment: ''
+            column: created_at
+        updatedAt:
+            type: datetime
+            nullable: false
+            comment: ''
+            default: CURRENT_TIMESTAMP
+            column: updated_at
+    lifecycleCallbacks: {  }

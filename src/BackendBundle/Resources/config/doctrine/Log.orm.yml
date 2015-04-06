@@ -1,0 +1,55 @@
+BackendBundle\Entity\Log:
+    type: entity
+    table: log
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            comment: ''
+            id: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        service:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: 'Service ID'
+            column: Service
+        method:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: 'Method of that service'
+            column: Method
+        status:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: 'Status of the request either success or failed'
+            column: Status
+        request:
+            type: text
+            nullable: true
+            length: null
+            fixed: false
+            comment: 'requested data'
+            column: Request
+        response:
+            type: text
+            nullable: true
+            length: null
+            fixed: false
+            comment: 'Response Data'
+            column: Response
+        date:
+            type: datetime
+            nullable: true
+            comment: ''
+            default: CURRENT_TIMESTAMP
+            column: Date
+    lifecycleCallbacks: {  }
