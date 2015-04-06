@@ -3,64 +3,19 @@
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-<!-- 
-    <parameters>
-        <parameter key="testing.array" type="collection">
-            <parameter>en</parameter>
-            <parameter>de</parameter>
-            <parameter type="collection">
-                <parameter>en</parameter>
-                <parameter>de</parameter>
-            </parameter>
-        </parameter>
-    </parameters> -->
-        
-    <services>
-        
-        <service id="queue" class="Api\PayoutBundle\Model\Queue" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-        <service id="log" class="Api\PayoutBundle\Model\Log" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-         <service id="connection" class="Api\PayoutBundle\Model\DB" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
 
-        <service id="bdo" class="Api\PayoutBundle\Library\BDO" lazy="true">            
+    <services>        
+        <service id="queue" class="ApiBundle\Model\Queue" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-         <service id="tb_mock" class="Api\PayoutBundle\Library\TB" lazy="true">            
+        <service id="log" class="ApiBundle\Model\Log" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="mock" class="Api\PayoutBundle\Library\MOCK" lazy="true">            
+         <service id="connection" class="ApiBundle\Model\DB" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-        <service id="greenbelt" class="Api\PayoutBundle\Library\Greenbelt" lazy="true">            
+         <service id="intermex" class="ApiBundle\Library\Intermex" lazy="true">            
             <argument type="service" id="service_container" />         
-        </service>
-        <service id="sanmartin" class="Api\PayoutBundle\Library\Sanmartin" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-        <service id="consultoria" class="Api\PayoutBundle\Library\Consultoria" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-        <service id="intermex" class="Api\PayoutBundle\Library\Intermex" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-        <service id="olympic" class="Api\PayoutBundle\Library\Olympic" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-        <service id="mcb" class="Api\PayoutBundle\Library\MCB" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-        <service id="tb" class="Api\PayoutBundle\Library\TBConnectionModel" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>       
-        <service id="bts" class="Api\PayoutBundle\Library\BTS" lazy="true"> 
-            <argument type="service" id="service_container" /> 
-         <!--    <argument type="string">Suraj</argument>
-            <argument>%testing.array%</argument> -->
         </service>
     </services>
     
