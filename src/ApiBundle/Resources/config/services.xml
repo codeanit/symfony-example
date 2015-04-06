@@ -14,7 +14,14 @@
          <service id="connection" class="ApiBundle\Model\DB" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
+<<<<<<< HEAD
          <service id="intermex" class="ApiBundle\Library\Intermex" lazy="true">            
+=======
+         <service id="transnetwork" class="Api\PayoutBundle\Library\TransNetwork" lazy="true">            
+            <argument type="service" id="service_container" />         
+        </service>
+        <service id="tb" class="Api\PayoutBundle\Library\TBConnectionModel" lazy="true">            
+>>>>>>> 2668cc7452aa9b51ef2908139ecea2ea3765c9d4
             <argument type="service" id="service_container" />         
         </service>
     </services>
