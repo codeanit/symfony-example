@@ -87,20 +87,22 @@ class DB
                                ->setParameter('transaction_code', $num);
                 $count=$qb->execute()->fetchColumn();
                                
-                if($operation=='modify') {
+                if($operation=='update') {
                     if($count>0) {
-                        $check_queue = $conn->insert('operations_queue', $queueData); 
-                        $check=3;                    
-                        $check_queue=3;                        
+                        if(strtolower($data['service'])=='intermex'){
+                            $intermex=$this->container->get('intermex');
+                            $intermex->update($data);
+                        }else{
+                            $check_queue = $conn->insert('operations_queue', $queueData);                            
+                        } 
+                        $check=$check_queue=3;              
                     }else {
-                        $check=4;                    
-                        $check_queue=4;
+                        $check=$check_queue=4;
                     }                             
 
                 }elseif ($operation== 'cancel') {
                     $check_queue = $conn->insert('operations_queue', $queueData); 
-                    $check=4;                    
-                    $check_queue=4;
+                    $check=$check_queue=4;
                 } else{
 
                     if ($count <= 0) {  
@@ -108,14 +110,12 @@ class DB
                         $check_queue = $conn->insert('operations_queue', $queueData);            
                         // $check_queue = $conn->insert('TB', $logData);
                     }else{
-
-                        $check=2;
-                        $check_queue=2;
+                        $check=$check_queue=2;
                     } 
                 } 
 
             } catch (\Exception $e) {
-            echo $e->getMessage();
+            echo $e->getMessage();die;
             }
             if($data['source']!=''){
                 $source=$data['source'];
@@ -136,7 +136,7 @@ class DB
     public function getTransactions()
     {
         $conn = $this->container->get('database_connection');
-        $data=$conn->fetchAll('SELECT * FROM transactions');
+        $data=$conn->fetchAll('SELECT * FROM transactions ORDER BY id DESC LIMIT 25 ');        
         return $data;
     }
 
