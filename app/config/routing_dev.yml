@@ -21,6 +21,10 @@ _main:
 _backend:
     resource: "@BackendBundle/Resources/config/routing.yml"
 
+api_bundle:
+    type: rest
+    resource: "@ApiBundle/Resources/config/routing.yml"
+
 # Transactions Route
 _transaction:
     type: rest

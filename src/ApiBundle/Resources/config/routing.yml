@@ -1,0 +1,6 @@
+
+transactionv2:
+    resource: ApiBundle\Controller\PayoutV2Controller
+    type: rest
+    prefix: transactions/v2
+    name_prefix: transaction_v2_
