@@ -13,11 +13,13 @@ use Doctrine\ORM\Mapping as ORM;
 class Transactions
 {
     /**
-     * @var string
+     * @var integer
      *
-     * @ORM\Column(name="transaction_key", type="string", length=45, nullable=false)
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $transactionKey;
+    private $id;
 
     /**
      * @var string
@@ -36,23 +38,23 @@ class Transactions
     /**
      * @var string
      *
-     * @ORM\Column(name="status", type="string", length=10, nullable=false)
+     * @ORM\Column(name="source_transaction_id", type="string", length=11, nullable=true)
      */
-    private $status;
+    private $sourceTransactionId;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="transaction_status", type="string", length=25, nullable=false)
-     */
-    private $transactionStatus;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="transaction_code", type="string", length=255, nullable=false)
+     * @ORM\Column(name="transaction_code", type="string", length=50, nullable=false)
      */
     private $transactionCode;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="tracking_number", type="string", length=50, nullable=true)
+     */
+    private $trackingNumber;
 
     /**
      * @var string
@@ -62,284 +64,32 @@ class Transactions
     private $transactionType;
 
     /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(name="receiver_id_number", type="integer", nullable=true)
+     * @ORM\Column(name="remitting_currency", type="string", length=3, nullable=true)
      */
-    private $receiverIdNumber;
+    private $remittingCurrency;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="receiver_id_type", type="string", length=45, nullable=true)
+     * @ORM\Column(name="payout_currency", type="string", length=3, nullable=true)
      */
-    private $receiverIdType;
+    private $payoutCurrency;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="receiver_id_issued_country", type="string", length=45, nullable=true)
+     * @ORM\Column(name="remitting_amount", type="decimal", precision=10, scale=2, nullable=true)
      */
-    private $receiverIdIssuedCountry;
+    private $remittingAmount;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="receiver_first_name", type="string", length=45, nullable=true)
+     * @ORM\Column(name="payout_amount", type="decimal", precision=10, scale=2, nullable=true)
      */
-    private $receiverFirstName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_middle_name", type="string", length=45, nullable=true)
-     */
-    private $receiverMiddleName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_last_name", type="string", length=45, nullable=true)
-     */
-    private $receiverLastName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_email", type="string", length=45, nullable=true)
-     */
-    private $receiverEmail;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_account_type", type="string", length=45, nullable=true)
-     */
-    private $receiverAccountType;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_currency", type="string", length=45, nullable=true)
-     */
-    private $receiverCurrency;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_city", type="string", length=45, nullable=true)
-     */
-    private $receiverCity;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_country", type="string", length=45, nullable=true)
-     */
-    private $receiverCountry;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_state", type="string", length=45, nullable=true)
-     */
-    private $receiverState;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_phone_mobile", type="string", length=15, nullable=true)
-     */
-    private $receiverPhoneMobile;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_phone_landline", type="string", length=15, nullable=true)
-     */
-    private $receiverPhoneLandline;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_postal_code", type="string", length=10, nullable=true)
-     */
-    private $receiverPostalCode;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="receiver_account_number", type="integer", nullable=true)
-     */
-    private $receiverAccountNumber;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="receiver_bank_routing_no", type="integer", nullable=true)
-     */
-    private $receiverBankRoutingNo;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_bank_branch", type="string", length=45, nullable=true)
-     */
-    private $receiverBankBranch;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiver_bank_name", type="string", length=45, nullable=true)
-     */
-    private $receiverBankName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="receiving_amount", type="decimal", precision=10, scale=2, nullable=true)
-     */
-    private $receivingAmount;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="sender_id_number", type="integer", nullable=true)
-     */
-    private $senderIdNumber;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_id_type", type="string", length=45, nullable=true)
-     */
-    private $senderIdType;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_id_issued_country", type="string", length=45, nullable=true)
-     */
-    private $senderIdIssuedCountry;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_first_name", type="string", length=45, nullable=true)
-     */
-    private $senderFirstName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_middle_name", type="string", length=45, nullable=true)
-     */
-    private $senderMiddleName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_last_name", type="string", length=45, nullable=true)
-     */
-    private $senderLastName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_email", type="string", length=45, nullable=true)
-     */
-    private $senderEmail;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_account_type", type="string", length=45, nullable=true)
-     */
-    private $senderAccountType;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_currency", type="string", length=45, nullable=true)
-     */
-    private $senderCurrency;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_city", type="string", length=45, nullable=true)
-     */
-    private $senderCity;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_country", type="string", length=45, nullable=true)
-     */
-    private $senderCountry;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_state", type="string", length=45, nullable=true)
-     */
-    private $senderState;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_phone_mobile", type="string", length=15, nullable=true)
-     */
-    private $senderPhoneMobile;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_phone_landline", type="string", length=15, nullable=true)
-     */
-    private $senderPhoneLandline;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_postal_code", type="string", length=10, nullable=true)
-     */
-    private $senderPostalCode;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="sender_account_number", type="integer", nullable=true)
-     */
-    private $senderAccountNumber;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="sender_bank_routing_number", type="integer", nullable=true)
-     */
-    private $senderBankRoutingNumber;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_bank_branch", type="string", length=45, nullable=true)
-     */
-    private $senderBankBranch;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender_bank_name", type="string", length=45, nullable=true)
-     */
-    private $senderBankName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sending_amount", type="decimal", precision=10, scale=2, nullable=true)
-     */
-    private $sendingAmount;
+    private $payoutAmount;
 
     /**
      * @var string
@@ -351,9 +101,415 @@ class Transactions
     /**
      * @var string
      *
-     * @ORM\Column(name="additional_informations", type="text", nullable=true)
+     * @ORM\Column(name="fee", type="decimal", precision=10, scale=2, nullable=true)
      */
-    private $additionalInformations;
+    private $fee;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="remittance_date", type="datetime", nullable=true)
+     */
+    private $remittanceDate;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_first_name", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryFirstName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_middle_name", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryMiddleName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_last_name", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryLastName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_email", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryEmail;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_city", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryCity;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_state", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryState;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_country", type="string", length=20, nullable=true)
+     */
+    private $beneficiaryCountry;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_address", type="string", length=100, nullable=true)
+     */
+    private $beneficiaryAddress;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_phone_mobile", type="string", length=15, nullable=true)
+     */
+    private $beneficiaryPhoneMobile;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_phone_landline", type="string", length=15, nullable=true)
+     */
+    private $beneficiaryPhoneLandline;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_postal_code", type="string", length=10, nullable=true)
+     */
+    private $beneficiaryPostalCode;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="beneficiary_account_number", type="integer", nullable=true)
+     */
+    private $beneficiaryAccountNumber;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="beneficiary_bank_routing_no", type="integer", nullable=true)
+     */
+    private $beneficiaryBankRoutingNo;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_bank_branch", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryBankBranch;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_bank_name", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryBankName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_bank_account_type", type="string", length=6, nullable=true)
+     */
+    private $beneficiaryBankAccountType;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="beneficiary_id_number", type="integer", nullable=true)
+     */
+    private $beneficiaryIdNumber;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_id_type", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryIdType;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_id_issued_country", type="string", length=20, nullable=true)
+     */
+    private $beneficiaryIdIssuedCountry;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_id_issued_city", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryIdIssuedCity;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="beneficiary_id_issued_state", type="string", length=45, nullable=true)
+     */
+    private $beneficiaryIdIssuedState;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="beneficiary_id_issued_date", type="datetime", nullable=true)
+     */
+    private $beneficiaryIdIssuedDate;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="beneficiary_id_expiry_date", type="datetime", nullable=true)
+     */
+    private $beneficiaryIdExpiryDate;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="payout_agent_id", type="integer", nullable=true)
+     */
+    private $payoutAgentId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="payout_agent_name", type="string", length=25, nullable=true)
+     */
+    private $payoutAgentName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="payout_agent_city", type="string", length=45, nullable=true)
+     */
+    private $payoutAgentCity;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="payout_agent_state", type="string", length=45, nullable=true)
+     */
+    private $payoutAgentState;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="payout_agent_country", type="string", length=20, nullable=true)
+     */
+    private $payoutAgentCountry;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_first_name", type="string", length=45, nullable=true)
+     */
+    private $remitterFirstName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_middle_name", type="string", length=45, nullable=true)
+     */
+    private $remitterMiddleName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_last_name", type="string", length=45, nullable=true)
+     */
+    private $remitterLastName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_email", type="string", length=45, nullable=true)
+     */
+    private $remitterEmail;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_city", type="string", length=45, nullable=true)
+     */
+    private $remitterCity;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_country", type="string", length=20, nullable=true)
+     */
+    private $remitterCountry;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_state", type="string", length=45, nullable=true)
+     */
+    private $remitterState;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_address", type="string", length=100, nullable=true)
+     */
+    private $remitterAddress;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_phone_mobile", type="string", length=15, nullable=true)
+     */
+    private $remitterPhoneMobile;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_phone_landline", type="string", length=15, nullable=true)
+     */
+    private $remitterPhoneLandline;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_postal_code", type="string", length=10, nullable=true)
+     */
+    private $remitterPostalCode;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="remitter_account_number", type="integer", nullable=true)
+     */
+    private $remitterAccountNumber;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="remitter_bank_routing_no", type="integer", nullable=true)
+     */
+    private $remitterBankRoutingNo;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_bank_branch", type="string", length=45, nullable=true)
+     */
+    private $remitterBankBranch;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_bank_name", type="string", length=45, nullable=true)
+     */
+    private $remitterBankName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_bank_account_type", type="string", length=6, nullable=true)
+     */
+    private $remitterBankAccountType;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="remitter_id_number", type="integer", nullable=true)
+     */
+    private $remitterIdNumber;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_id_type", type="string", length=45, nullable=true)
+     */
+    private $remitterIdType;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_id_issued_country", type="string", length=20, nullable=true)
+     */
+    private $remitterIdIssuedCountry;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_id_issued_city", type="string", length=45, nullable=true)
+     */
+    private $remitterIdIssuedCity;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitter_id_issued_state", type="string", length=45, nullable=true)
+     */
+    private $remitterIdIssuedState;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="remitter_id_issued_date", type="datetime", nullable=true)
+     */
+    private $remitterIdIssuedDate;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="remitter_id_expiry_date", type="datetime", nullable=true)
+     */
+    private $remitterIdExpiryDate;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="remitting_agent_id", type="integer", nullable=true)
+     */
+    private $remittingAgentId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitting_agent_name", type="string", length=25, nullable=true)
+     */
+    private $remittingAgentName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitting_agent_city", type="string", length=45, nullable=true)
+     */
+    private $remittingAgentCity;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitting_agent_state", type="string", length=45, nullable=true)
+     */
+    private $remittingAgentState;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="remitting_agent_country", type="string", length=20, nullable=true)
+     */
+    private $remittingAgentCountry;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="processing_status", type="string", length=25, nullable=false)
+     */
+    private $processingStatus;
 
     /**
      * @var \DateTime
@@ -365,56 +521,20 @@ class Transactions
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
+     * @ORM\Column(name="updated_at", type="datetime", nullable=false)
      */
     private $updatedAt;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="transaction_payment_type", type="string", length=10, nullable=true)
-     */
-    private $transactionPaymentType;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="transaction_payment_type_code", type="string", length=10, nullable=true)
-     */
-    private $transactionPaymentTypeCode;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
 
 
     /**
-     * Set transactionKey
+     * Get id
      *
-     * @param string $transactionKey
-     * @return Transactions
+     * @return integer 
      */
-    public function setTransactionKey($transactionKey)
+    public function getId()
     {
-        $this->transactionKey = $transactionKey;
-
-        return $this;
-    }
-
-    /**
-     * Get transactionKey
-     *
-     * @return string 
-     */
-    public function getTransactionKey()
-    {
-        return $this->transactionKey;
+        return $this->id;
     }
 
     /**
@@ -464,49 +584,26 @@ class Transactions
     }
 
     /**
-     * Set status
+     * Set sourceTransactionId
      *
-     * @param string $status
+     * @param string $sourceTransactionId
      * @return Transactions
      */
-    public function setStatus($status)
+    public function setSourceTransactionId($sourceTransactionId)
     {
-        $this->status = $status;
+        $this->sourceTransactionId = $sourceTransactionId;
 
         return $this;
     }
 
     /**
-     * Get status
+     * Get sourceTransactionId
      *
      * @return string 
      */
-    public function getStatus()
+    public function getSourceTransactionId()
     {
-        return $this->status;
-    }
-
-    /**
-     * Set transactionStatus
-     *
-     * @param string $transactionStatus
-     * @return Transactions
-     */
-    public function setTransactionStatus($transactionStatus)
-    {
-        $this->transactionStatus = $transactionStatus;
-
-        return $this;
-    }
-
-    /**
-     * Get transactionStatus
-     *
-     * @return string 
-     */
-    public function getTransactionStatus()
-    {
-        return $this->transactionStatus;
+        return $this->sourceTransactionId;
     }
 
     /**
@@ -533,6 +630,29 @@ class Transactions
     }
 
     /**
+     * Set trackingNumber
+     *
+     * @param string $trackingNumber
+     * @return Transactions
+     */
+    public function setTrackingNumber($trackingNumber)
+    {
+        $this->trackingNumber = $trackingNumber;
+
+        return $this;
+    }
+
+    /**
+     * Get trackingNumber
+     *
+     * @return string 
+     */
+    public function getTrackingNumber()
+    {
+        return $this->trackingNumber;
+    }
+
+    /**
      * Set transactionType
      *
      * @param string $transactionType
@@ -556,923 +676,95 @@ class Transactions
     }
 
     /**
-     * Set receiverIdNumber
+     * Set remittingCurrency
      *
-     * @param integer $receiverIdNumber
+     * @param string $remittingCurrency
      * @return Transactions
      */
-    public function setReceiverIdNumber($receiverIdNumber)
+    public function setRemittingCurrency($remittingCurrency)
     {
-        $this->receiverIdNumber = $receiverIdNumber;
+        $this->remittingCurrency = $remittingCurrency;
 
         return $this;
     }
 
     /**
-     * Get receiverIdNumber
-     *
-     * @return integer 
-     */
-    public function getReceiverIdNumber()
-    {
-        return $this->receiverIdNumber;
-    }
-
-    /**
-     * Set receiverIdType
-     *
-     * @param string $receiverIdType
-     * @return Transactions
-     */
-    public function setReceiverIdType($receiverIdType)
-    {
-        $this->receiverIdType = $receiverIdType;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverIdType
+     * Get remittingCurrency
      *
      * @return string 
      */
-    public function getReceiverIdType()
+    public function getRemittingCurrency()
     {
-        return $this->receiverIdType;
+        return $this->remittingCurrency;
     }
 
     /**
-     * Set receiverIdIssuedCountry
+     * Set payoutCurrency
      *
-     * @param string $receiverIdIssuedCountry
+     * @param string $payoutCurrency
      * @return Transactions
      */
-    public function setReceiverIdIssuedCountry($receiverIdIssuedCountry)
+    public function setPayoutCurrency($payoutCurrency)
     {
-        $this->receiverIdIssuedCountry = $receiverIdIssuedCountry;
+        $this->payoutCurrency = $payoutCurrency;
 
         return $this;
     }
 
     /**
-     * Get receiverIdIssuedCountry
+     * Get payoutCurrency
      *
      * @return string 
      */
-    public function getReceiverIdIssuedCountry()
+    public function getPayoutCurrency()
     {
-        return $this->receiverIdIssuedCountry;
+        return $this->payoutCurrency;
     }
 
     /**
-     * Set receiverFirstName
+     * Set remittingAmount
      *
-     * @param string $receiverFirstName
+     * @param string $remittingAmount
      * @return Transactions
      */
-    public function setReceiverFirstName($receiverFirstName)
+    public function setRemittingAmount($remittingAmount)
     {
-        $this->receiverFirstName = $receiverFirstName;
+        $this->remittingAmount = $remittingAmount;
 
         return $this;
     }
 
     /**
-     * Get receiverFirstName
+     * Get remittingAmount
      *
      * @return string 
      */
-    public function getReceiverFirstName()
+    public function getRemittingAmount()
     {
-        return $this->receiverFirstName;
+        return $this->remittingAmount;
     }
 
     /**
-     * Set receiverMiddleName
+     * Set payoutAmount
      *
-     * @param string $receiverMiddleName
+     * @param string $payoutAmount
      * @return Transactions
      */
-    public function setReceiverMiddleName($receiverMiddleName)
+    public function setPayoutAmount($payoutAmount)
     {
-        $this->receiverMiddleName = $receiverMiddleName;
+        $this->payoutAmount = $payoutAmount;
 
         return $this;
     }
 
     /**
-     * Get receiverMiddleName
+     * Get payoutAmount
      *
      * @return string 
      */
-    public function getReceiverMiddleName()
+    public function getPayoutAmount()
     {
-        return $this->receiverMiddleName;
-    }
-
-    /**
-     * Set receiverLastName
-     *
-     * @param string $receiverLastName
-     * @return Transactions
-     */
-    public function setReceiverLastName($receiverLastName)
-    {
-        $this->receiverLastName = $receiverLastName;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverLastName
-     *
-     * @return string 
-     */
-    public function getReceiverLastName()
-    {
-        return $this->receiverLastName;
-    }
-
-    /**
-     * Set receiverEmail
-     *
-     * @param string $receiverEmail
-     * @return Transactions
-     */
-    public function setReceiverEmail($receiverEmail)
-    {
-        $this->receiverEmail = $receiverEmail;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverEmail
-     *
-     * @return string 
-     */
-    public function getReceiverEmail()
-    {
-        return $this->receiverEmail;
-    }
-
-    /**
-     * Set receiverAccountType
-     *
-     * @param string $receiverAccountType
-     * @return Transactions
-     */
-    public function setReceiverAccountType($receiverAccountType)
-    {
-        $this->receiverAccountType = $receiverAccountType;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverAccountType
-     *
-     * @return string 
-     */
-    public function getReceiverAccountType()
-    {
-        return $this->receiverAccountType;
-    }
-
-    /**
-     * Set receiverCurrency
-     *
-     * @param string $receiverCurrency
-     * @return Transactions
-     */
-    public function setReceiverCurrency($receiverCurrency)
-    {
-        $this->receiverCurrency = $receiverCurrency;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverCurrency
-     *
-     * @return string 
-     */
-    public function getReceiverCurrency()
-    {
-        return $this->receiverCurrency;
-    }
-
-    /**
-     * Set receiverCity
-     *
-     * @param string $receiverCity
-     * @return Transactions
-     */
-    public function setReceiverCity($receiverCity)
-    {
-        $this->receiverCity = $receiverCity;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverCity
-     *
-     * @return string 
-     */
-    public function getReceiverCity()
-    {
-        return $this->receiverCity;
-    }
-
-    /**
-     * Set receiverCountry
-     *
-     * @param string $receiverCountry
-     * @return Transactions
-     */
-    public function setReceiverCountry($receiverCountry)
-    {
-        $this->receiverCountry = $receiverCountry;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverCountry
-     *
-     * @return string 
-     */
-    public function getReceiverCountry()
-    {
-        return $this->receiverCountry;
-    }
-
-    /**
-     * Set receiverState
-     *
-     * @param string $receiverState
-     * @return Transactions
-     */
-    public function setReceiverState($receiverState)
-    {
-        $this->receiverState = $receiverState;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverState
-     *
-     * @return string 
-     */
-    public function getReceiverState()
-    {
-        return $this->receiverState;
-    }
-
-    /**
-     * Set receiverPhoneMobile
-     *
-     * @param string $receiverPhoneMobile
-     * @return Transactions
-     */
-    public function setReceiverPhoneMobile($receiverPhoneMobile)
-    {
-        $this->receiverPhoneMobile = $receiverPhoneMobile;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverPhoneMobile
-     *
-     * @return string 
-     */
-    public function getReceiverPhoneMobile()
-    {
-        return $this->receiverPhoneMobile;
-    }
-
-    /**
-     * Set receiverPhoneLandline
-     *
-     * @param string $receiverPhoneLandline
-     * @return Transactions
-     */
-    public function setReceiverPhoneLandline($receiverPhoneLandline)
-    {
-        $this->receiverPhoneLandline = $receiverPhoneLandline;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverPhoneLandline
-     *
-     * @return string 
-     */
-    public function getReceiverPhoneLandline()
-    {
-        return $this->receiverPhoneLandline;
-    }
-
-    /**
-     * Set receiverPostalCode
-     *
-     * @param string $receiverPostalCode
-     * @return Transactions
-     */
-    public function setReceiverPostalCode($receiverPostalCode)
-    {
-        $this->receiverPostalCode = $receiverPostalCode;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverPostalCode
-     *
-     * @return string 
-     */
-    public function getReceiverPostalCode()
-    {
-        return $this->receiverPostalCode;
-    }
-
-    /**
-     * Set receiverAccountNumber
-     *
-     * @param integer $receiverAccountNumber
-     * @return Transactions
-     */
-    public function setReceiverAccountNumber($receiverAccountNumber)
-    {
-        $this->receiverAccountNumber = $receiverAccountNumber;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverAccountNumber
-     *
-     * @return integer 
-     */
-    public function getReceiverAccountNumber()
-    {
-        return $this->receiverAccountNumber;
-    }
-
-    /**
-     * Set receiverBankRoutingNo
-     *
-     * @param integer $receiverBankRoutingNo
-     * @return Transactions
-     */
-    public function setReceiverBankRoutingNo($receiverBankRoutingNo)
-    {
-        $this->receiverBankRoutingNo = $receiverBankRoutingNo;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverBankRoutingNo
-     *
-     * @return integer 
-     */
-    public function getReceiverBankRoutingNo()
-    {
-        return $this->receiverBankRoutingNo;
-    }
-
-    /**
-     * Set receiverBankBranch
-     *
-     * @param string $receiverBankBranch
-     * @return Transactions
-     */
-    public function setReceiverBankBranch($receiverBankBranch)
-    {
-        $this->receiverBankBranch = $receiverBankBranch;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverBankBranch
-     *
-     * @return string 
-     */
-    public function getReceiverBankBranch()
-    {
-        return $this->receiverBankBranch;
-    }
-
-    /**
-     * Set receiverBankName
-     *
-     * @param string $receiverBankName
-     * @return Transactions
-     */
-    public function setReceiverBankName($receiverBankName)
-    {
-        $this->receiverBankName = $receiverBankName;
-
-        return $this;
-    }
-
-    /**
-     * Get receiverBankName
-     *
-     * @return string 
-     */
-    public function getReceiverBankName()
-    {
-        return $this->receiverBankName;
-    }
-
-    /**
-     * Set receivingAmount
-     *
-     * @param string $receivingAmount
-     * @return Transactions
-     */
-    public function setReceivingAmount($receivingAmount)
-    {
-        $this->receivingAmount = $receivingAmount;
-
-        return $this;
-    }
-
-    /**
-     * Get receivingAmount
-     *
-     * @return string 
-     */
-    public function getReceivingAmount()
-    {
-        return $this->receivingAmount;
-    }
-
-    /**
-     * Set senderIdNumber
-     *
-     * @param integer $senderIdNumber
-     * @return Transactions
-     */
-    public function setSenderIdNumber($senderIdNumber)
-    {
-        $this->senderIdNumber = $senderIdNumber;
-
-        return $this;
-    }
-
-    /**
-     * Get senderIdNumber
-     *
-     * @return integer 
-     */
-    public function getSenderIdNumber()
-    {
-        return $this->senderIdNumber;
-    }
-
-    /**
-     * Set senderIdType
-     *
-     * @param string $senderIdType
-     * @return Transactions
-     */
-    public function setSenderIdType($senderIdType)
-    {
-        $this->senderIdType = $senderIdType;
-
-        return $this;
-    }
-
-    /**
-     * Get senderIdType
-     *
-     * @return string 
-     */
-    public function getSenderIdType()
-    {
-        return $this->senderIdType;
-    }
-
-    /**
-     * Set senderIdIssuedCountry
-     *
-     * @param string $senderIdIssuedCountry
-     * @return Transactions
-     */
-    public function setSenderIdIssuedCountry($senderIdIssuedCountry)
-    {
-        $this->senderIdIssuedCountry = $senderIdIssuedCountry;
-
-        return $this;
-    }
-
-    /**
-     * Get senderIdIssuedCountry
-     *
-     * @return string 
-     */
-    public function getSenderIdIssuedCountry()
-    {
-        return $this->senderIdIssuedCountry;
-    }
-
-    /**
-     * Set senderFirstName
-     *
-     * @param string $senderFirstName
-     * @return Transactions
-     */
-    public function setSenderFirstName($senderFirstName)
-    {
-        $this->senderFirstName = $senderFirstName;
-
-        return $this;
-    }
-
-    /**
-     * Get senderFirstName
-     *
-     * @return string 
-     */
-    public function getSenderFirstName()
-    {
-        return $this->senderFirstName;
-    }
-
-    /**
-     * Set senderMiddleName
-     *
-     * @param string $senderMiddleName
-     * @return Transactions
-     */
-    public function setSenderMiddleName($senderMiddleName)
-    {
-        $this->senderMiddleName = $senderMiddleName;
-
-        return $this;
-    }
-
-    /**
-     * Get senderMiddleName
-     *
-     * @return string 
-     */
-    public function getSenderMiddleName()
-    {
-        return $this->senderMiddleName;
-    }
-
-    /**
-     * Set senderLastName
-     *
-     * @param string $senderLastName
-     * @return Transactions
-     */
-    public function setSenderLastName($senderLastName)
-    {
-        $this->senderLastName = $senderLastName;
-
-        return $this;
-    }
-
-    /**
-     * Get senderLastName
-     *
-     * @return string 
-     */
-    public function getSenderLastName()
-    {
-        return $this->senderLastName;
-    }
-
-    /**
-     * Set senderEmail
-     *
-     * @param string $senderEmail
-     * @return Transactions
-     */
-    public function setSenderEmail($senderEmail)
-    {
-        $this->senderEmail = $senderEmail;
-
-        return $this;
-    }
-
-    /**
-     * Get senderEmail
-     *
-     * @return string 
-     */
-    public function getSenderEmail()
-    {
-        return $this->senderEmail;
-    }
-
-    /**
-     * Set senderAccountType
-     *
-     * @param string $senderAccountType
-     * @return Transactions
-     */
-    public function setSenderAccountType($senderAccountType)
-    {
-        $this->senderAccountType = $senderAccountType;
-
-        return $this;
-    }
-
-    /**
-     * Get senderAccountType
-     *
-     * @return string 
-     */
-    public function getSenderAccountType()
-    {
-        return $this->senderAccountType;
-    }
-
-    /**
-     * Set senderCurrency
-     *
-     * @param string $senderCurrency
-     * @return Transactions
-     */
-    public function setSenderCurrency($senderCurrency)
-    {
-        $this->senderCurrency = $senderCurrency;
-
-        return $this;
-    }
-
-    /**
-     * Get senderCurrency
-     *
-     * @return string 
-     */
-    public function getSenderCurrency()
-    {
-        return $this->senderCurrency;
-    }
-
-    /**
-     * Set senderCity
-     *
-     * @param string $senderCity
-     * @return Transactions
-     */
-    public function setSenderCity($senderCity)
-    {
-        $this->senderCity = $senderCity;
-
-        return $this;
-    }
-
-    /**
-     * Get senderCity
-     *
-     * @return string 
-     */
-    public function getSenderCity()
-    {
-        return $this->senderCity;
-    }
-
-    /**
-     * Set senderCountry
-     *
-     * @param string $senderCountry
-     * @return Transactions
-     */
-    public function setSenderCountry($senderCountry)
-    {
-        $this->senderCountry = $senderCountry;
-
-        return $this;
-    }
-
-    /**
-     * Get senderCountry
-     *
-     * @return string 
-     */
-    public function getSenderCountry()
-    {
-        return $this->senderCountry;
-    }
-
-    /**
-     * Set senderState
-     *
-     * @param string $senderState
-     * @return Transactions
-     */
-    public function setSenderState($senderState)
-    {
-        $this->senderState = $senderState;
-
-        return $this;
-    }
-
-    /**
-     * Get senderState
-     *
-     * @return string 
-     */
-    public function getSenderState()
-    {
-        return $this->senderState;
-    }
-
-    /**
-     * Set senderPhoneMobile
-     *
-     * @param string $senderPhoneMobile
-     * @return Transactions
-     */
-    public function setSenderPhoneMobile($senderPhoneMobile)
-    {
-        $this->senderPhoneMobile = $senderPhoneMobile;
-
-        return $this;
-    }
-
-    /**
-     * Get senderPhoneMobile
-     *
-     * @return string 
-     */
-    public function getSenderPhoneMobile()
-    {
-        return $this->senderPhoneMobile;
-    }
-
-    /**
-     * Set senderPhoneLandline
-     *
-     * @param string $senderPhoneLandline
-     * @return Transactions
-     */
-    public function setSenderPhoneLandline($senderPhoneLandline)
-    {
-        $this->senderPhoneLandline = $senderPhoneLandline;
-
-        return $this;
-    }
-
-    /**
-     * Get senderPhoneLandline
-     *
-     * @return string 
-     */
-    public function getSenderPhoneLandline()
-    {
-        return $this->senderPhoneLandline;
-    }
-
-    /**
-     * Set senderPostalCode
-     *
-     * @param string $senderPostalCode
-     * @return Transactions
-     */
-    public function setSenderPostalCode($senderPostalCode)
-    {
-        $this->senderPostalCode = $senderPostalCode;
-
-        return $this;
-    }
-
-    /**
-     * Get senderPostalCode
-     *
-     * @return string 
-     */
-    public function getSenderPostalCode()
-    {
-        return $this->senderPostalCode;
-    }
-
-    /**
-     * Set senderAccountNumber
-     *
-     * @param integer $senderAccountNumber
-     * @return Transactions
-     */
-    public function setSenderAccountNumber($senderAccountNumber)
-    {
-        $this->senderAccountNumber = $senderAccountNumber;
-
-        return $this;
-    }
-
-    /**
-     * Get senderAccountNumber
-     *
-     * @return integer 
-     */
-    public function getSenderAccountNumber()
-    {
-        return $this->senderAccountNumber;
-    }
-
-    /**
-     * Set senderBankRoutingNumber
-     *
-     * @param integer $senderBankRoutingNumber
-     * @return Transactions
-     */
-    public function setSenderBankRoutingNumber($senderBankRoutingNumber)
-    {
-        $this->senderBankRoutingNumber = $senderBankRoutingNumber;
-
-        return $this;
-    }
-
-    /**
-     * Get senderBankRoutingNumber
-     *
-     * @return integer 
-     */
-    public function getSenderBankRoutingNumber()
-    {
-        return $this->senderBankRoutingNumber;
-    }
-
-    /**
-     * Set senderBankBranch
-     *
-     * @param string $senderBankBranch
-     * @return Transactions
-     */
-    public function setSenderBankBranch($senderBankBranch)
-    {
-        $this->senderBankBranch = $senderBankBranch;
-
-        return $this;
-    }
-
-    /**
-     * Get senderBankBranch
-     *
-     * @return string 
-     */
-    public function getSenderBankBranch()
-    {
-        return $this->senderBankBranch;
-    }
-
-    /**
-     * Set senderBankName
-     *
-     * @param string $senderBankName
-     * @return Transactions
-     */
-    public function setSenderBankName($senderBankName)
-    {
-        $this->senderBankName = $senderBankName;
-
-        return $this;
-    }
-
-    /**
-     * Get senderBankName
-     *
-     * @return string 
-     */
-    public function getSenderBankName()
-    {
-        return $this->senderBankName;
-    }
-
-    /**
-     * Set sendingAmount
-     *
-     * @param string $sendingAmount
-     * @return Transactions
-     */
-    public function setSendingAmount($sendingAmount)
-    {
-        $this->sendingAmount = $sendingAmount;
-
-        return $this;
-    }
-
-    /**
-     * Get sendingAmount
-     *
-     * @return string 
-     */
-    public function getSendingAmount()
-    {
-        return $this->sendingAmount;
+        return $this->payoutAmount;
     }
 
     /**
@@ -1499,26 +791,1360 @@ class Transactions
     }
 
     /**
-     * Set additionalInformations
+     * Set fee
      *
-     * @param string $additionalInformations
+     * @param string $fee
      * @return Transactions
      */
-    public function setAdditionalInformations($additionalInformations)
+    public function setFee($fee)
     {
-        $this->additionalInformations = $additionalInformations;
+        $this->fee = $fee;
 
         return $this;
     }
 
     /**
-     * Get additionalInformations
+     * Get fee
      *
      * @return string 
      */
-    public function getAdditionalInformations()
+    public function getFee()
     {
-        return $this->additionalInformations;
+        return $this->fee;
+    }
+
+    /**
+     * Set remittanceDate
+     *
+     * @param \DateTime $remittanceDate
+     * @return Transactions
+     */
+    public function setRemittanceDate($remittanceDate)
+    {
+        $this->remittanceDate = $remittanceDate;
+
+        return $this;
+    }
+
+    /**
+     * Get remittanceDate
+     *
+     * @return \DateTime 
+     */
+    public function getRemittanceDate()
+    {
+        return $this->remittanceDate;
+    }
+
+    /**
+     * Set beneficiaryFirstName
+     *
+     * @param string $beneficiaryFirstName
+     * @return Transactions
+     */
+    public function setBeneficiaryFirstName($beneficiaryFirstName)
+    {
+        $this->beneficiaryFirstName = $beneficiaryFirstName;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryFirstName
+     *
+     * @return string 
+     */
+    public function getBeneficiaryFirstName()
+    {
+        return $this->beneficiaryFirstName;
+    }
+
+    /**
+     * Set beneficiaryMiddleName
+     *
+     * @param string $beneficiaryMiddleName
+     * @return Transactions
+     */
+    public function setBeneficiaryMiddleName($beneficiaryMiddleName)
+    {
+        $this->beneficiaryMiddleName = $beneficiaryMiddleName;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryMiddleName
+     *
+     * @return string 
+     */
+    public function getBeneficiaryMiddleName()
+    {
+        return $this->beneficiaryMiddleName;
+    }
+
+    /**
+     * Set beneficiaryLastName
+     *
+     * @param string $beneficiaryLastName
+     * @return Transactions
+     */
+    public function setBeneficiaryLastName($beneficiaryLastName)
+    {
+        $this->beneficiaryLastName = $beneficiaryLastName;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryLastName
+     *
+     * @return string 
+     */
+    public function getBeneficiaryLastName()
+    {
+        return $this->beneficiaryLastName;
+    }
+
+    /**
+     * Set beneficiaryEmail
+     *
+     * @param string $beneficiaryEmail
+     * @return Transactions
+     */
+    public function setBeneficiaryEmail($beneficiaryEmail)
+    {
+        $this->beneficiaryEmail = $beneficiaryEmail;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryEmail
+     *
+     * @return string 
+     */
+    public function getBeneficiaryEmail()
+    {
+        return $this->beneficiaryEmail;
+    }
+
+    /**
+     * Set beneficiaryCity
+     *
+     * @param string $beneficiaryCity
+     * @return Transactions
+     */
+    public function setBeneficiaryCity($beneficiaryCity)
+    {
+        $this->beneficiaryCity = $beneficiaryCity;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryCity
+     *
+     * @return string 
+     */
+    public function getBeneficiaryCity()
+    {
+        return $this->beneficiaryCity;
+    }
+
+    /**
+     * Set beneficiaryState
+     *
+     * @param string $beneficiaryState
+     * @return Transactions
+     */
+    public function setBeneficiaryState($beneficiaryState)
+    {
+        $this->beneficiaryState = $beneficiaryState;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryState
+     *
+     * @return string 
+     */
+    public function getBeneficiaryState()
+    {
+        return $this->beneficiaryState;
+    }
+
+    /**
+     * Set beneficiaryCountry
+     *
+     * @param string $beneficiaryCountry
+     * @return Transactions
+     */
+    public function setBeneficiaryCountry($beneficiaryCountry)
+    {
+        $this->beneficiaryCountry = $beneficiaryCountry;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryCountry
+     *
+     * @return string 
+     */
+    public function getBeneficiaryCountry()
+    {
+        return $this->beneficiaryCountry;
+    }
+
+    /**
+     * Set beneficiaryAddress
+     *
+     * @param string $beneficiaryAddress
+     * @return Transactions
+     */
+    public function setBeneficiaryAddress($beneficiaryAddress)
+    {
+        $this->beneficiaryAddress = $beneficiaryAddress;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryAddress
+     *
+     * @return string 
+     */
+    public function getBeneficiaryAddress()
+    {
+        return $this->beneficiaryAddress;
+    }
+
+    /**
+     * Set beneficiaryPhoneMobile
+     *
+     * @param string $beneficiaryPhoneMobile
+     * @return Transactions
+     */
+    public function setBeneficiaryPhoneMobile($beneficiaryPhoneMobile)
+    {
+        $this->beneficiaryPhoneMobile = $beneficiaryPhoneMobile;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryPhoneMobile
+     *
+     * @return string 
+     */
+    public function getBeneficiaryPhoneMobile()
+    {
+        return $this->beneficiaryPhoneMobile;
+    }
+
+    /**
+     * Set beneficiaryPhoneLandline
+     *
+     * @param string $beneficiaryPhoneLandline
+     * @return Transactions
+     */
+    public function setBeneficiaryPhoneLandline($beneficiaryPhoneLandline)
+    {
+        $this->beneficiaryPhoneLandline = $beneficiaryPhoneLandline;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryPhoneLandline
+     *
+     * @return string 
+     */
+    public function getBeneficiaryPhoneLandline()
+    {
+        return $this->beneficiaryPhoneLandline;
+    }
+
+    /**
+     * Set beneficiaryPostalCode
+     *
+     * @param string $beneficiaryPostalCode
+     * @return Transactions
+     */
+    public function setBeneficiaryPostalCode($beneficiaryPostalCode)
+    {
+        $this->beneficiaryPostalCode = $beneficiaryPostalCode;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryPostalCode
+     *
+     * @return string 
+     */
+    public function getBeneficiaryPostalCode()
+    {
+        return $this->beneficiaryPostalCode;
+    }
+
+    /**
+     * Set beneficiaryAccountNumber
+     *
+     * @param integer $beneficiaryAccountNumber
+     * @return Transactions
+     */
+    public function setBeneficiaryAccountNumber($beneficiaryAccountNumber)
+    {
+        $this->beneficiaryAccountNumber = $beneficiaryAccountNumber;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryAccountNumber
+     *
+     * @return integer 
+     */
+    public function getBeneficiaryAccountNumber()
+    {
+        return $this->beneficiaryAccountNumber;
+    }
+
+    /**
+     * Set beneficiaryBankRoutingNo
+     *
+     * @param integer $beneficiaryBankRoutingNo
+     * @return Transactions
+     */
+    public function setBeneficiaryBankRoutingNo($beneficiaryBankRoutingNo)
+    {
+        $this->beneficiaryBankRoutingNo = $beneficiaryBankRoutingNo;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryBankRoutingNo
+     *
+     * @return integer 
+     */
+    public function getBeneficiaryBankRoutingNo()
+    {
+        return $this->beneficiaryBankRoutingNo;
+    }
+
+    /**
+     * Set beneficiaryBankBranch
+     *
+     * @param string $beneficiaryBankBranch
+     * @return Transactions
+     */
+    public function setBeneficiaryBankBranch($beneficiaryBankBranch)
+    {
+        $this->beneficiaryBankBranch = $beneficiaryBankBranch;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryBankBranch
+     *
+     * @return string 
+     */
+    public function getBeneficiaryBankBranch()
+    {
+        return $this->beneficiaryBankBranch;
+    }
+
+    /**
+     * Set beneficiaryBankName
+     *
+     * @param string $beneficiaryBankName
+     * @return Transactions
+     */
+    public function setBeneficiaryBankName($beneficiaryBankName)
+    {
+        $this->beneficiaryBankName = $beneficiaryBankName;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryBankName
+     *
+     * @return string 
+     */
+    public function getBeneficiaryBankName()
+    {
+        return $this->beneficiaryBankName;
+    }
+
+    /**
+     * Set beneficiaryBankAccountType
+     *
+     * @param string $beneficiaryBankAccountType
+     * @return Transactions
+     */
+    public function setBeneficiaryBankAccountType($beneficiaryBankAccountType)
+    {
+        $this->beneficiaryBankAccountType = $beneficiaryBankAccountType;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryBankAccountType
+     *
+     * @return string 
+     */
+    public function getBeneficiaryBankAccountType()
+    {
+        return $this->beneficiaryBankAccountType;
+    }
+
+    /**
+     * Set beneficiaryIdNumber
+     *
+     * @param integer $beneficiaryIdNumber
+     * @return Transactions
+     */
+    public function setBeneficiaryIdNumber($beneficiaryIdNumber)
+    {
+        $this->beneficiaryIdNumber = $beneficiaryIdNumber;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryIdNumber
+     *
+     * @return integer 
+     */
+    public function getBeneficiaryIdNumber()
+    {
+        return $this->beneficiaryIdNumber;
+    }
+
+    /**
+     * Set beneficiaryIdType
+     *
+     * @param string $beneficiaryIdType
+     * @return Transactions
+     */
+    public function setBeneficiaryIdType($beneficiaryIdType)
+    {
+        $this->beneficiaryIdType = $beneficiaryIdType;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryIdType
+     *
+     * @return string 
+     */
+    public function getBeneficiaryIdType()
+    {
+        return $this->beneficiaryIdType;
+    }
+
+    /**
+     * Set beneficiaryIdIssuedCountry
+     *
+     * @param string $beneficiaryIdIssuedCountry
+     * @return Transactions
+     */
+    public function setBeneficiaryIdIssuedCountry($beneficiaryIdIssuedCountry)
+    {
+        $this->beneficiaryIdIssuedCountry = $beneficiaryIdIssuedCountry;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryIdIssuedCountry
+     *
+     * @return string 
+     */
+    public function getBeneficiaryIdIssuedCountry()
+    {
+        return $this->beneficiaryIdIssuedCountry;
+    }
+
+    /**
+     * Set beneficiaryIdIssuedCity
+     *
+     * @param string $beneficiaryIdIssuedCity
+     * @return Transactions
+     */
+    public function setBeneficiaryIdIssuedCity($beneficiaryIdIssuedCity)
+    {
+        $this->beneficiaryIdIssuedCity = $beneficiaryIdIssuedCity;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryIdIssuedCity
+     *
+     * @return string 
+     */
+    public function getBeneficiaryIdIssuedCity()
+    {
+        return $this->beneficiaryIdIssuedCity;
+    }
+
+    /**
+     * Set beneficiaryIdIssuedState
+     *
+     * @param string $beneficiaryIdIssuedState
+     * @return Transactions
+     */
+    public function setBeneficiaryIdIssuedState($beneficiaryIdIssuedState)
+    {
+        $this->beneficiaryIdIssuedState = $beneficiaryIdIssuedState;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryIdIssuedState
+     *
+     * @return string 
+     */
+    public function getBeneficiaryIdIssuedState()
+    {
+        return $this->beneficiaryIdIssuedState;
+    }
+
+    /**
+     * Set beneficiaryIdIssuedDate
+     *
+     * @param \DateTime $beneficiaryIdIssuedDate
+     * @return Transactions
+     */
+    public function setBeneficiaryIdIssuedDate($beneficiaryIdIssuedDate)
+    {
+        $this->beneficiaryIdIssuedDate = $beneficiaryIdIssuedDate;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryIdIssuedDate
+     *
+     * @return \DateTime 
+     */
+    public function getBeneficiaryIdIssuedDate()
+    {
+        return $this->beneficiaryIdIssuedDate;
+    }
+
+    /**
+     * Set beneficiaryIdExpiryDate
+     *
+     * @param \DateTime $beneficiaryIdExpiryDate
+     * @return Transactions
+     */
+    public function setBeneficiaryIdExpiryDate($beneficiaryIdExpiryDate)
+    {
+        $this->beneficiaryIdExpiryDate = $beneficiaryIdExpiryDate;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryIdExpiryDate
+     *
+     * @return \DateTime 
+     */
+    public function getBeneficiaryIdExpiryDate()
+    {
+        return $this->beneficiaryIdExpiryDate;
+    }
+
+    /**
+     * Set payoutAgentId
+     *
+     * @param integer $payoutAgentId
+     * @return Transactions
+     */
+    public function setPayoutAgentId($payoutAgentId)
+    {
+        $this->payoutAgentId = $payoutAgentId;
+
+        return $this;
+    }
+
+    /**
+     * Get payoutAgentId
+     *
+     * @return integer 
+     */
+    public function getPayoutAgentId()
+    {
+        return $this->payoutAgentId;
+    }
+
+    /**
+     * Set payoutAgentName
+     *
+     * @param string $payoutAgentName
+     * @return Transactions
+     */
+    public function setPayoutAgentName($payoutAgentName)
+    {
+        $this->payoutAgentName = $payoutAgentName;
+
+        return $this;
+    }
+
+    /**
+     * Get payoutAgentName
+     *
+     * @return string 
+     */
+    public function getPayoutAgentName()
+    {
+        return $this->payoutAgentName;
+    }
+
+    /**
+     * Set payoutAgentCity
+     *
+     * @param string $payoutAgentCity
+     * @return Transactions
+     */
+    public function setPayoutAgentCity($payoutAgentCity)
+    {
+        $this->payoutAgentCity = $payoutAgentCity;
+
+        return $this;
+    }
+
+    /**
+     * Get payoutAgentCity
+     *
+     * @return string 
+     */
+    public function getPayoutAgentCity()
+    {
+        return $this->payoutAgentCity;
+    }
+
+    /**
+     * Set payoutAgentState
+     *
+     * @param string $payoutAgentState
+     * @return Transactions
+     */
+    public function setPayoutAgentState($payoutAgentState)
+    {
+        $this->payoutAgentState = $payoutAgentState;
+
+        return $this;
+    }
+
+    /**
+     * Get payoutAgentState
+     *
+     * @return string 
+     */
+    public function getPayoutAgentState()
+    {
+        return $this->payoutAgentState;
+    }
+
+    /**
+     * Set payoutAgentCountry
+     *
+     * @param string $payoutAgentCountry
+     * @return Transactions
+     */
+    public function setPayoutAgentCountry($payoutAgentCountry)
+    {
+        $this->payoutAgentCountry = $payoutAgentCountry;
+
+        return $this;
+    }
+
+    /**
+     * Get payoutAgentCountry
+     *
+     * @return string 
+     */
+    public function getPayoutAgentCountry()
+    {
+        return $this->payoutAgentCountry;
+    }
+
+    /**
+     * Set remitterFirstName
+     *
+     * @param string $remitterFirstName
+     * @return Transactions
+     */
+    public function setRemitterFirstName($remitterFirstName)
+    {
+        $this->remitterFirstName = $remitterFirstName;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterFirstName
+     *
+     * @return string 
+     */
+    public function getRemitterFirstName()
+    {
+        return $this->remitterFirstName;
+    }
+
+    /**
+     * Set remitterMiddleName
+     *
+     * @param string $remitterMiddleName
+     * @return Transactions
+     */
+    public function setRemitterMiddleName($remitterMiddleName)
+    {
+        $this->remitterMiddleName = $remitterMiddleName;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterMiddleName
+     *
+     * @return string 
+     */
+    public function getRemitterMiddleName()
+    {
+        return $this->remitterMiddleName;
+    }
+
+    /**
+     * Set remitterLastName
+     *
+     * @param string $remitterLastName
+     * @return Transactions
+     */
+    public function setRemitterLastName($remitterLastName)
+    {
+        $this->remitterLastName = $remitterLastName;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterLastName
+     *
+     * @return string 
+     */
+    public function getRemitterLastName()
+    {
+        return $this->remitterLastName;
+    }
+
+    /**
+     * Set remitterEmail
+     *
+     * @param string $remitterEmail
+     * @return Transactions
+     */
+    public function setRemitterEmail($remitterEmail)
+    {
+        $this->remitterEmail = $remitterEmail;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterEmail
+     *
+     * @return string 
+     */
+    public function getRemitterEmail()
+    {
+        return $this->remitterEmail;
+    }
+
+    /**
+     * Set remitterCity
+     *
+     * @param string $remitterCity
+     * @return Transactions
+     */
+    public function setRemitterCity($remitterCity)
+    {
+        $this->remitterCity = $remitterCity;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterCity
+     *
+     * @return string 
+     */
+    public function getRemitterCity()
+    {
+        return $this->remitterCity;
+    }
+
+    /**
+     * Set remitterCountry
+     *
+     * @param string $remitterCountry
+     * @return Transactions
+     */
+    public function setRemitterCountry($remitterCountry)
+    {
+        $this->remitterCountry = $remitterCountry;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterCountry
+     *
+     * @return string 
+     */
+    public function getRemitterCountry()
+    {
+        return $this->remitterCountry;
+    }
+
+    /**
+     * Set remitterState
+     *
+     * @param string $remitterState
+     * @return Transactions
+     */
+    public function setRemitterState($remitterState)
+    {
+        $this->remitterState = $remitterState;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterState
+     *
+     * @return string 
+     */
+    public function getRemitterState()
+    {
+        return $this->remitterState;
+    }
+
+    /**
+     * Set remitterAddress
+     *
+     * @param string $remitterAddress
+     * @return Transactions
+     */
+    public function setRemitterAddress($remitterAddress)
+    {
+        $this->remitterAddress = $remitterAddress;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterAddress
+     *
+     * @return string 
+     */
+    public function getRemitterAddress()
+    {
+        return $this->remitterAddress;
+    }
+
+    /**
+     * Set remitterPhoneMobile
+     *
+     * @param string $remitterPhoneMobile
+     * @return Transactions
+     */
+    public function setRemitterPhoneMobile($remitterPhoneMobile)
+    {
+        $this->remitterPhoneMobile = $remitterPhoneMobile;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterPhoneMobile
+     *
+     * @return string 
+     */
+    public function getRemitterPhoneMobile()
+    {
+        return $this->remitterPhoneMobile;
+    }
+
+    /**
+     * Set remitterPhoneLandline
+     *
+     * @param string $remitterPhoneLandline
+     * @return Transactions
+     */
+    public function setRemitterPhoneLandline($remitterPhoneLandline)
+    {
+        $this->remitterPhoneLandline = $remitterPhoneLandline;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterPhoneLandline
+     *
+     * @return string 
+     */
+    public function getRemitterPhoneLandline()
+    {
+        return $this->remitterPhoneLandline;
+    }
+
+    /**
+     * Set remitterPostalCode
+     *
+     * @param string $remitterPostalCode
+     * @return Transactions
+     */
+    public function setRemitterPostalCode($remitterPostalCode)
+    {
+        $this->remitterPostalCode = $remitterPostalCode;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterPostalCode
+     *
+     * @return string 
+     */
+    public function getRemitterPostalCode()
+    {
+        return $this->remitterPostalCode;
+    }
+
+    /**
+     * Set remitterAccountNumber
+     *
+     * @param integer $remitterAccountNumber
+     * @return Transactions
+     */
+    public function setRemitterAccountNumber($remitterAccountNumber)
+    {
+        $this->remitterAccountNumber = $remitterAccountNumber;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterAccountNumber
+     *
+     * @return integer 
+     */
+    public function getRemitterAccountNumber()
+    {
+        return $this->remitterAccountNumber;
+    }
+
+    /**
+     * Set remitterBankRoutingNo
+     *
+     * @param integer $remitterBankRoutingNo
+     * @return Transactions
+     */
+    public function setRemitterBankRoutingNo($remitterBankRoutingNo)
+    {
+        $this->remitterBankRoutingNo = $remitterBankRoutingNo;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterBankRoutingNo
+     *
+     * @return integer 
+     */
+    public function getRemitterBankRoutingNo()
+    {
+        return $this->remitterBankRoutingNo;
+    }
+
+    /**
+     * Set remitterBankBranch
+     *
+     * @param string $remitterBankBranch
+     * @return Transactions
+     */
+    public function setRemitterBankBranch($remitterBankBranch)
+    {
+        $this->remitterBankBranch = $remitterBankBranch;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterBankBranch
+     *
+     * @return string 
+     */
+    public function getRemitterBankBranch()
+    {
+        return $this->remitterBankBranch;
+    }
+
+    /**
+     * Set remitterBankName
+     *
+     * @param string $remitterBankName
+     * @return Transactions
+     */
+    public function setRemitterBankName($remitterBankName)
+    {
+        $this->remitterBankName = $remitterBankName;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterBankName
+     *
+     * @return string 
+     */
+    public function getRemitterBankName()
+    {
+        return $this->remitterBankName;
+    }
+
+    /**
+     * Set remitterBankAccountType
+     *
+     * @param string $remitterBankAccountType
+     * @return Transactions
+     */
+    public function setRemitterBankAccountType($remitterBankAccountType)
+    {
+        $this->remitterBankAccountType = $remitterBankAccountType;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterBankAccountType
+     *
+     * @return string 
+     */
+    public function getRemitterBankAccountType()
+    {
+        return $this->remitterBankAccountType;
+    }
+
+    /**
+     * Set remitterIdNumber
+     *
+     * @param integer $remitterIdNumber
+     * @return Transactions
+     */
+    public function setRemitterIdNumber($remitterIdNumber)
+    {
+        $this->remitterIdNumber = $remitterIdNumber;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterIdNumber
+     *
+     * @return integer 
+     */
+    public function getRemitterIdNumber()
+    {
+        return $this->remitterIdNumber;
+    }
+
+    /**
+     * Set remitterIdType
+     *
+     * @param string $remitterIdType
+     * @return Transactions
+     */
+    public function setRemitterIdType($remitterIdType)
+    {
+        $this->remitterIdType = $remitterIdType;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterIdType
+     *
+     * @return string 
+     */
+    public function getRemitterIdType()
+    {
+        return $this->remitterIdType;
+    }
+
+    /**
+     * Set remitterIdIssuedCountry
+     *
+     * @param string $remitterIdIssuedCountry
+     * @return Transactions
+     */
+    public function setRemitterIdIssuedCountry($remitterIdIssuedCountry)
+    {
+        $this->remitterIdIssuedCountry = $remitterIdIssuedCountry;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterIdIssuedCountry
+     *
+     * @return string 
+     */
+    public function getRemitterIdIssuedCountry()
+    {
+        return $this->remitterIdIssuedCountry;
+    }
+
+    /**
+     * Set remitterIdIssuedCity
+     *
+     * @param string $remitterIdIssuedCity
+     * @return Transactions
+     */
+    public function setRemitterIdIssuedCity($remitterIdIssuedCity)
+    {
+        $this->remitterIdIssuedCity = $remitterIdIssuedCity;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterIdIssuedCity
+     *
+     * @return string 
+     */
+    public function getRemitterIdIssuedCity()
+    {
+        return $this->remitterIdIssuedCity;
+    }
+
+    /**
+     * Set remitterIdIssuedState
+     *
+     * @param string $remitterIdIssuedState
+     * @return Transactions
+     */
+    public function setRemitterIdIssuedState($remitterIdIssuedState)
+    {
+        $this->remitterIdIssuedState = $remitterIdIssuedState;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterIdIssuedState
+     *
+     * @return string 
+     */
+    public function getRemitterIdIssuedState()
+    {
+        return $this->remitterIdIssuedState;
+    }
+
+    /**
+     * Set remitterIdIssuedDate
+     *
+     * @param \DateTime $remitterIdIssuedDate
+     * @return Transactions
+     */
+    public function setRemitterIdIssuedDate($remitterIdIssuedDate)
+    {
+        $this->remitterIdIssuedDate = $remitterIdIssuedDate;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterIdIssuedDate
+     *
+     * @return \DateTime 
+     */
+    public function getRemitterIdIssuedDate()
+    {
+        return $this->remitterIdIssuedDate;
+    }
+
+    /**
+     * Set remitterIdExpiryDate
+     *
+     * @param \DateTime $remitterIdExpiryDate
+     * @return Transactions
+     */
+    public function setRemitterIdExpiryDate($remitterIdExpiryDate)
+    {
+        $this->remitterIdExpiryDate = $remitterIdExpiryDate;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterIdExpiryDate
+     *
+     * @return \DateTime 
+     */
+    public function getRemitterIdExpiryDate()
+    {
+        return $this->remitterIdExpiryDate;
+    }
+
+    /**
+     * Set remittingAgentId
+     *
+     * @param integer $remittingAgentId
+     * @return Transactions
+     */
+    public function setRemittingAgentId($remittingAgentId)
+    {
+        $this->remittingAgentId = $remittingAgentId;
+
+        return $this;
+    }
+
+    /**
+     * Get remittingAgentId
+     *
+     * @return integer 
+     */
+    public function getRemittingAgentId()
+    {
+        return $this->remittingAgentId;
+    }
+
+    /**
+     * Set remittingAgentName
+     *
+     * @param string $remittingAgentName
+     * @return Transactions
+     */
+    public function setRemittingAgentName($remittingAgentName)
+    {
+        $this->remittingAgentName = $remittingAgentName;
+
+        return $this;
+    }
+
+    /**
+     * Get remittingAgentName
+     *
+     * @return string 
+     */
+    public function getRemittingAgentName()
+    {
+        return $this->remittingAgentName;
+    }
+
+    /**
+     * Set remittingAgentCity
+     *
+     * @param string $remittingAgentCity
+     * @return Transactions
+     */
+    public function setRemittingAgentCity($remittingAgentCity)
+    {
+        $this->remittingAgentCity = $remittingAgentCity;
+
+        return $this;
+    }
+
+    /**
+     * Get remittingAgentCity
+     *
+     * @return string 
+     */
+    public function getRemittingAgentCity()
+    {
+        return $this->remittingAgentCity;
+    }
+
+    /**
+     * Set remittingAgentState
+     *
+     * @param string $remittingAgentState
+     * @return Transactions
+     */
+    public function setRemittingAgentState($remittingAgentState)
+    {
+        $this->remittingAgentState = $remittingAgentState;
+
+        return $this;
+    }
+
+    /**
+     * Get remittingAgentState
+     *
+     * @return string 
+     */
+    public function getRemittingAgentState()
+    {
+        return $this->remittingAgentState;
+    }
+
+    /**
+     * Set remittingAgentCountry
+     *
+     * @param string $remittingAgentCountry
+     * @return Transactions
+     */
+    public function setRemittingAgentCountry($remittingAgentCountry)
+    {
+        $this->remittingAgentCountry = $remittingAgentCountry;
+
+        return $this;
+    }
+
+    /**
+     * Get remittingAgentCountry
+     *
+     * @return string 
+     */
+    public function getRemittingAgentCountry()
+    {
+        return $this->remittingAgentCountry;
+    }
+
+    /**
+     * Set processingStatus
+     *
+     * @param string $processingStatus
+     * @return Transactions
+     */
+    public function setProcessingStatus($processingStatus)
+    {
+        $this->processingStatus = $processingStatus;
+
+        return $this;
+    }
+
+    /**
+     * Get processingStatus
+     *
+     * @return string 
+     */
+    public function getProcessingStatus()
+    {
+        return $this->processingStatus;
     }
 
     /**
@@ -1565,61 +2191,5 @@ class Transactions
     public function getUpdatedAt()
     {
         return $this->updatedAt;
-    }
-
-    /**
-     * Set transactionPaymentType
-     *
-     * @param string $transactionPaymentType
-     * @return Transactions
-     */
-    public function setTransactionPaymentType($transactionPaymentType)
-    {
-        $this->transactionPaymentType = $transactionPaymentType;
-
-        return $this;
-    }
-
-    /**
-     * Get transactionPaymentType
-     *
-     * @return string 
-     */
-    public function getTransactionPaymentType()
-    {
-        return $this->transactionPaymentType;
-    }
-
-    /**
-     * Set transactionPaymentTypeCode
-     *
-     * @param string $transactionPaymentTypeCode
-     * @return Transactions
-     */
-    public function setTransactionPaymentTypeCode($transactionPaymentTypeCode)
-    {
-        $this->transactionPaymentTypeCode = $transactionPaymentTypeCode;
-
-        return $this;
-    }
-
-    /**
-     * Get transactionPaymentTypeCode
-     *
-     * @return string 
-     */
-    public function getTransactionPaymentTypeCode()
-    {
-        return $this->transactionPaymentTypeCode;
-    }
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 }

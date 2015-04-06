@@ -13,6 +13,15 @@ use Doctrine\ORM\Mapping as ORM;
 class OperationsQueue
 {
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="transaction_source", type="string", length=10, nullable=false)
@@ -29,7 +38,7 @@ class OperationsQueue
     /**
      * @var string
      *
-     * @ORM\Column(name="operation", type="string", length=10, nullable=false)
+     * @ORM\Column(name="operation", type="string", length=25, nullable=false)
      */
     private $operation;
 
@@ -61,16 +70,17 @@ class OperationsQueue
      */
     private $executionTimestamp;
 
+
+
     /**
-     * @var integer
+     * Get id
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @return integer 
      */
-    private $id;
-
-
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * Set transactionSource
@@ -231,15 +241,5 @@ class OperationsQueue
     public function getExecutionTimestamp()
     {
         return $this->executionTimestamp;
-    }
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 }

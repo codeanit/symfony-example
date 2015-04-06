@@ -13,6 +13,15 @@ use Doctrine\ORM\Mapping as ORM;
 class Services
 {
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="service_name", type="string", length=45, nullable=false)
@@ -40,16 +49,17 @@ class Services
      */
     private $isFtpService;
 
+
+
     /**
-     * @var integer
+     * Get id
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @return integer 
      */
-    private $id;
-
-
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * Set serviceName
@@ -141,15 +151,5 @@ class Services
     public function getIsFtpService()
     {
         return $this->isFtpService;
-    }
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 }
