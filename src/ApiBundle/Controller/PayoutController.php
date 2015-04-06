@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use FOS\RestBundle\Controller\Annotations\View;
-
+use Acme\BlogBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -14,7 +14,8 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 class PayoutController extends Controller
-{
+{   
+
     /** 
      * It Handels all post request from TB for Create(approved TxN) Operation
      * @return JSON 
@@ -22,13 +23,14 @@ class PayoutController extends Controller
      *
      * @param JSON Post Data     
      * 
-     **/    
+     * */    
     public function postCreateAction(Request $request)
     { 
-        $this->DB = $this->get('connection');     
+        $this->DB = $this->get('connection');
         $postData=$request->getContent();
-        $decodedData=(array) json_decode($postData);
+        $decodedData=(array) json_decode($postData);      
         $status=$this->DB->operateTransaction($decodedData,$postData,'create');        
+          
         if($status[0]==1 && $status[1]==1)
         {
             $result = array('code'=>'200','message'=>'Successfully Received');
@@ -51,11 +53,13 @@ class PayoutController extends Controller
      *
      * @param JSON Post Data     
      * 
-     * */
+     * */    
+    
     public function postModifyAction(Request $request)
-    {
+    {        
         $this->DB = $this->get('connection');     
         $postData=$request->getContent();
+
         $decodedData=(array) json_decode($postData);
 
         $status=$this->DB->operateTransaction($decodedData,$postData,'update');
@@ -84,7 +88,6 @@ class PayoutController extends Controller
         $this->DB = $this->get('connection');     
         $postData=$request->getContent();
         $decodedData=(array) json_decode($postData);
-
         $status=$this->DB->operateTransaction($decodedData,$postData,'cancel');
 
        if($status[0]==4 && $status[1]==4) {

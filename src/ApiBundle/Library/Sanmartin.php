@@ -20,6 +20,7 @@ class Sanmartin extends Common
         $this->connection = $this->container->get('database_connection');        
     }  
 
+
     public function parse($results,$p=null){
                
         $log = new \Symfony\Bridge\Monolog\Logger('FILE_QUEUE');
@@ -39,7 +40,8 @@ class Sanmartin extends Common
                      }               
                 $data=file_get_contents($path);
                 $txnData=explode("\n", str_replace("\r", '', trim($data)));
-                unset($txnData[count($txnData)]);               
+                unset($txnData[count($txnData)]);
+
                 $this->insertIntoQueue($service_name,$txnData);                             
                     
             } catch (\Exception $e) {                               
@@ -50,48 +52,45 @@ class Sanmartin extends Common
             }               
         }
         return $result;        
-        }
+    }
 
-        public function insertIntoQueue($service_name=null,$txnData=null){
-            for ($txn=0; $txn < count($txnData) ; $txn++) {
-                    $parseData=explode('|', trim($txnData[$txn]));
-                    $queueData = array(
-                            'transaction_source' => 'CDEX',
-                            'transaction_service' => $service_name,
-                            'operation' => 'update', 
-                            'parameter' => json_encode(array('code'=>'200','operation'=>'modify','confirmation_number'=>$parseData[0],'status'=>'successful','change_status'=>'PAID')),
-                            'is_executed' => 0,
-                            'creation_datetime' => date('Y-m-d H:i:s')
-                            );
-                    $check_queue = $this->connection->insert('operations_queue', $queueData);
-                }  
-                
-            return;
-        }
-
-         public function generate($data=null,$p=null){          
-            $output='';
-            if($p==null){
-            $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.'Sanmartin.txt';                 
-                }
-            else{
-                  $path= $p.'Sanmartin.txt';
-                }    
+    public function insertIntoQueue($service_name=null,$txnData=null){
+        for ($txn=0; $txn < count($txnData) ; $txn++) {
+                $parseData=explode('|', trim($txnData[$txn]));
+                $queueData = array(
+                        'transaction_source' => 'CDEX',
+                        'transaction_service' => $service_name,
+                        'operation' => 'update', 
+                        'parameter' => json_encode(array('code'=>'200','operation'=>'modify','confirmation_number'=>$parseData[0],'status'=>'successful','change_status'=>'PAID')),
+                        'is_executed' => 0,
+                        'creation_datetime' => date('Y-m-d H:i:s')
+                        );
+                $check_queue = $this->connection->insert('operations_queue', $queueData);
+            }  
             
-            foreach ($data as $key => $value) {                
-                $output .= $value.'|';
-            }        
-            file_put_contents($path,$output.PHP_EOL,FILE_APPEND | LOCK_EX);           
-            $check=file_exists($path);
-            return $check;
+        return;
+    }
 
-            /**
-             * @todo  validate output data
-             */
-            //$this->validate($output);
-        }
+     public function generate($data=null,$p=null){          
+        $output='';
+        if($p==null){
+        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.'Sanmartin.txt';                 
+            }
+        else{
+              $path= $p.'Sanmartin.txt';
+            }    
+        
+        foreach ($data as $key => $value) {                
+            $output .= $value.'|';
+        }        
+        file_put_contents($path,$output.PHP_EOL,FILE_APPEND | LOCK_EX);           
+        $check=file_exists($path);
+        return $check;
 
-
-   
+        /**
+         * @todo  validate output data
+         */
+        //$this->validate($output);
+    }
 }
 

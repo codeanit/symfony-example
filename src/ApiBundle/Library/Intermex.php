@@ -48,7 +48,7 @@ class Intermex
           $cred =array('vUsuario'=>$this->database->username, 'vPassword'=>$this->database->password);
           $actual = $soap_client->Conectar($cred);      
         if ($actual->ConectarResult) {
-            $this->log->addInfo($this->service_id, 'Conectar', $cred, $actual->ConectarResult);
+            //$this->log->addInfo($this->service_id, 'Conectar', $cred, $actual->ConectarResult);
             return $actual->ConectarResult;
         } else {           
             $this->log->addError($this->service_id, 'Conectar', $cred, 'Null');
@@ -66,7 +66,7 @@ class Intermex
      */
     public function create($txn=null)
     {      
-      $data=$txn;
+      $data=$txn;     
       $currencyId=(strtoupper($data['transaction']->payout_currency) == "USD" ||
                    strtoupper($data['transaction']->payout_currency) == "CAD")?'2':'1';
       $payoutId=(strtoupper($data['transaction']->transaction_type) == "BANK")?'2':'1';
@@ -110,6 +110,7 @@ class Intermex
           'siIdTipoDeposito'=>isset($bankAccountNumber)?$bankAccountNumber:'',
           'vNumerotarjeta'=>'',
           'vMontoCom'=>$data['transaction']->fee);
+           
       
         $soap_client = new \SoapClient(
                     $this->url,
@@ -125,16 +126,18 @@ class Intermex
             'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
         );
 
-      $response = json_decode(json_encode((array) $xmlFinal), true);      
+      $response = json_decode(json_encode((array) $xmlFinal), true); 
+           
       if ($xmlFinal->NewDataSet->ENVIO->tiExito == '1') {
             $return = array('code' => '200',
                             'operation'=>'create',
                             'message' => 'Transaction Create Successful.' ,
                             'notify_source'=>$data['source'],
+                            'source'=>'intermex',
                             'status' => 'complete' , 
-                            'change_status'=>'',                           
+                            'change_status'=>'paid',                           
                             'confirmation_number' =>
-                              $data['transaction']->transaction_code
+                            $data['transaction']->transaction_code
                            );
             $this->log->addInfo($this->service_id, 'altaEnvioT', $param, $response_main);
         } else {
@@ -144,6 +147,7 @@ class Intermex
                               ->ENVIO->iIdTipoError.'-'.$xmlFinal
                               ->NewDataSet->ENVIO->vMensajeError,
                             'notify_source'=>$data['source'],
+                            'source'=>'intermex',                            
                             'status' => 'failed' ,
                             'confirmation_number' =>
                               $data['transaction']->transaction_code
@@ -265,6 +269,7 @@ class Intermex
                               'operation'=>'update',
                               'message' => 'Receiver Name Change Successful.' ,
                               'notify_source'=>'tb',
+                              'source'=>'intermex',
                               'status' => 'complete' ,
                               'data' => array(
                                         'beneficiary_first_name'=>$txn['transaction']->beneficiary_first_name
@@ -285,6 +290,7 @@ class Intermex
                       'operation'=>'update',
                       'message' => 'Receiver Name Change Failed.' ,
                       'notify_source'=>'tb',
+                      'source'=>'intermex',
                       'status' => 'failed' ,
                       'data' => '' ,
                       'confirmation_number' => $txn['transaction']->transaction_code,
@@ -333,6 +339,7 @@ class Intermex
               $return = array('code' => '200',
                               'operation'=>'update',
                               'message' => 'Sender Name Change Successful.' ,
+                              'source'=>'intermex',
                               'notify_source'=>'tb',
                               'status' => 'complete' ,
                               'data' => array('remitter_first_name'=>$vNuevoRemitente) ,
@@ -349,7 +356,8 @@ class Intermex
       }
       $return = array('code' => '400',
                       'operation'=>'update',
-                      'message' => 'Sender Name Change Failed.' ,
+                      'message' => 'Sender Name Change Failed.' , 
+                      'source'=>'intermex',
                       'notify_source'=>'tb',
                       'status' => 'failed' ,
                       'data' => '' ,
@@ -400,6 +408,7 @@ class Intermex
                               'operation'=>'update',
                               'message' => 'Receiver Phone Number Change Successful.' ,
                               'notify_source'=>'tb',
+                              'source'=>'intermex',
                               'status' => 'complete' ,
                               'data' => array('beneficiary_phone_mobile'=>$vNuevoTelefon) ,
                               'confirmation_number' => $vReferencia,
@@ -417,6 +426,7 @@ class Intermex
                       'operation'=>'update',
                       'message' => 'Receiver Phone Number Change Failed.' ,
                       'notify_source'=>'tb',
+                      'source'=>'intermex',
                       'status' => 'failed' ,
                       'data' => '' ,
                       'confirmation_number' => $vReferencia,
@@ -461,6 +471,7 @@ class Intermex
                               'operation'=>'cancel',
                               'message' => 'Transaction Successfully Cancelled.' ,
                               'notify_source'=>'tb',
+                              'source'=>'intermex',
                               'status' => 'complete' ,
                               'change_status'=>'cancel',
                               'data' => '' ,
@@ -480,6 +491,7 @@ class Intermex
                       'operation'=>'cancel',
                       'message' => 'Transaction Cancel Failed.' ,
                       'notify_source'=>'tb',
+                      'source'=>'intermex',
                       'status' => 'failed' ,
                       'data' => '' ,
                       'confirmation_number' => $vReferencia,

@@ -48,12 +48,13 @@ class DB
         }
         $logData=array();
         $logData = array(
-                        'source_transaction_id'=> mt_rand(1, 9999999),
+                        'source_transaction_id'=> isset($data['transaction']->source_transaction_id)?
+                                                        $data['transaction']->source_transaction_id:rand(1,10000),
                         'transaction_source'=>isset($data['source'])?$data['source']:'',
                         'transaction_service'=>isset($data['service'])?$data['service']:'',
                         'processing_status'=>$status,
                         'created_at'=>date('Y-m-d H:i:s'),        
-                        );       
+                        ); 
         foreach ($data['transaction'] as $key => $value) 
         {
             $logData[$key]=isset($value)?$value:'';                                               
@@ -88,14 +89,14 @@ class DB
                 $count=$qb->execute()->fetchColumn();
                                
                 if($operation=='update') {
-                    if($count>0) {
+                    if($count>0) {  
                         if(strtolower($data['service'])=='intermex'){
                             $intermex=$this->container->get('intermex');
                             $intermex->update($data);
                         }else{
                             $check_queue = $conn->insert('operations_queue', $queueData);                            
-                        } 
-                        $check=$check_queue=3;              
+                        }                     
+                        $check=$check_queue=3;                        
                     }else {
                         $check=$check_queue=4;
                     }                             
@@ -136,7 +137,7 @@ class DB
     public function getTransactions()
     {
         $conn = $this->container->get('database_connection');
-        $data=$conn->fetchAll('SELECT * FROM transactions ORDER BY id DESC LIMIT 25 ');        
+        $data=$conn->fetchAll('SELECT * FROM transactions ORDER BY id DESC LIMIT 25 ');
         return $data;
     }
 
