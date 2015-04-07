@@ -5,15 +5,14 @@
  * Date: 2/25/15
  * Time: 4:06 PM.
  */
-namespace LibraryBundle\BusinessLogic\BDO;
-
-use LibraryBundle\BusinessLogic\ThirdParty;
+namespace BackendBundle\Library\BDO;
+;
 
 /**
- * Class BDO
+ * Class Bdo
  * @package LibraryBundle\BusinessLogics
  */
-class BdoBL extends ThirdParty
+class Bdo
 {
     /**
      * Returns encrypted password
@@ -25,8 +24,8 @@ class BdoBL extends ThirdParty
     public function getEncryptedPassword($password)
     {
         $queryString = "java -cp "
-            . "/home/anit/bdo-implemented/RemittanceAPITool.jar:."
-            . " EncryptPassword Password=" . $password;
+            . "src/BackendBundle/Library/BDO/RemittanceAPITool.jar:."
+            . " src.BackendBundle.Library.BDO.EncryptPassword password=" . $password;
         $ePass = "";
 
         try {
@@ -63,7 +62,7 @@ class BdoBL extends ThirdParty
         $SignatureType = "TXN",
         $CLEAR_BRS_PASSWORD = "test123",
         $TRANSACTION_REFERENCE_NUMBER = "txn12345",
-        $KEYSTORE_FILE = "/home/anit/Dropbox/firstglobaldata/220FGOFC1",
+        $KEYSTORE_FILE = "src/BackendBundle/Library/BDO/certificate-and-jks/220FGOFC1",
         $KEYSTORE_PASSWORD = "FGM#374040w",
         $KEY_NAME = "fgdc",
         $KEY_PASSWORD = "FGM#374040w",
@@ -72,12 +71,12 @@ class BdoBL extends ThirdParty
         $ACCOUNT_NUMBER = "123456789"
     )
     {
-        $queryString = "java -cp /home/anit/bdo-implemented/RemittanceAPITool.jar:."
-            ." com.tb.security.SignedData"
+        $queryString = "java -cp src/BackendBundle/Library/BDO/RemittanceAPITool.jar:."
+            ." src/BackendBundle/Library/BDO/SignedData"
             ." SignatureType=TXN"
             .",CLEAR_BRS_PASSWORD=test123"
             .",TRANSACTION_REFERENCE_NUMBER=txn12345"
-            .",KEYSTORE_FILE=/home/anit/Dropbox/firstglobaldata/220FGOFC1"
+            .",KEYSTORE_FILE=src/BackendBundle/Library/BDO/certificate-and-jks/220FGOFC1"
             .",KEYSTORE_PASSWORD=FGM#374040w"
             .",KEY_NAME=fgdc"
             .",KEY_PASSWORD=FGM#374040w"

@@ -7,7 +7,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use LibraryBundle\BusinessLogic\BDO\BdoBL;
+
+use BackendBundle\Library\BDO\Bdo;
 
 class CronCommand extends Command
 {
@@ -35,7 +36,7 @@ class CronCommand extends Command
         $return = "";
         $operation = $input->getArgument('operation');
 
-        if ($operation == 'BDO') {
+        if ($operation == 'bdo') {
             $output->writeln("Calling BDO");
             $return = $this->_bdoTest();
 //            $text = 'Hello '. $operation;
@@ -51,7 +52,8 @@ class CronCommand extends Command
 
     private function _bdoTest()
     {
-        $this->businessLogic = new BdoBL();
-        return $this->businessLogic->getEncryptedPassword("test");
+        $this->businessLogic = new Bdo();
+        // return $this->businessLogic->getEncryptedPassword("test");
+        return $this->businessLogic->getSignedData();
     }
 }
