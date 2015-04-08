@@ -8,10 +8,15 @@ use Doctrine\ORM\Mapping as ORM;
  * Transactions
  *
  * @ORM\Table(name="transactions")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="BackendBundle\Entity\Repository\TransactionRepository")
  */
 class Transactions
 {
+    const QUEUE_OPERATION_CREATE = 'CREATE';
+    const QUEUE_OPERATION_CHANGE = 'CHANGE';
+    const QUEUE_OPERATION_CANCEL = 'CANCEL';
+    const QUEUE_OPERATION_ENQUEUE = 'ENQUEUE';
+
     /**
      * @var integer
      *
@@ -2191,5 +2196,330 @@ class Transactions
     public function getUpdatedAt()
     {
         return $this->updatedAt;
+    }
+    /**
+     * @var string
+     */
+    private $uuid;
+
+    /**
+     * @var \DateTime
+     */
+    private $beneficiaryDob;
+
+    /**
+     * @var string
+     */
+    private $beneficiarySsn;
+
+    /**
+     * @var string
+     */
+    private $beneficiaryGender;
+
+    /**
+     * @var string
+     */
+    private $beneficiaryOccupation;
+
+    /**
+     * @var \DateTime
+     */
+    private $remitterDob;
+
+    /**
+     * @var string
+     */
+    private $remitterSsn;
+
+    /**
+     * @var string
+     */
+    private $remitterGender;
+
+    /**
+     * @var string
+     */
+    private $remitterOccupation;
+
+    /**
+     * @var string
+     */
+    private $queueOperation;
+
+
+    /**
+     * Set uuid
+     *
+     * @param string $uuid
+     * @return Transactions
+     */
+    public function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    /**
+     * Get uuid
+     *
+     * @return string 
+     */
+    public function getUuid()
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * Set beneficiaryDob
+     *
+     * @param \DateTime $beneficiaryDob
+     * @return Transactions
+     */
+    public function setBeneficiaryDob($beneficiaryDob)
+    {
+        $this->beneficiaryDob = $beneficiaryDob;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryDob
+     *
+     * @return \DateTime 
+     */
+    public function getBeneficiaryDob()
+    {
+        return $this->beneficiaryDob;
+    }
+
+    /**
+     * Set beneficiarySsn
+     *
+     * @param string $beneficiarySsn
+     * @return Transactions
+     */
+    public function setBeneficiarySsn($beneficiarySsn)
+    {
+        $this->beneficiarySsn = $beneficiarySsn;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiarySsn
+     *
+     * @return string 
+     */
+    public function getBeneficiarySsn()
+    {
+        return $this->beneficiarySsn;
+    }
+
+    /**
+     * Set beneficiaryGender
+     *
+     * @param string $beneficiaryGender
+     * @return Transactions
+     */
+    public function setBeneficiaryGender($beneficiaryGender)
+    {
+        $this->beneficiaryGender = $beneficiaryGender;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryGender
+     *
+     * @return string 
+     */
+    public function getBeneficiaryGender()
+    {
+        return $this->beneficiaryGender;
+    }
+
+    /**
+     * Set beneficiaryOccupation
+     *
+     * @param string $beneficiaryOccupation
+     * @return Transactions
+     */
+    public function setBeneficiaryOccupation($beneficiaryOccupation)
+    {
+        $this->beneficiaryOccupation = $beneficiaryOccupation;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryOccupation
+     *
+     * @return string 
+     */
+    public function getBeneficiaryOccupation()
+    {
+        return $this->beneficiaryOccupation;
+    }
+
+    /**
+     * Set remitterDob
+     *
+     * @param \DateTime $remitterDob
+     * @return Transactions
+     */
+    public function setRemitterDob($remitterDob)
+    {
+        $this->remitterDob = $remitterDob;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterDob
+     *
+     * @return \DateTime 
+     */
+    public function getRemitterDob()
+    {
+        return $this->remitterDob;
+    }
+
+    /**
+     * Set remitterSsn
+     *
+     * @param string $remitterSsn
+     * @return Transactions
+     */
+    public function setRemitterSsn($remitterSsn)
+    {
+        $this->remitterSsn = $remitterSsn;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterSsn
+     *
+     * @return string 
+     */
+    public function getRemitterSsn()
+    {
+        return $this->remitterSsn;
+    }
+
+    /**
+     * Set remitterGender
+     *
+     * @param string $remitterGender
+     * @return Transactions
+     */
+    public function setRemitterGender($remitterGender)
+    {
+        $this->remitterGender = $remitterGender;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterGender
+     *
+     * @return string 
+     */
+    public function getRemitterGender()
+    {
+        return $this->remitterGender;
+    }
+
+    /**
+     * Set remitterOccupation
+     *
+     * @param string $remitterOccupation
+     * @return Transactions
+     */
+    public function setRemitterOccupation($remitterOccupation)
+    {
+        $this->remitterOccupation = $remitterOccupation;
+
+        return $this;
+    }
+
+    /**
+     * Get remitterOccupation
+     *
+     * @return string 
+     */
+    public function getRemitterOccupation()
+    {
+        return $this->remitterOccupation;
+    }
+
+    /**
+     * Set queueOperation
+     *
+     * @param string $queueOperation
+     * @return Transactions
+     */
+    public function setQueueOperation($queueOperation)
+    {
+        $this->queueOperation = $queueOperation;
+
+        return $this;
+    }
+
+    /**
+     * Get queueOperation
+     *
+     * @return string 
+     */
+    public function getQueueOperation()
+    {
+        return $this->queueOperation;
+    }
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $queues;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->queues = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add queues
+     *
+     * @param \BackendBundle\Entity\OperationsQueue $queues
+     * @return Transactions
+     */
+    public function addQueue(\BackendBundle\Entity\OperationsQueue $queues)
+    {
+        $this->queues[] = $queues;
+
+        return $this;
+    }
+
+    /**
+     * Remove queues
+     *
+     * @param \BackendBundle\Entity\OperationsQueue $queues
+     */
+    public function removeQueue(\BackendBundle\Entity\OperationsQueue $queues)
+    {
+        $this->queues->removeElement($queues);
+    }
+
+    /**
+     * Get queues
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getQueues()
+    {
+        return $this->queues;
     }
 }
