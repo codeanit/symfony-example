@@ -20,23 +20,28 @@
         <service id="queue" class="ApiBundle\Model\Queue" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
+        
         <service id="log" class="ApiBundle\Model\Log" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
+        
          <service id="connection" class="ApiBundle\Model\DB" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-         <service id="intermex" class="ApiBundle\Library\Intermex" lazy="true">            
+        
+         <service id="intermex" class="ApiBundle\Library\Intermex" lazy="true">
             <argument type="service" id="service_container" />         
         </service>
 
-<!-- 
+        <service id="tb_mock" class="ApiBundle\Library\TB" lazy="true">            
+            <argument type="service" id="service_container" />         
+        </service>
+
+        <!--
         <service id="bdo" class="ApiBundle\Library\BDO" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
-         <service id="tb_mock" class="ApiBundle\Library\TB" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
+        
         <service id="mock" class="ApiBundle\Library\MOCK" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
@@ -63,9 +68,11 @@
         </service>       
         <service id="bts" class="ApiBundle\Library\BTS" lazy="true"> 
             <argument type="service" id="service_container" /> 
-         <!--    <argument type="string">Suraj</argument>
-            <argument>%testing.array%</argument> - ->
-        </service> -->
+                <argument type="string">Suraj</argument>
+            <argument>%testing.array%</argument> 
+        </service>
+    -->
+
     </services>
     
 </container>

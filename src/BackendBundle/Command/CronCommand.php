@@ -15,8 +15,8 @@ class CronCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('demo:greet')
-            ->setDescription('Greet someone')
+            ->setName('cron:update')
+            ->setDescription('Execute update from command.')
             ->addArgument(
                 'operation',
                 InputArgument::OPTIONAL,
@@ -53,7 +53,9 @@ class CronCommand extends Command
     private function _bdoTest()
     {
         $this->businessLogic = new Bdo();
-        // return $this->businessLogic->getEncryptedPassword("test");
-        return $this->businessLogic->getSignedData();
+        
+        return $this->businessLogic->getEncryptedPassword("bdoRemit1!");
+        
+        //return $this->businessLogic->getSignedData();
     }
 }
