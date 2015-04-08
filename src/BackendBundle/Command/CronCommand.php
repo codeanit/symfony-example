@@ -53,9 +53,7 @@ class CronCommand extends Command
     private function _bdoTest()
     {
         $this->businessLogic = new Bdo();
+        $this->businessLogic->create();
         
-        return $this->businessLogic->getEncryptedPassword("bdoRemit1!");
-        
-        //return $this->businessLogic->getSignedData();
     }
 }

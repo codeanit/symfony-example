@@ -6,7 +6,7 @@
  * Time: 4:06 PM.
  */
 namespace BackendBundle\Library\BDO;
-;
+
 
 /**
  * Class Bdo
@@ -84,6 +84,15 @@ class Bdo
             .",TRANSACTION_DATE=" . $TRANSACTION_DATE
             .",ACCOUNT_NUMBER=" . $ACCOUNT_NUMBER;
 
+
         return shell_exec($queryString);
     }
+
+    public function create()
+    {
+        $this->getEncryptedPassword("bdoRemit1!");
+        
+        $this->getSignedData();
+    }
+
 }
