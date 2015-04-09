@@ -1,7 +1,33 @@
 services:
+    abstarct_queue_worker:
+        class: BackendBundle\Library\Queue\AbstractQueueWorker
+        abstrct: true
+        calls:
+            - [setDoctrine, [@doctrine.orm.entity_manager]]
+            - [setLogger, [@logger]]
+
     cdex_queue_worker_factory:
         class: BackendBundle\Library\Queue\QueueWorkerFactory
+        arguments: ["@service_container"]
+        lazy: true
 
     cdex_queue_manager:
         class: BackendBundle\Library\Queue\QueueManager
         arguments: ["@doctrine.orm.entity_manager", "@logger", "@cdex_queue_worker_factory"]
+
+    cdex_queue_worker.intrermex:
+        class: BackendBundle\Library\Queue\Worker\IntermexWorker
+        parent: abstarct_queue_worker
+
+    twig.extension.backend:
+        class: BackendBundle\Twig\Extension\BackendExtension
+        public: false
+        arguments: [@twig.loader]
+        tags:
+            - { name: twig.extension }
+
+    backend.listener:
+         class: BackendBundle\EventListener\ControllerListener
+         arguments: [@twig.extension.backend]
+         tags:
+            - {name: kernel.event_listener, event: kernel.controller, method: onKernelController}
