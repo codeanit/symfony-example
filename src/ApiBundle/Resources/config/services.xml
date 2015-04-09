@@ -38,7 +38,7 @@
         </service>
 
         <!--
-        <service id="bdo" class="ApiBundle\Library\BDO" lazy="true">            
+        <service id="bdo" class="BackendBundle\Library\BDO\Bdo" lazy="true">            
             <argument type="service" id="service_container" />         
         </service>
         
