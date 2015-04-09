@@ -35,11 +35,20 @@
 
         <service id="tb_mock" class="ApiBundle\Library\TB" lazy="true">
             <argument type="service" id="service_container" />
+
+        </service>
+    
+        <service id="bdo" class="BackendBundle\Library\BDO\Bdo" lazy="true">            
+            <argument type="service" id="service_container" />                       
+        </service>
+
+        <service id="transnetwork" class="ApiBundle\Library\TransNetwork" lazy="true">
+            <argument type="service" id="service_container" />                       
         </service>
 
         <!--
-        <service id="bdo" class="ApiBundle\Library\BDO" lazy="true">
-            <argument type="service" id="service_container" />
+        <service id="bdo" class="BackendBundle\Library\BDO\Bdo" lazy="true">            
+            <argument type="service" id="service_container" />                       
         </service>
 
         <service id="mock" class="ApiBundle\Library\MOCK" lazy="true">

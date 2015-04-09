@@ -5,7 +5,7 @@ use Api\PayoutBundle\Library\Greenbelt;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class TransNetworkTest extends WebTestCase
+class IntermexTest extends WebTestCase
 {
 
   private $GB; 
@@ -17,42 +17,12 @@ class TransNetworkTest extends WebTestCase
     $this->path='/var/www/dex-api/web/upload/';  
     $client = $this->createClient(); 
     $this->container = $client->getContainer();
-    $this->GB=$this->container->get('transnetwork');
+    $this->GB=$this->container->get('bdo');
   }
-  public function ptestForCancel()
+  public function testForBankAccountPayment()
   {
-    $data=$this->GB->cancel('X230007222288','2015-04-03');
-    print_r($data);die;
+    
   }
-
-  public function testForUpdate()
-  {
-    $data=$this->GB->queryUpdate();
-    print_r($data);die;
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 ?>
