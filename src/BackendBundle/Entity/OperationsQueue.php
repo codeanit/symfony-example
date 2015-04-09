@@ -66,7 +66,7 @@ class OperationsQueue
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="execution_timestamp", type="datetime", nullable=false)
+     * @ORM\Column(name="execution_timestamp", type="datetime", nullable=true)
      */
     private $executionTimestamp;
 
@@ -241,5 +241,33 @@ class OperationsQueue
     public function getExecutionTimestamp()
     {
         return $this->executionTimestamp;
+    }
+    /**
+     * @var \BackendBundle\Entity\Transactions
+     */
+    private $transaction;
+
+
+    /**
+     * Set transaction
+     *
+     * @param \BackendBundle\Entity\Transactions $transaction
+     * @return OperationsQueue
+     */
+    public function setTransaction(\BackendBundle\Entity\Transactions $transaction = null)
+    {
+        $this->transaction = $transaction;
+
+        return $this;
+    }
+
+    /**
+     * Get transaction
+     *
+     * @return \BackendBundle\Entity\Transactions 
+     */
+    public function getTransaction()
+    {
+        return $this->transaction;
     }
 }

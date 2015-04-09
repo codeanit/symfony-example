@@ -17,7 +17,17 @@ use BackendBundle\Entity\Transactions;
  */
 interface QueueWorkerInterface
 {
+    /**
+     * @param OperationsQueue $queue
+     * @param array $args
+     * @return mixed
+     */
     public function processQueue(OperationsQueue $queue, $args = []);
 
+    /**
+     * @param Transactions $transaction
+     * @param array $args
+     * @return mixed
+     */
     public function enqueueTransaction(Transactions $transaction, $args = []);
 } 

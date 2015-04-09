@@ -10,7 +10,18 @@ BackendBundle\Entity\Transactions:
             id: true
             generator:
                 strategy: IDENTITY
+    oneToMany:
+        queues:
+            targetEntity: BackendBundle\Entity\OperationsQueue
+            mappedBy: transaction
+
     fields:
+        uuid:
+            type: string
+            nullable: false
+            length: 32
+            fixed: false
+            comment: 'Transaction UUID generated from CDEX API. Its is used to uniquely track transactions at CDEX.'
         transactionSource:
             type: string
             nullable: false
@@ -253,6 +264,32 @@ BackendBundle\Entity\Transactions:
             nullable: true
             comment: 'Date of remittance date at Source'
             column: beneficiary_id_expiry_date
+        beneficiaryDob:
+            type: datetime
+            nullable: true
+            comment: 'Date of Birth Beneficiary'
+            column: beneficiary_dob
+        beneficiarySsn:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_ssn
+        beneficiaryGender:
+            type: string
+            nullable: true
+            length: 20
+            fixed: false
+            comment: ''
+            column: beneficiary_gender
+        beneficiaryOccupation:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: beneficiary_occupation
         payoutAgentId:
             type: integer
             nullable: true
@@ -475,6 +512,32 @@ BackendBundle\Entity\Transactions:
             fixed: false
             comment: ''
             column: remitting_agent_country
+        remitterDob:
+            type: datetime
+            nullable: true
+            comment: 'Date of Birth Remitter'
+            column: remitter_dob
+        remitterSsn:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_ssn
+        remitterGender:
+            type: string
+            nullable: true
+            length: 20
+            fixed: false
+            comment: ''
+            column: remitter_gender
+        remitterOccupation:
+            type: string
+            nullable: true
+            length: 45
+            fixed: false
+            comment: ''
+            column: remitter_occupation
         processingStatus:
             type: string
             nullable: false
@@ -482,6 +545,13 @@ BackendBundle\Entity\Transactions:
             fixed: false
             comment: 'Transaction Processing status at CDEX. Filed values = completed, pending, cancelled, ambiguous'
             column: processing_status
+        queueOperation:
+            type: string
+            nullable: false
+            length: 8
+            fixed: false
+            comment: 'Defines whether the request has been moved to queue or. The status that marks the operation is moved to queue is enqueued. Filed values = CREATE, CHANGE, CANCEL, ENQUEUED'
+            column: queue_operation
         createdAt:
             type: datetime
             nullable: true
