@@ -59,6 +59,12 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
     abstract public function cancelTransaction(OperationsQueue $queue, $args = []);
 
     /**
+     * @param array $arg
+     * @return mixed
+     */
+    abstract public function confirmTransaction(array $arg = []);
+
+    /**
      * @return string
      */
     abstract protected function getWorkerServiceName();
