@@ -10,6 +10,14 @@ BackendBundle\Entity\OperationsQueue:
             id: true
             generator:
                 strategy: IDENTITY
+
+    manyToOne:
+        transaction:
+            targetEntity: BackendBundle\Entity\Transactions
+            joinColumn:
+                name: transaction_id
+                referencedColumnName: id
+
     fields:
         transactionSource:
             type: string
@@ -50,7 +58,7 @@ BackendBundle\Entity\OperationsQueue:
             column: creation_datetime
         executionTimestamp:
             type: datetime
-            nullable: false
+            nullable: true
             comment: 'Operation executed date time'
             default: CURRENT_TIMESTAMP
             column: execution_timestamp
