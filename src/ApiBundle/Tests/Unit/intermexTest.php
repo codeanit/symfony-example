@@ -61,7 +61,7 @@ class IntermexTest extends WebTestCase
                     "remittance_date"=>"14/03/2015",
                     "additional_information"=> ""));
      
-    $resultData=$this->GB->process('create',$param);
+    $resultData=$this->GB->process('create', $param);
     $expected='200';
     $this->assertEquals($expected,$resultData['code']);
   }

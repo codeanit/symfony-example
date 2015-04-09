@@ -189,7 +189,7 @@ class TransNetwork
                 'cache_wsdl' => WSDL_CACHE_NONE,)
         );
         $response = $soap_client->GetUpdates($param);      
-        $extractedData =explode('</xs:schema>',$response->GetUpdatesResult->any);
+        $extractedData =explode('</xs:schema>', $response->GetUpdatesResult->any);
         $xmlFinal   = simplexml_load_string(
                 $extractedData[1],
                 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
@@ -199,7 +199,10 @@ class TransNetwork
         $count=0;
         foreach ($list as $value) {   
             if($value['Update_Code']=='1000' || $value['Update_Code']=='1001')
-            {              
+            {
+
+                $this->confirmUpdate($value);
+                
                 $this->log->addInfo($this->service_id, 'update', $param, $list[$count]);
                 $return = array('code' => '200',
                             'operation'=>'notify',
@@ -245,6 +248,11 @@ class TransNetwork
         return $check_queue;
     }
 
+    public function confirmUpdate()
+    {
+        ConfirmUpdate();
+
+    }
 
     /**
      * The createCancel WebMethod allows a transmitter to cancel
