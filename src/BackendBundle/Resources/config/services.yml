@@ -1,0 +1,7 @@
+services:
+    cdex_queue_worker_factory:
+        class: BackendBundle\Library\Queue\QueueWorkerFactory
+
+    cdex_queue_manager:
+        class: BackendBundle\Library\Queue\QueueManager
+        arguments: ["@doctrine.orm.entity_manager", "@logger", "@cdex_queue_worker_factory"]
