@@ -14,15 +14,6 @@ use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
 class TransNetworkWorker extends BaseWorker
 {
     /**
-     * @param OperationsQueue $queue
-     * @param array $args
-     */
-    public function processQueue(OperationsQueue $queue, $args = [])
-    {
-        // TODO: Implement processQueue() method.
-    }
-
-    /**
      * @param Transactions $transaction
      * @param array $args
      */
@@ -31,4 +22,33 @@ class TransNetworkWorker extends BaseWorker
         // TODO: Implement enqueueTransaction() method.
     }
 
+    /**
+     * @param OperationsQueue $queue
+     * @param array $args
+     * @return mixed
+     */
+    public function createTransaction(OperationsQueue $queue, $args = [])
+    {
+        // TODO: Implement createTransaction() method.
+    }
+
+    /**
+     * @param OperationsQueue $queue
+     * @param array $args
+     * @return mixed
+     */
+    public function modifyTransaction(OperationsQueue $queue, $args = [])
+    {
+        // TODO: Implement modifyTransaction() method.
+    }
+
+    /**
+     * @param OperationsQueue $queue
+     * @param array $args
+     * @return mixed
+     */
+    public function cancelTransaction(OperationsQueue $queue, $args = [])
+    {
+        // TODO: Implement cancelTransaction() method.
+    }
 } 

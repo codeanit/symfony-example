@@ -3,7 +3,7 @@
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-<!-- 
+<!--
     <parameters>
         <parameter key="testing.array" type="collection">
             <parameter>en</parameter>
@@ -14,65 +14,70 @@
             </parameter>
         </parameter>
     </parameters> -->
-        
+
     <services>
-        
-        <service id="queue" class="ApiBundle\Model\Queue" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-        
-        <service id="log" class="ApiBundle\Model\Log" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-        
-         <service id="connection" class="ApiBundle\Model\DB" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>
-        
-         <service id="intermex" class="ApiBundle\Library\Intermex" lazy="true">
-            <argument type="service" id="service_container" />         
+
+        <service id="queue" class="ApiBundle\Model\Queue" lazy="true">
+            <argument type="service" id="service_container" />
         </service>
 
-        <service id="tb_mock" class="ApiBundle\Library\TB" lazy="true">            
-            <argument type="service" id="service_container" />         
+        <service id="log" class="ApiBundle\Model\Log" lazy="true">
+            <argument type="service" id="service_container" />
+        </service>
+
+         <service id="connection" class="ApiBundle\Model\DB" lazy="true">
+            <argument type="service" id="service_container" />
+        </service>
+
+         <service id="intermex" class="ApiBundle\Library\Intermex" lazy="true">
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="tb_mock" class="ApiBundle\Library\TB" lazy="true">
+            <argument type="service" id="service_container" />
+
+        </service>
+    
+        <service id="bdo" class="BackendBundle\Library\BDO\Bdo" lazy="true">            
+            <argument type="service" id="service_container" />                       
         </service>
 
         <!--
         <service id="bdo" class="BackendBundle\Library\BDO\Bdo" lazy="true">            
-            <argument type="service" id="service_container" />         
+            <argument type="service" id="service_container" />                       
         </service>
-        
-        <service id="mock" class="ApiBundle\Library\MOCK" lazy="true">            
-            <argument type="service" id="service_container" />         
+
+        <service id="mock" class="ApiBundle\Library\MOCK" lazy="true">
+            <argument type="service" id="service_container" />
         </service>
-        <service id="greenbelt" class="ApiBundle\Library\Greenbelt" lazy="true">            
-            <argument type="service" id="service_container" />         
+        <service id="greenbelt" class="ApiBundle\Library\Greenbelt" lazy="true">
+            <argument type="service" id="service_container" />
         </service>
-        <service id="sanmartin" class="ApiBundle\Library\Sanmartin" lazy="true">            
-            <argument type="service" id="service_container" />         
+        <service id="sanmartin" class="ApiBundle\Library\Sanmartin" lazy="true">
+            <argument type="service" id="service_container" />
         </service>
-        <service id="consultoria" class="ApiBundle\Library\Consultoria" lazy="true">            
-            <argument type="service" id="service_container" />         
+        <service id="consultoria" class="ApiBundle\Library\Consultoria" lazy="true">
+            <argument type="service" id="service_container" />
         </service>
-        <service id="intermex" class="ApiBundle\Library\Intermex" lazy="true">            
-            <argument type="service" id="service_container" />         
+        <service id="intermex" class="ApiBundle\Library\Intermex" lazy="true">
+            <argument type="service" id="service_container" />
         </service>
-        <service id="olympic" class="ApiBundle\Library\Olympic" lazy="true">            
-            <argument type="service" id="service_container" />         
+        <service id="olympic" class="ApiBundle\Library\Olympic" lazy="true">
+            <argument type="service" id="service_container" />
         </service>
-        <service id="mcb" class="ApiBundle\Library\MCB" lazy="true">            
-            <argument type="service" id="service_container" />         
+        <service id="mcb" class="ApiBundle\Library\MCB" lazy="true">
+            <argument type="service" id="service_container" />
         </service>
-        <service id="tb" class="ApiBundle\Library\TBConnectionModel" lazy="true">            
-            <argument type="service" id="service_container" />         
-        </service>       
-        <service id="bts" class="ApiBundle\Library\BTS" lazy="true"> 
-            <argument type="service" id="service_container" /> 
+        <service id="tb" class="ApiBundle\Library\TBConnectionModel" lazy="true">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="bts" class="ApiBundle\Library\BTS" lazy="true">
+            <argument type="service" id="service_container" />
                 <argument type="string">Suraj</argument>
-            <argument>%testing.array%</argument> 
+            <argument>%testing.array%</argument>
         </service>
     -->
 
     </services>
-    
+
 </container>

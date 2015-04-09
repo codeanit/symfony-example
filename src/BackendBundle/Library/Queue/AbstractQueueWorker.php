@@ -11,9 +11,11 @@ use BackendBundle\Entity\OperationsQueue;
  */
 abstract class AbstractQueueWorker implements QueueWorkerInterface
 {
+    protected $settings = [];
+
     public function processQueue(OperationsQueue $queue, $args = [])
     {
-        $operation = $queue->getOperation();
+        $operation = strtolower($queue->getOperation());
 
         switch ($operation) {
             case 'create':
@@ -28,6 +30,11 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
             default:
                 throw new \Exception('Fatal Error :: Undefined operation attempted!!');
         }
+    }
+
+    public function getWorkerSetting()
+    {
+
     }
 
     /**
@@ -50,4 +57,9 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
      * @return mixed
      */
     abstract public function cancelTransaction(OperationsQueue $queue, $args = []);
+
+    /**
+     * @return string
+     */
+    abstract protected function getWorkerServiceName();
 }

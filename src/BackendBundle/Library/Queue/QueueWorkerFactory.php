@@ -5,6 +5,7 @@ namespace BackendBundle\Library\Queue;
 
 use BackendBundle\Entity\OperationsQueue;
 use BackendBundle\Entity\Transactions;
+use BackendBundle\Library\Queue\Worker\IntermexWorker;
 
 class QueueWorkerFactory
 {
@@ -40,14 +41,17 @@ class QueueWorkerFactory
     public function forgeWorker($service)
     {
         $service = strtolower($service);
-        $forgeMethod = 'forge' . ucfirst($service);
+        $forgeMethod = 'forge' . ucfirst($service) . 'Worker';
 
         if (! method_exists($this, $forgeMethod)) {
-            throw new \Exception('Fatal Error :: Unable to locate the worker.');
+            throw new \Exception("Fatal Error :: Unable to locate the worker for '{$service}'.");
         }
 
         return $this->$forgeMethod();
     }
 
-
-} 
+    public function forgeIntermexWorker()
+    {
+        return new IntermexWorker();
+    }
+}
