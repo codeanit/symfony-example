@@ -4,6 +4,9 @@ namespace BackendBundle\Library\Queue;
 
 
 use BackendBundle\Entity\OperationsQueue;
+use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
  * Class AbstractQueueWorker
@@ -11,8 +14,40 @@ use BackendBundle\Entity\OperationsQueue;
  */
 abstract class AbstractQueueWorker implements QueueWorkerInterface
 {
-    protected $settings = [];
+    private $settings = [];
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected  $em;
+
+    /**
+     * @var \Symfony\Bridge\Monolog\Logger
+     */
+    protected $logger;
+
+    /**
+     * @param \Doctrine\ORM\EntityManager $em
+     */
+    public function setDoctrine(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param OperationsQueue $queue
+     * @param array $args
+     * @return mixed|void
+     * @throws \Exception
+     */
     public function processQueue(OperationsQueue $queue, $args = [])
     {
         $operation = strtolower($queue->getOperation());
