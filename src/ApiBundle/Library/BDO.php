@@ -49,10 +49,12 @@ class BDO
                   SignatureType=TXN,CLEAR_BRS_PASSWORD=p8%A$$9X6,TRANSACTION_REFERENCE_NUMBER=REFNO123456,
                   KEYSTORE_FILE=/home/manish/bdo-implemented/certificate-and-jks/220FGOFC1,KEYSTORE_PASSWORD=FGM#374040w,
                   KEY_NAME=fgdc,KEY_PASSWORD=FGM#374040w,LANDED_AMOUNT=500,TRANSACTION_DATE=2014-11-24,ACCOUNT_NUMBER=100661036243');
+                
                 echo shell_exec('java -cp RemittanceAPITool.jar:. com.tb.security.SignedData 
                   SignatureType=TXN,CLEAR_BRS_PASSWORD=p8%A$$9X6,TRANSACTION_REFERENCE_NUMBER=REFNO123456,
                   KEYSTORE_FILE=/home/manish/bdo-implemented/certificate-and-jks/220FGOFC1,KEYSTORE_PASSWORD=FGM#374040w,
                   KEY_NAME=fgdc,KEY_PASSWORD=FGM#374040w,LANDED_AMOUNT=500,TRANSACTION_DATE=2014-11-24,ACCOUNT_NUMBER=100661036243 ');
+                
                 die;
                 $xml=$this->xml($data);
                 $soap_client = new \SoapClient(

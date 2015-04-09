@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Tobias Schultze <http://tobion.de>
  */
-class CdexEnqueueCommand extends ContainerAwareCommand
+class CdexQueueCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
@@ -25,9 +25,9 @@ class CdexEnqueueCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('cdex:queue:enqueue')
+            ->setName('cdex:queue')
             ->setDescription('Enqueue CDEX Transactions.')
-//            ->addArgument('who', InputArgument::OPTIONAL, 'Who to greet.', 'World')
+            ->addArgument('operation', InputArgument::OPTIONAL, 'What operation.', 'both')
 /*
     <info>php %command.full_name%</info>
 
@@ -37,6 +37,12 @@ class CdexEnqueueCommand extends ContainerAwareCommand
 */
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command enqueue CDEX TXN to queue
+
+<info>php %command.full_name%</info>
+
+    The optional argument specifies what operation:
+
+<info>php %command.full_name%</info> [enqueue|process|both]
 EOF
             );
     }
@@ -46,9 +52,34 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-//        $input->getOption('')
-
+        $operation = $input->getArgument('operation');
         $queueManager = $this->getContainer()->get('cdex_queue_manager');
-        $queueManager->enqueueAll();
+        $queuedTxn = 0;
+        $processedTxn = 0;
+
+        switch ($operation) {
+            case 'enqueue':
+                $queuedTxn = $queueManager->enqueueAll();
+                break;
+
+            case 'execute':
+                $processedTxn = (int) $queueManager->processAll();
+                break;
+
+            case 'both':
+                $queuedTxn = $queueManager->enqueueAll();
+                $processedTxn = (int) $queueManager->processAll();
+                break;
+
+            default:
+                $output->writeln('<error>Invalid Operation "' . $operation . '".</error>');
+        }
+
+        if ($queuedTxn > 0 ) {
+            $output->writeln('<info>'. $queuedTxn .' transactions queued for processing.</info>');
+        }
+        if ($processedTxn > 0 ) {
+            $output->writeln('<info>'. $processedTxn .' queues processed.</info>');
+        }
     }
 }
