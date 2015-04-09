@@ -42,6 +42,10 @@
             <argument type="service" id="service_container" />                       
         </service>
 
+        <service id="transnetwork" class="ApiBundle\Library\TransNetwork" lazy="true">
+            <argument type="service" id="service_container" />                       
+        </service>
+
         <!--
         <service id="bdo" class="BackendBundle\Library\BDO\Bdo" lazy="true">            
             <argument type="service" id="service_container" />                       

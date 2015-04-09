@@ -179,7 +179,7 @@ class TransNetwork
         $param=array(
             'Username'=>'samsos',
             'Password'=>'TNC1234!',
-            'NumberOfUpdates'=>'100',           
+            'NumberOfUpdates'=>'15',           
             );
         $soap_client = new \SoapClient(
             $this->url,
@@ -198,24 +198,30 @@ class TransNetwork
         $list = $response['UpdatesList']['Updates'];
         $count=0;
         foreach ($list as $value) {   
-            if($value['Update_Code']=='1000' || $value['Update_Code']=='1001')
+            if(true || $value['Update_Code']=='1000' || $value['Update_Code']=='1001')
             {
-
-                $this->confirmUpdate($value);
-                
-                $this->log->addInfo($this->service_id, 'update', $param, $list[$count]);
-                $return = array('code' => '200',
-                            'operation'=>'notify',
-                            'message' => $list[$count]['Message'],
-                            'notify_source'=>'tb',
-                            'source'=>'transnetwork',                            
-                            'status' => 'complete' , 
-                            'change_status'=>'',                           
-                            'confirmation_number' =>$list[$count]['Update_Number']                           
-                           );
-                $this->addToQueue($return);                
+                $paramConfirm=array(
+                          "Username"=>"samsos",
+                          "Password"=>"TNC1234!",
+                          "UpdateID"=>$value['Update_Number'],
+                          "ClaimNumber"=>$value['Claim_Number']
+                    );
+                $confData=$this->confirmUpdate($paramConfirm);
+                $this->log->addInfo($this->service_id, 'queryUpdate', $param, $list[$count]);
+                if($confData->ReturnCode == '1000'){
+                    $return = array('code' => '200',
+                                'operation'=>'notify',
+                                'message' => $list[$count]['Message'],
+                                'notify_source'=>'tb',
+                                'source'=>'transnetwork',                            
+                                'status' => 'complete' , 
+                                'change_status'=>'',                           
+                                'confirmation_number' =>$list[$count]['Update_Number']                           
+                               );
+                    $this->addToQueue($return); 
+                }             
             }else{
-                $this->log->addError($this->service_id, 'update', $param, $list[$count]);
+                $this->log->addError($this->service_id, 'queryUpdate', $param, $list[$count]);
                 $return = array('code' => '400',
                             'operation'=>'notify',
                             'message' => $list[$count]['Message'],
@@ -248,10 +254,25 @@ class TransNetwork
         return $check_queue;
     }
 
-    public function confirmUpdate()
+    public function confirmUpdate($param)
     {
-        ConfirmUpdate();
+         $soap_client = new \SoapClient(
+            $this->url,
+            array(
+                "trace" => 1,
+                'exceptions' => 1,
+                'cache_wsdl' => WSDL_CACHE_NONE,)
+        );
+        $response = $soap_client->ConfirmUpdate($param);
+        $result=$response->ConfirmUpdateResult;
+        if($result->ReturnCode == '1000'){
+            $this->log->addInfo($this->service_id, 'ConfirmUpdate', $param, $result);            
+        }else{
+            $this->log->addError($this->service_id, 'ConfirmUpdate', $param, $result);
+        }
 
+        return $result;   
+        
     }
 
     /**
