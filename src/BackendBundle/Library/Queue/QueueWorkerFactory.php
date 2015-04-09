@@ -6,9 +6,27 @@ namespace BackendBundle\Library\Queue;
 use BackendBundle\Entity\OperationsQueue;
 use BackendBundle\Entity\Transactions;
 use BackendBundle\Library\Queue\Worker\IntermexWorker;
+use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * Class QueueWorkerFactory
+ * @package BackendBundle\Library\Queue
+ */
 class QueueWorkerFactory
 {
+    /**
+     * @var \Symfony\Component\DependencyInjection\Container
+     */
+    protected $container;
+
+    /**
+     * @param \Symfony\Component\DependencyInjection\Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
     /**
      * @param Transactions $transaction
      * @return QueueWorkerInterface
@@ -52,6 +70,6 @@ class QueueWorkerFactory
 
     public function forgeIntermexWorker()
     {
-        return new IntermexWorker();
+        return $this->container->get('cdex_queue_worker.intrermex');
     }
 }
