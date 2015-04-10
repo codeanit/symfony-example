@@ -1,6 +1,7 @@
 BackendBundle\Entity\Transactions:
     type: entity
     table: transactions
+    repositoryClass: BackendBundle\Entity\Repository\TransactionRepository
     id:
         id:
             type: integer
