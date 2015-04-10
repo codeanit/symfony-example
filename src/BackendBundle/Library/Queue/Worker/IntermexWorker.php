@@ -211,8 +211,12 @@ class IntermexWorker extends BaseWorker
      */
     private function sendHttpRequest($wsdlUrl, array $credentials, $action)
     {
-        $client = new \SoapClient($wsdlUrl, $credentials);
-
+        $params = [
+            'trace' => true,
+            'exception' => true,
+            'cache_wsdl' => WSDL_CACHE_NONE,
+        ];
+        $client = new \SoapClient($wsdlUrl, $params);
         $response = $client->{$action}($credentials);
 
         return $response;
