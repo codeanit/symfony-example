@@ -67,6 +67,9 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
         }
     }
 
+    /**
+     * @return array|mixed
+     */
     public function getWorkerSetting()
     {
         if (! empty($this->settings)) {
