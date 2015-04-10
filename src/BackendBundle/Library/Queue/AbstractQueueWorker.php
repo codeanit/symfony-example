@@ -4,6 +4,9 @@ namespace BackendBundle\Library\Queue;
 
 
 use BackendBundle\Entity\OperationsQueue;
+use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
  * Class AbstractQueueWorker
@@ -11,8 +14,40 @@ use BackendBundle\Entity\OperationsQueue;
  */
 abstract class AbstractQueueWorker implements QueueWorkerInterface
 {
-    protected $settings = [];
+    private $settings = [];
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected  $em;
+
+    /**
+     * @var \Symfony\Bridge\Monolog\Logger
+     */
+    protected $logger;
+
+    /**
+     * @param \Doctrine\ORM\EntityManager $em
+     */
+    public function setDoctrine(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param OperationsQueue $queue
+     * @param array $args
+     * @return mixed|void
+     * @throws \Exception
+     */
     public function processQueue(OperationsQueue $queue, $args = [])
     {
         $operation = strtolower($queue->getOperation());
@@ -34,7 +69,37 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
 
     public function getWorkerSetting()
     {
+        if (! empty($this->settings)) {
+            return $this->settings;
+        }
+        $service = $this->em->getRepository('BackendBundle:Services')
+                            ->findOneBy([
+                                'serviceName' => $this->getWorkerServiceName()
+                            ]);
 
+        if (! $service) {
+            $this->settings = [];
+        } else {
+            $this->settings = json_decode(base64_decode($service->getCredentials()), true);
+            $this->settings['service_id'] = $service->getId();
+        }
+
+        return $this->settings;
+    }
+
+    /**
+     * @param OperationsQueue $queue
+     * @return bool
+     */
+    protected function updateExecutedQueue(OperationsQueue $queue)
+    {
+        $queue->setIsExecuted(true);
+        $queue->setExecutionTimestamp(new \DateTime());
+
+        $this->em->persist($queue);
+        $this->em->flush();
+
+        return true;
     }
 
     /**
@@ -57,6 +122,12 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
      * @return mixed
      */
     abstract public function cancelTransaction(OperationsQueue $queue, $args = []);
+
+    /**
+     * @param array $arg
+     * @return mixed
+     */
+    abstract public function confirmTransaction(array $arg = []);
 
     /**
      * @return string

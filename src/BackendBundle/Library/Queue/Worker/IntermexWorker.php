@@ -7,8 +7,21 @@ use BackendBundle\Entity\OperationsQueue;
 use BackendBundle\Entity\Transactions;
 use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
 
+/**
+ * Class IntermexWorker
+ * @package BackendBundle\Library\Queue\Worker
+ */
 class IntermexWorker extends BaseWorker
 {
+    /**
+     * @param array $arg
+     * @return mixed
+     */
+    public function confirmTransaction(array $arg = [])
+    {
+        // TODO: Implement confirmTransaction() method.
+    }
+
     /**
      * @return string
      */
@@ -34,19 +47,70 @@ class IntermexWorker extends BaseWorker
      */
     public function createTransaction(OperationsQueue $queue, $args = [])
     {
-        $credentials = $this->prepareCreateCredentials($queue);
+        $settings = $this->getWorkerSetting();
+        $parameters = [];
+        $url = (isset($settings['url'])) ? $settings['url'] : false;
+        $dataPattern = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
+        $outputToSend = [
+            'operation' => 'create',
+            'message' => '' ,
+            'notify_source' => $queue->getTransactionSource(),
+            'source' => 'intermex',
+            'status' => '' ,
+            'confirmation_number' => $queue->getTransaction()->getTransactionCode(),
+        ];
+        $serverResponse = null;
 
         try {
-            $this->sendHttpRequest($credentials);
+            $parameters = $this->prepareCreateParameters($queue);
+            $response = $this->sendHttpRequest($url, $parameters, 'AltaEnvioN');
+
+            preg_match_all(
+                $dataPattern,
+                $response->AltaEnvioNResult->any, //$response_main->AltaEnvioNResult->any
+                $matches
+            );
+
+            $xmlFinal = simplexml_load_string(
+               $matches[0][0],
+               'SimpleXMLElement',
+               LIBXML_NOCDATA | LIBXML_PARSEHUGE
+            );
+
+            $serverResponse = json_encode((array) $xmlFinal);
+
+            if ($xmlFinal->NewDataSet->ENVIO->tiExito == '1') {
+                $outputToSend['message'] = 'Transaction Successfully Created.';
+                $outputToSend['status'] = 'paid';
+
+            } else {
+                $outputToSend['message'] = 'Unable to create Transaction.';
+                $outputToSend['status'] = 'failed';
+            }
+
+            $this->updateExecutedQueue($queue);
+
         } catch(\Exception $e) {
+            $this->logger->error('main', [$e->getMessage()]);
         }
+
+        $this->em->getRepository('BackendBundle:Log')
+            ->addLog(
+                $settings['service_id'],
+                'AltaEnvioN',
+                json_encode($parameters),
+                $serverResponse
+            );
+
+        return $outputToSend;
     }
 
     /**
      * @param \BackendBundle\Entity\OperationsQueue $queue
+     * @throws \Exception
      * @return array
      */
-    private function prepareCreateCredentials(OperationsQueue $queue)
+    private function prepareCreateParameters(OperationsQueue $queue)
     {
         $transaction    = $queue->getTransaction();
         $payoutId       = $transaction->getTransactionType();
@@ -59,6 +123,19 @@ class IntermexWorker extends BaseWorker
         $bankBranch     = '';
         $bankAccount    = '';
 
+        $settings = $this->getWorkerSetting();
+        $url = (isset($settings['url'])) ? $settings['url'] : false;
+        $username = (isset($settings['username'])) ? $settings['username'] : false;
+        $password = (isset($settings['password'])) ? $settings['password'] : false;
+
+        if (! $url){
+            throw new \Exception('Fatal Error :: Url not specified for the Intermex Api!!');
+        }
+
+        if (! $username or ! $password) {
+            throw new \Exception('Fatal Error :: Username or Password not specified for the Intermex Api!!');
+        }
+
         if ($payoutId == '2') {
             $isBankDeposit = 1;
             $bankBranch = $transaction->getBeneficiaryBankBranch();
@@ -66,13 +143,13 @@ class IntermexWorker extends BaseWorker
         }
 
         $credentials = [
-            'iIdAgencia'          => $this->conectar(),
+            'iIdAgencia'          => $this->conectar($url, $username, $password),
             'vReferencia'         => $transaction->getTransactionCode(),
             'dtFechaEnvio'        => $remittanceDate,
-            'iConsecutivoAgencia' => '12345678',
+            'iConsecutivoAgencia' => $transaction->getId(),
             'mMonto'              => $transaction->getPayoutAmount(),//$data['transaction']->payout_amount,
             'fTipoCambio'         => $transaction->getExchangeRate(),//$data['transaction']->exchange_rate,
-            'mMontoPago'          => '',//$data['transaction']->remitting_amount,
+            'mMontoPago'          => $transaction->getRemittingAmount(),//$data['transaction']->remitting_amount,
             'siIdDivisaPago'      => $currencyId,
             'tiIdTipoPagoEnvio'   => $payoutId,
             'vNomsRemitente'      => $transaction->getRemitterFirstName(),// $data['transaction']->remitter_first_name,
@@ -102,22 +179,47 @@ class IntermexWorker extends BaseWorker
     }
 
     /**
-     *
+     * @param $url
+     * @param $username
+     * @param $password
+     * @return mixed
+     * @throws \Exception
      */
-    private function conectar()
+    private function conectar($url, $username, $password)
     {
         $params = [
-
+            'trace' => 1,
+            'exception' => 1,
+            'cache_wsdl' => WSDL_CACHE_NONE,
         ];
+
         $client = new \SoapClient($url, $params);
+        $response = $client->Conectar([
+            'vUsuario' => $username,
+            'vPassword' => $password
+        ]);
+
+        if (! $response->ConectarResult) {
+            throw new \Exception('Internal Error :: Invalid response from "Conectar"!!');
+        }
+
+        return $response->ConectarResult;
     }
 
     /**
      * @param array $credentials
      */
-    private function sendHttpRequest(array $credentials)
+    private function sendHttpRequest($wsdlUrl, array $credentials, $action)
     {
+        $params = [
+            'trace' => true,
+            'exception' => true,
+            'cache_wsdl' => WSDL_CACHE_NONE,
+        ];
+        $client = new \SoapClient($wsdlUrl, $params);
+        $response = $client->{$action}($credentials);
 
+        return $response;
     }
 
     /**

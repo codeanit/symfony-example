@@ -1,6 +1,7 @@
 BackendBundle\Entity\Log:
     type: entity
     table: log
+    repositoryClass: BackendBundle\Entity\Repository\TransactionLogRepository
     id:
         id:
             type: integer
