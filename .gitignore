@@ -7,6 +7,8 @@ app/bootstrap.php.cache
 app/config/parameters.yml
 app/phpunit.xml.dist
 
+app/phpunit.xml
+
 /bin
 #Ignore vendor folder
 /vendor
