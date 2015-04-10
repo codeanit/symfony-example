@@ -7,7 +7,7 @@ use BackendBundle\Library\BDO\Bdo;
 
 class BdoTest extends \PHPUnit_Framework_TestCase {
 
-  public function testBDO()
+  public function testBDOPicuup()
   {
     $bdo = new Bdo();
     $data=array(
@@ -78,7 +78,9 @@ class BdoTest extends \PHPUnit_Framework_TestCase {
         "remitting_agent_city"=>"hawa city"
     ));
 
-    $bdo->pickupCash($data);
+    print_r($bdo->pickupCash($data));
+    print_r($bdo->pickupMLLhuillier($data));
+    print_r($bdo->pickupCebuana($data));
     die;
   }
 }

@@ -23,8 +23,8 @@ class Bdo
     function __construct() {
         $this->url = "https://203.177.92.217/RemittanceWSApi/RemitAPIService?wsdl";
         $this->type=array(
-            'pickup'=>array('transactionType'=>'01','payableCode'=>'BPMM'),
-            'pickupMLhullier'=>array('transactionType'=>'42','payableCode'=>'BPMM'),
+            'pickupCash'=>array('transactionType'=>'01','payableCode'=>'BPMM'),
+            'pickupMLLhuillier'=>array('transactionType'=>'42','payableCode'=>'BPMM'),
             'pickupCebuana'=>array('transactionType'=>'CL','payableCode'=>'BPMM'),
             );
     }
@@ -96,7 +96,7 @@ class Bdo
     }
 
      public function pickupCash($data=null){
-                $xml=$this->xml($data);
+                $xml=$this->xml($data ,'pickupCash');
                 //print_r($xml);die;
                 $soap_client = new \SoapClient(
                     $this->url,
@@ -106,14 +106,14 @@ class Bdo
                         'cache_wsdl' => WSDL_CACHE_NONE, )
                 );
                 $actual = $soap_client->__soapCall('PickUpCash',$xml);
-                print_r($actual);die;
-                
-                $response = json_encode((array)$actual);
+                //print_r($actual);
+                return $actual;
+                //$response = json_encode((array)$actual);
 
      
     }
     public function pickupCebuana($data=null){      
-                $xml=$this->xml($data);
+                $xml=$this->xml($data,'pickupCebuana');
                  $soap_client = new \SoapClient(
                     $this->url,
                     array(
@@ -122,10 +122,13 @@ class Bdo
                         'cache_wsdl' => WSDL_CACHE_NONE, )
                 );
                 $actual = $soap_client->__soapCall('PickUpCebuana',(array)$xml);
+                return $actual;
+                
+                print_r($actual);
         
     }
     public function pickupMLLhuillier($data=null){      
-                $xml=$this->xml($data);
+                $xml=$this->xml($data,'pickupMLLhuillier');
                  $soap_client = new \SoapClient(
                     $this->url,
                     array(
@@ -134,6 +137,10 @@ class Bdo
                         'cache_wsdl' => WSDL_CACHE_NONE, )
                 );
                 $actual = $soap_client->__soapCall('PickUpMLLhuillier',(array)$xml);
+                return $actual;
+
+                print_r($actual);
+
 
     }
     public function BdoAKRemitter($data=null){        
@@ -154,10 +161,10 @@ class Bdo
      * @param  [array] $data 
      * @return [String]       [xml string]
      */
-    public function xml($data=null){
+    public function xml($data=null,$type=null){
         //$acc=(strtolower($data['transaction']->transaction_type)=='bank')?
          //   $data['transaction']->beneficiary_account_number:'';
-
+        $methodData=$this->type[$type];
         $mainDate=explode(' ',$data['transaction']->remittance_date);
         $date=explode('-',$mainDate[0]);
         if (strtolower($data['transaction']->transaction_type)=='bank') {
@@ -197,8 +204,8 @@ class Bdo
                     'receiverAddress2'=>'',
                     'receiverMobilePhone'=>$data['transaction']->beneficiary_phone_mobile,
                     'receiverBirthDate'=>'1991-07-24',                   
-                    'transactionType'=>'01',                   
-                    'payableCode'=>'BPMM',                   
+                    'transactionType'=>$methodData['transactionType'],                   
+                    'payableCode'=>$methodData['payableCode'],                   
                     'bankCode'=>'BDO',                   
                     'branchName'=>$bankBranch,                   
                     'accountNo'=>$acc,                   
