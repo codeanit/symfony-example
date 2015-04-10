@@ -17,6 +17,7 @@ BackendBundle\Entity\OperationsQueue:
             joinColumn:
                 name: transaction_id
                 referencedColumnName: id
+                onDelete: cascade
 
     fields:
         transactionSource:

@@ -15,6 +15,15 @@ BackendBundle\Entity\Transactions:
             targetEntity: BackendBundle\Entity\OperationsQueue
             mappedBy: transaction
 
+    manyToOne:
+        parentTransaction:
+            targetEntity: BackendBundle\Entity\Transactions
+            joinColumn:
+                name: parent_id
+                nullable: true
+                referencedColumnName: id
+                onDelete: cascade
+
     fields:
         uuid:
             type: string

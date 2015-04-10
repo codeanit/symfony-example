@@ -2522,4 +2522,32 @@ class Transactions
     {
         return $this->queues;
     }
+    /**
+     * @var \BackendBundle\Entity\Transactions
+     */
+    private $parentTransaction;
+
+
+    /**
+     * Set parentTransaction
+     *
+     * @param \BackendBundle\Entity\Transactions $parentTransaction
+     * @return Transactions
+     */
+    public function setParentTransaction(\BackendBundle\Entity\Transactions $parentTransaction = null)
+    {
+        $this->parentTransaction = $parentTransaction;
+
+        return $this;
+    }
+
+    /**
+     * Get parentTransaction
+     *
+     * @return \BackendBundle\Entity\Transactions 
+     */
+    public function getParentTransaction()
+    {
+        return $this->parentTransaction;
+    }
 }
