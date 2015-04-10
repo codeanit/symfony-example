@@ -179,7 +179,7 @@ class TransNetwork
         $param=array(
             'Username'=>'samsos',
             'Password'=>'TNC1234!',
-            'NumberOfUpdates'=>'15',           
+            'NumberOfUpdates'=>'1',           
             );
         $soap_client = new \SoapClient(
             $this->url,
@@ -188,14 +188,43 @@ class TransNetwork
                 'exceptions' => 1,
                 'cache_wsdl' => WSDL_CACHE_NONE,)
         );
-        $response = $soap_client->GetUpdates($param);      
-        $extractedData =explode('</xs:schema>', $response->GetUpdatesResult->any);
+        $response = $soap_client->GetUpdates($param);
+
+        $extractedData = explode('</xs:schema>', $response->GetUpdatesResult->any);
         $xmlFinal   = simplexml_load_string(
                 $extractedData[1],
                 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
             );
+
+
         $response = json_decode(json_encode((array) $xmlFinal), true);
-        $list = $response['UpdatesList']['Updates'];
+        
+        if (array_key_exists('UpdatesList', $response))
+        {
+            $this->__processUpdatedList($response['UpdatesList']['Updates']);
+        }
+   
+        return;
+       
+    }
+    public function addToQueue($data)
+    {      
+        $conn=$this->container->get('database_connection');       
+        $queueData = array(
+                            'transaction_source' => 'cdex',
+                            'transaction_service' => 'tb',
+                            'operation' => 'notify', 
+                            'parameter' => json_encode($data),
+                            'is_executed' => 0,
+                            'creation_datetime' => date('Y-m-d H:i:s')
+                          );
+       
+        $check_queue = $conn->insert('operations_queue', $queueData);
+        return $check_queue;
+    }
+    
+    private function __processUpdatedList($list)
+    {
         $count=0;
         foreach ($list as $value) {   
             if(true || $value['Update_Code']=='1000' || $value['Update_Code']=='1001')
@@ -207,7 +236,9 @@ class TransNetwork
                           "ClaimNumber"=>$value['Claim_Number']
                     );
                 $confData=$this->confirmUpdate($paramConfirm);
+
                 $this->log->addInfo($this->service_id, 'queryUpdate', $param, $list[$count]);
+                
                 if($confData->ReturnCode == '1000'){
                     $return = array('code' => '200',
                                 'operation'=>'notify',
@@ -234,24 +265,7 @@ class TransNetwork
                 $this->addToQueue($return);
             }
             $count++;
-        }    
-        return ;
-       
-    }
-    public function addToQueue($data)
-    {      
-        $conn=$this->container->get('database_connection');       
-        $queueData = array(
-                            'transaction_source' => 'cdex',
-                            'transaction_service' => 'tb',
-                            'operation' => 'notify', 
-                            'parameter' => json_encode($data),
-                            'is_executed' => 0,
-                            'creation_datetime' => date('Y-m-d H:i:s')
-                          );
-       
-        $check_queue = $conn->insert('operations_queue', $queueData);
-        return $check_queue;
+        } 
     }
 
     public function confirmUpdate($param)
@@ -272,7 +286,7 @@ class TransNetwork
         }
 
         return $result;   
-        
+      
     }
 
     /**
