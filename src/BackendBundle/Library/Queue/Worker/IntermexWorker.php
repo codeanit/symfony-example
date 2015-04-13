@@ -241,4 +241,15 @@ class IntermexWorker extends BaseWorker
     {
         // TODO: Implement cancelTransaction() method.
     }
+
+    /**
+     * @param OperationsQueue $queue
+     * @param array $args
+     * @return mixed
+     */
+    public function changeTransaction(OperationsQueue $queue, $args = [])
+    {
+        echo 'Changing Transactions!!', PHP_EOL;
+        // TODO: Implement changeTransaction() method.
+    }
 }
