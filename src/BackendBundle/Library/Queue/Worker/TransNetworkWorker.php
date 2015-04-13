@@ -51,4 +51,31 @@ class TransNetworkWorker extends BaseWorker
     {
         // TODO: Implement cancelTransaction() method.
     }
-} 
+
+    /**
+     * @param OperationsQueue $queue
+     * @param array $args
+     * @return mixed
+     */
+    public function changeTransaction(OperationsQueue $queue, $args = [])
+    {
+        // TODO: Implement changeTransaction() method.
+    }
+
+    /**
+     * @param array $arg
+     * @return mixed
+     */
+    public function confirmTransaction(array $arg = [])
+    {
+        // TODO: Implement confirmTransaction() method.
+    }
+
+    /**
+     * @return string
+     */
+    protected function getWorkerServiceName()
+    {
+        return 'transnetwork';
+    }
+}

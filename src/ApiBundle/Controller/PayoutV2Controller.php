@@ -2,12 +2,14 @@
 
 namespace ApiBundle\Controller;
 
+use BackendBundle\Entity\Transactions;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -35,6 +37,7 @@ class PayoutV2Controller extends Controller
             'processing_status'=> $request->get('processing_status', 'hold'),
             'created_at'=> date('Y-m-d H:i:s'),
             'uuid' => $uuid,
+            'queue_operation' => Transactions::QUEUE_OPERATION_CREATE,
         ], $transactionData);
 
         $logger = $this->get('logger');
@@ -64,11 +67,66 @@ class PayoutV2Controller extends Controller
         ];
     }
 
+    public function postChangesAction(Request $request)
+    {
+        $status = '';
+        $statusCode = '';
+        $message = '';
+        $data = [];
+
+        $uuid = $request->get('transaction_uuid');
+        $transactionData = $request->get('transaction');
+
+        try {
+            if (! $uuid) {
+                throw new \Exception('Fatal Error :: UUID not found.');
+            }
+            $txn = $this->findTransactionByTransactionId($uuid);
+
+            if (! $txn) {
+                throw new \Exception("Fatal Error :: Transaction with id '{$uuid}' not found!!");
+            }
+            $parentId = $txn['id'];
+            unset($txn['id']);
+            unset($txn['uuid']);
+            $transactionData = array_merge($txn, $transactionData, [
+                'source_transaction_id'=> mt_rand(1, 9999999),
+                'transaction_source'=> $request->get('source'), //isset($data['source'])?$data['source']:'',
+                'transaction_service'=> $request->get('service'), //isset($data['service'])?$data['service']:'',
+                'processing_status'=> $request->get('processing_status', 'hold'),
+                'created_at'=> date('Y-m-d H:i:s'),
+                'queue_operation' => Transactions::QUEUE_OPERATION_CHANGE,
+                'parent_id' => $parentId,
+            ]);
+
+            if (! $this->createTransaction($transactionData)) {
+                throw new \Exception('Fatal Error :: Unable to create new Transaction.');
+            }
+
+            $status = 'Ok';
+            $statusCode = 200;
+            $message = 'Transaction Successfully Created.';
+            $data['transaction_uuid'] = $uuid;
+
+        } catch(\Exception $e) {
+            $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $status = 'Failed';
+            $message = $e->getMessage();
+        }
+
+        return [
+            'status' => $status,
+            'status_code' => $statusCode,
+            'message' => $message,
+            'data' => $data,
+        ];
+    }
+
     /**
      * @param Request $request
      * @return array
      */
-    public function postModifyAction(Request $request)
+    public function postCancelAction(Request $request)
     {
         $status = 'Failed';
         $statusCode = 500;
@@ -78,17 +136,14 @@ class PayoutV2Controller extends Controller
         $responseData = [];
 
         try {
-
-
             $postData = array_merge([
                 'source_transaction_id'=> mt_rand(1, 9999999),
                 'transaction_source'=> $request->get('source'), //isset($data['source'])?$data['source']:'',
                 'transaction_service'=> $request->get('service'), //isset($data['service'])?$data['service']:'',
                 'processing_status'=> $request->get('processing_status', 'hold'),
                 'created_at'=> date('Y-m-d H:i:s'),
-
+                'queue_operation' => Transactions::QUEUE_OPERATION_CANCEL
             ], $postData);
-//            $postData['action'] = 'modify';
 
             if (! $this->createTransaction($postData)) {
                 throw new \Exception('Fatal Error :: Unable to create new Transaction.');
@@ -130,5 +185,23 @@ class PayoutV2Controller extends Controller
                         ->fetchColumn();
 
         return $uuid;
+    }
+
+    /**
+     * @param $transactionUuid
+     * @return mixed
+     */
+    private function findTransactionByTransactionId($transactionUuid)
+    {
+        $qb = $this->get('doctrine.dbal.default_connection')
+                    ->createQueryBuilder()
+                    ->select('*')
+                    ->from('transactions', 't')
+                    ->where('t.uuid = :txnuuid')
+                    ->andWhere('t.parent_id IS NULL')
+                    ->setParameter('txnuuid', $transactionUuid)
+        ;
+
+        return $qb->execute()->fetch();
     }
 }

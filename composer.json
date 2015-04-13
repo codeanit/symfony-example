@@ -26,7 +26,8 @@
         "phpunit/phpunit": "4.1.*"
     },
     "require-dev": {
-        "sensio/generator-bundle": "~2.3"
+        "sensio/generator-bundle": "~2.3",
+        "guzzlehttp/guzzle": "5.0.*@dev"
     },
     "scripts": {
         "post-root-package-install": [

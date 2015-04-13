@@ -56,8 +56,8 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
             case 'create':
                 return $this->createTransaction($queue, $args);
 
-            case 'modify':
-                return $this->modifyTransaction($queue, $args);
+            case 'change':
+                return $this->changeTransaction($queue, $args);
 
             case 'cancel':
                 return $this->cancelTransaction($queue, $args);
@@ -67,6 +67,9 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
         }
     }
 
+    /**
+     * @return array|mixed
+     */
     public function getWorkerSetting()
     {
         if (! empty($this->settings)) {
@@ -114,7 +117,7 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
      * @param array $args
      * @return mixed
      */
-    abstract public function modifyTransaction(OperationsQueue $queue, $args = []);
+    abstract public function changeTransaction(OperationsQueue $queue, $args = []);
 
     /**
      * @param OperationsQueue $queue

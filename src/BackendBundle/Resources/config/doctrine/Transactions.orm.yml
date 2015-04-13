@@ -1,6 +1,7 @@
 BackendBundle\Entity\Transactions:
     type: entity
     table: transactions
+    repositoryClass: BackendBundle\Entity\Repository\TransactionRepository
     id:
         id:
             type: integer
@@ -14,6 +15,15 @@ BackendBundle\Entity\Transactions:
         queues:
             targetEntity: BackendBundle\Entity\OperationsQueue
             mappedBy: transaction
+
+    manyToOne:
+        parentTransaction:
+            targetEntity: BackendBundle\Entity\Transactions
+            joinColumn:
+                name: parent_id
+                nullable: true
+                referencedColumnName: id
+                onDelete: cascade
 
     fields:
         uuid:

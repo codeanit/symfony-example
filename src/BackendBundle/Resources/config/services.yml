@@ -8,12 +8,12 @@ services:
 
     cdex_queue_worker_factory:
         class: BackendBundle\Library\Queue\QueueWorkerFactory
-        arguments: ["@service_container"]
+        arguments: [@service_container]
         lazy: true
 
     cdex_queue_manager:
         class: BackendBundle\Library\Queue\QueueManager
-        arguments: ["@doctrine.orm.entity_manager", "@logger", "@cdex_queue_worker_factory"]
+        arguments: [@doctrine.orm.entity_manager, @logger, @cdex_queue_worker_factory]
 
     cdex_queue_worker.intrermex:
         class: BackendBundle\Library\Queue\Worker\IntermexWorker
