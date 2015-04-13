@@ -7,6 +7,9 @@
  */
 namespace BackendBundle\Library\BDO;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+
 
 /**
  * Class Bdo
@@ -16,11 +19,21 @@ class Bdo
 {   
     private $url;
     private $type;
+    private $container;
+    private $log;
 
     /**
      * [__construct description]
      */
-    function __construct() {
+    function __construct(ContainerInterface $container) {
+        $this->container = $container;
+        $this->log=$this->container->get('log');      
+        $connection=$this->container->get('connection');  
+        $result=$connection->getCred('bdo');
+        $this->database = json_decode(base64_decode($result[0]['credentials']));        
+        // $this->url=$this->database->url;        
+        $this->service_id=$result[0]['id'];
+
         $this->url = "https://203.177.92.217/RemittanceWSApi/RemitAPIService?wsdl";
         $this->type=array(
             'pickupCash'=>array('transactionType'=>'01','payableCode'=>'BPMM'),
@@ -96,8 +109,7 @@ class Bdo
     }
 
      public function pickupCash($data=null){
-                $xml=$this->xml($data ,'pickupCash');
-                //print_r($xml);die;
+                $xml=$this->xml($data ,'pickupCash');              
                 $soap_client = new \SoapClient(
                     $this->url,
                     array(
@@ -106,9 +118,14 @@ class Bdo
                         'cache_wsdl' => WSDL_CACHE_NONE, )
                 );
                 $actual = $soap_client->__soapCall('PickUpCash',$xml);
-                //print_r($actual);
+                if($actual->responseCode=='00' || $actual->responseCode=='0'){
+                    $this->log->addInfo($this->service_id, 'pickupCash', $xml, $actual);
+                }else{
+                    $this->log->addError($this->service_id, 'pickupCash', $xml, $actual);                    
+                }
+
                 return $actual;
-                //$response = json_encode((array)$actual);
+               
 
      
     }
@@ -122,9 +139,14 @@ class Bdo
                         'cache_wsdl' => WSDL_CACHE_NONE, )
                 );
                 $actual = $soap_client->__soapCall('PickUpCebuana',(array)$xml);
+                if($actual->responseCode=='00' || $actual->responseCode=='0'){
+                    $this->log->addInfo($this->service_id, 'pickupCebuana', $xml, $actual);
+                }else{
+                    $this->log->addError($this->service_id, 'pickupCebuana', $xml, $actual);                    
+                }
+
                 return $actual;
-                
-                print_r($actual);
+              
         
     }
     public function pickupMLLhuillier($data=null){      
@@ -137,10 +159,13 @@ class Bdo
                         'cache_wsdl' => WSDL_CACHE_NONE, )
                 );
                 $actual = $soap_client->__soapCall('PickUpMLLhuillier',(array)$xml);
+                if($actual->responseCode=='00' || $actual->responseCode=='0'){
+                    $this->log->addInfo($this->service_id, 'pickupMLLhuillier', $xml, $actual);
+                }else{
+                    $this->log->addError($this->service_id, 'pickupMLLhuillier', $xml, $actual);                    
+                }
+
                 return $actual;
-
-                print_r($actual);
-
 
     }
     public function BdoAKRemitter($data=null){        
@@ -153,6 +178,7 @@ class Bdo
                         'cache_wsdl' => WSDL_CACHE_NONE, )
                 );
                 $actual = $soap_client->__soapCall('BDOAKRemitter',(array)$xml);
+                return $actual;               
 
     }
 
@@ -210,10 +236,11 @@ class Bdo
                     'branchName'=>$bankBranch,                   
                     'accountNo'=>$acc,                   
                     'landedCurrency'=>$data['transaction']->payout_currency,                   
+                    'landedAmount'=>$data['transaction']->payout_amount,                   
                     'messageToBene1'=>'messsage',                   
                     'messageToBene2'=>'message',                   
                      );
-                
+                print_r($wsdl);
             return $wsdl;
 
     } 

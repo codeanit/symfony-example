@@ -3,13 +3,23 @@ namespace BackendBundle\Tests\Unit;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use BackendBundle\Library\BDO\Bdo;
-//use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class BdoTest extends \PHPUnit_Framework_TestCase {
+class BdoTest extends WebTestCase {
+
+  private $bdo; 
+  private $container;
+  
+  public function __construct() 
+  {
+    $client = $this->createClient(); 
+    $this->container = $client->getContainer();
+    $this->bdo=$this->container->get('bdo');
+  }
 
   public function testBDOPicuup()
   {
-    $bdo = new Bdo();
+    // $bdo = new Bdo();
     $data=array(
     "source"=> "tb",
     "service"=> "bdo",
@@ -46,10 +56,11 @@ class BdoTest extends \PHPUnit_Framework_TestCase {
         "beneficiary_id_issued_date"=>"",
         "beneficiary_id_expiry_date"=>"",
         "payout_agent_id"=>"321",
-        "payout_agent_name"=>"Bibek Baucha",
+        "payout_agent_name"=>"MLA",
         "payout_agent_country"=>"USA",
         "payout_agent_state"=>"NY",
         "payout_agent_city"=>"flo rida",
+        "payout_payer_name"=>"BDO",
         "remitter_first_name"=> "Visha",
         "remitter_middle_name"=> "Bharati",
         "remitter_last_name"=> "Shanghvi",
@@ -77,10 +88,10 @@ class BdoTest extends \PHPUnit_Framework_TestCase {
         "remitting_agent_state"=>"CA",
         "remitting_agent_city"=>"hawa city"
     ));
-
-    print_r($bdo->pickupCash($data));
-    print_r($bdo->pickupMLLhuillier($data));
-    print_r($bdo->pickupCebuana($data));
+    
+    print_r($this->bdo->pickupCash($data));
+    print_r($this->bdo->pickupMLLhuillier($data));
+    print_r($this->bdo->pickupCebuana($data));
     die;
   }
 }
