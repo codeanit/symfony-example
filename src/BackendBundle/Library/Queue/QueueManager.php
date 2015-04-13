@@ -93,13 +93,7 @@ class QueueManager
     {
         $counter = 0;
         $transactions = $this->em->getRepository('BackendBundle:Transactions')
-                        ->findBy([
-                            'queueOperation' => [
-                                Transactions::QUEUE_OPERATION_CANCEL,
-                                Transactions::QUEUE_OPERATION_CHANGE,
-                                Transactions::QUEUE_OPERATION_CREATE
-                            ]
-                        ]);
+                        ->getTransactionsToEnqueue();
 
 
         $_queue = new OperationsQueue();
