@@ -42,7 +42,7 @@ The <info>%command.name%</info> command enqueue CDEX TXN to queue
 
     The optional argument specifies what operation:
 
-<info>php %command.full_name%</info> [enqueue|process|both]
+<info>php %command.full_name%</info> [enqueue|execute|both]
 EOF
             );
     }
