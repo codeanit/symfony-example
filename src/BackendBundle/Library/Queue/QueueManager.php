@@ -97,27 +97,29 @@ class QueueManager
 
 
         $_queue = new OperationsQueue();
-        foreach ($transactions as $transaction) {
-            $queue = clone $_queue;
-
-            $queue->setTransactionSource($transaction->getTransactionSource());
-            $queue->setTransactionService($transaction->getTransactionService());
-            $queue->setOperation($transaction->getQueueOperation());
-            $queue->setCreationDatetime(new \DateTime());
-            $queue->setTransaction($transaction);
-
-            $transaction->setQueueOperation(Transactions::QUEUE_OPERATION_ENQUEUE);
-
-            $this->em->persist($transaction);
-            $this->em->persist($queue);
-            ++$counter;
-        }
 
         try {
+            foreach ($transactions as $transaction) {
+                $queue = clone $_queue;
+
+                $queue->setTransactionSource($transaction->getTransactionSource());
+                $queue->setTransactionService($transaction->getTransactionService());
+                $queue->setOperation($transaction->getQueueOperation());
+                $queue->setCreationDatetime(new \DateTime());
+                $queue->setTransaction($transaction);
+
+                $transaction->setQueueOperation(Transactions::QUEUE_OPERATION_ENQUEUE);
+
+                $this->em->persist($transaction);
+                $this->em->persist($queue);
+                ++$counter;
+            }
+
+
             $this->em->flush();
             $this->em->clear();
         } catch(\Exception $e) {
-            $this->logger->error('TRANSACTION_ENQUEUE_ERROR', [$e->getMessage()]);
+            $this->logger->error('TRANSACTION_ENQUEUE_ERROR', [$e->getMessage(), $e->getFile(), $e->getLine()]);
             $counter = 0;
         }
 
