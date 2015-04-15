@@ -86,6 +86,11 @@ class PayoutV2Controller extends Controller
             if (! $txn) {
                 throw new \Exception("Fatal Error :: Transaction with id '{$uuid}' not found!!");
             }
+
+            if ($this->isCancelRequestRegistered($txn['id'])) {
+                throw new \Exception("Fatal Error :: Transaction with id '{$uuid}' already queued for Cancellation!!");
+            }
+
             $parentId = $txn['id'];
             unset($txn['id']);
             unset($txn['uuid']);
@@ -203,5 +208,24 @@ class PayoutV2Controller extends Controller
         ;
 
         return $qb->execute()->fetch();
+    }
+
+    /**
+     * @param $transactionId
+     * @return mixed
+     */
+    private function isCancelRequestRegistered($transactionId)
+    {
+        $qb = $this->get('doctrine.dbal.default_connection')
+            ->createQueryBuilder()
+            ->select('count(id)')
+            ->from('transactions', 't')
+            ->where('t.parent_id = :txnId')
+            ->andWhere('t.queue_operation = :statusCancelled')
+            ->setParameter('statusCancelled', Transactions::QUEUE_OPERATION_CANCEL)
+            ->setParameter('txnId', $transactionId)
+        ;
+
+        return $qb->execute()->fetchColumn();
     }
 }
