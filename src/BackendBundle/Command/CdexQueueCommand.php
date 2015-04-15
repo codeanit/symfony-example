@@ -27,7 +27,7 @@ class CdexQueueCommand extends ContainerAwareCommand
         $this
             ->setName('cdex:queue')
             ->setDescription('Enqueue CDEX Transactions.')
-            ->addArgument('operation', InputArgument::OPTIONAL, 'What operation.', 'both')
+            ->addArgument('operation', InputArgument::OPTIONAL, 'What operation.', '')
 /*
     <info>php %command.full_name%</info>
 
@@ -70,6 +70,11 @@ EOF
                 $queuedTxn = $queueManager->enqueueAll();
                 $processedTxn = (int) $queueManager->processAll();
                 break;
+
+            case 'confirm':
+                $queuedTxn = $queueManager->confirmTransactionStatus();
+                break;
+
 
             default:
                 $output->writeln('<error>Invalid Operation "' . $operation . '".</error>');

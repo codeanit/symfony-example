@@ -17,9 +17,9 @@ class IntermexWorker extends BaseWorker
      * @param array $arg
      * @return mixed
      */
-    public function confirmTransaction(array $arg = [])
+    public function confirmTransaction()
     {
-        // TODO: Implement confirmTransaction() method.
+        echo 1234; die;
     }
 
     /**
