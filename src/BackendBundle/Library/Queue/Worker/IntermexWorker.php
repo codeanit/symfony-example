@@ -19,6 +19,11 @@ class IntermexWorker extends BaseWorker
         $this->url='http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl';
     }
     /**
+     * @var \JMS\Serializer\Serializer
+     */
+    protected $serializer;
+
+    /**
      * @param array $arg
      * @return mixed
      */
@@ -423,8 +428,8 @@ class IntermexWorker extends BaseWorker
     private function conectar($url, $username, $password)
     {        
         $params = [
-            'trace' => 1,
-            'exception' => 1,
+            'trace' => true,
+            'exception' => true,
             'cache_wsdl' => WSDL_CACHE_NONE,
         ];
 
@@ -462,19 +467,80 @@ class IntermexWorker extends BaseWorker
      * @param array $args
      * @return mixed
      */
-    public function modifyTransaction(OperationsQueue $queue, $args = [])
-    {
-        // TODO: Implement modifyTransaction() method.
-    }
-
-    /**
-     * @param OperationsQueue $queue
-     * @param array $args
-     * @return mixed
-     */
     public function cancelTransaction(OperationsQueue $queue, $args = [])
     {
-        // TODO: Implement cancelTransaction() method.
+        $url                    = $this->getWorkerSetting('url');
+        $username               = $this->getWorkerSetting('username');
+        $password               = $this->getWorkerSetting('password');
+        $parameters             = [];
+        $webServiceResponse     = [];
+        $transaction            = $queue->getTransaction();
+        $dataPattern            = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
+        $cancellationMotivation = 'Cancelled from TB.';
+
+        $outputMessage = '';
+        $outputStatus = 'Failed';
+        $outputStatusCode = 500;
+        $outputData = [];
+
+        try {
+            if (! $transaction or ! $transaction->getTransactionCode()) {
+                throw new \Exception('Fatal Error :: Unable to find Transaction!!');
+            }
+
+            $parameters = [
+                'iIdAgencia' => $this->conectar($url, $username, $password),
+                'vReferencia' => $transaction->getTransactionCode(),
+                'vMotivoModificacion' => $cancellationMotivation,
+            ];
+            $response = $this->sendHttpRequest($url, $parameters, 'AnulaEnvio');
+
+            preg_match_all(
+                $dataPattern,
+                $response->AltaEnvioNResult->any, //$response_main->AltaEnvioNResult->any
+                $matches
+            );
+
+            $webServiceResponse = simplexml_load_string(
+               $matches[0][0],
+               'SimpleXMLElement',
+               LIBXML_NOCDATA | LIBXML_PARSEHUGE
+            );
+
+            if (! property_exists($webServiceResponse, 'DocumentElement') or
+                ! property_exists($webServiceResponse->DocumentElement, 'RESP')) {
+                throw new \Exception('Fatal Error :: Unexpected error encountered');
+            }
+
+            if ($webServiceResponse->DocumentElement->RESP->tiExito != 1) {
+                throw new \Exception('Fatal Error :: Request not successful!!');
+            }
+
+            $outputStatus     = 'Ok';
+            $outputMessage    = 'Success!! Transaction successfully sent for Cancellation.';
+            $outputStatusCode = 200;
+            $outputData['confirmation_number'] = $transaction->getTransactionCode();
+
+        } catch(\Exception $e) {
+            $outputData['debug'][] = [$e->getMessage(), $e->getFile(), $e->getLine()];
+            $this->logger->addError('INTERMEX_CANCEL_ERROR', [$e->getTraceAsString()]);
+        }
+
+        $this->em->getRepository('BackendBundle:Log')
+                    ->addLog(
+                        $this->getWorkerSetting('service_id'),
+                        'AnulaEnvio',
+                        json_encode($parameters),
+                        json_encode($webServiceResponse),
+                        $outputStatus
+                    );
+
+        return [
+            'message'     => $outputMessage,
+            'status'      => $outputStatus,
+            'status_code' => $outputStatusCode,
+            'data'        => $outputData
+        ];
     }
 
     /**
@@ -484,7 +550,42 @@ class IntermexWorker extends BaseWorker
      */
     public function changeTransaction(OperationsQueue $queue, $args = [])
     {
-        echo 'Changing Transactions!!', PHP_EOL;
-        // TODO: Implement changeTransaction() method.
+        $transaction = $queue->getTransaction();
+        $parentTransaction = $transaction->getParentTransaction();
+        $fieldsOfIntrest = [
+            'beneficiary_first_name',
+            'remitter_first_name',
+            'beneficiary_phone_mobile',
+        ];
+
+        $differences = $this->findTransactionDifferences($parentTransaction, $transaction);
+
+        dump($differences);
+    }
+
+
+    public function setSerializer($serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
+    /**
+     * @param Transactions $baseTxn
+     * @param Transactions $newTxn
+     * @return array
+     */
+    private function findTransactionDifferences(Transactions $baseTxn, Transactions $newTxn)
+    {
+        $newTxnDump = $this->serializer->serialize($newTxn, 'json');
+        $newTxnDump = json_decode($newTxnDump, true);
+        $baseTxnDump = $this->serializer->serialize($baseTxn, 'json');
+        $baseTxnDump = json_decode($baseTxnDump, true);
+
+        unset($newTxnDump['parent_transaction']);
+        unset($baseTxnDump['parent_transaction']);
+        unset($newTxnDump['queues']);
+        unset($baseTxnDump['queues']);
+
+        return array_diff_assoc($newTxnDump, $baseTxnDump);
     }
 }

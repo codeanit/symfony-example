@@ -134,7 +134,9 @@ class QueueManager
     {
         $counter = 0;
         $queues = $this->em->getRepository('BackendBundle:OperationsQueue')
-                    ->findAll();
+                    ->findBy([
+                        'isExecuted' => false
+                    ]);
 
 
         foreach ($queues as $queue) {
