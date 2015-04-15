@@ -47,7 +47,7 @@ class QueueManager
      * @return bool
      */
     public function enqueue(Transactions $transaction, $isBulk = false)
-    {
+    {   echo 11; die;
         $queue = new OperationsQueue();
         $flag = false;
 

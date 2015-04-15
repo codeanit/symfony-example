@@ -72,4 +72,9 @@ class QueueWorkerFactory
     {
         return $this->container->get('cdex_queue_worker.intrermex');
     }
+
+    public function forgeBdoWorker()
+    {
+        return $this->container->get('cdex_queue_worker.bdo');
+    }
 }
