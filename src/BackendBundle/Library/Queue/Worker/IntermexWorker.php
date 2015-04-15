@@ -13,13 +13,19 @@ use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
  */
 class IntermexWorker extends BaseWorker
 {
+    private $url;
+
+    public function __construct(){
+        $this->url='http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl';
+    }
     /**
      * @param array $arg
      * @return mixed
      */
     public function confirmTransaction()
     {
-        echo 1234; die;
+        $this->consultaCambios();
+        $this->consultaPagados();
     }
 
     /**
@@ -38,6 +44,235 @@ class IntermexWorker extends BaseWorker
     public function enqueueTransaction(Transactions $transaction, $args = [])
     {
         // TODO: Implement enqueueTransaction() method.
+    }
+    /**
+     * Method for consulting paid remittances today.
+     *
+     * @return void
+     */
+    public function consultaPagados()
+    {      
+      $iIdAgencia=$this->conectar(
+                'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
+                '308901',
+                'ixrue308901p'
+                );
+      $param=array('iIdAgencia'=>$iIdAgencia);
+      $soap_client = new \SoapClient(
+                    $this->url,
+                    array(
+                        "trace" => 1,
+                        'exceptions' => 1,
+                        'cache_wsdl' => WSDL_CACHE_NONE,)
+                );
+      $response_main = $soap_client->ConsultaPagados($param);
+      $extractedData =explode('</xs:schema>',$response_main->ConsultaPagadosResult->any);
+      $xmlFinal   = simplexml_load_string(
+            $extractedData[1],
+            'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
+        );
+      $response = json_decode(json_encode((array) $xmlFinal), true);
+      // print_r($response);die;
+      if (isset($response['NewDataSet']['PAGADOS'])) {
+        $output=(object) $response['NewDataSet']['PAGADOS'];
+        // foreach ($output as $key => $value) { 
+          if($output->iIdTipoError == '0'){          
+            $confirmResult=$this->confirmaPagado($output->vReferencia,$output->iConsecutivoAgencia);
+            if($confirmResult->iIdTipoError=='1'){
+              //@TODO notify TB queue prepare
+            }            
+          }          
+        $this->em->getRepository('BackendBundle:Log')
+         ->addLog(
+            $this->getWorkerSetting('service_id'),
+            'consultaPagados',
+            json_encode($param),
+            $response_main
+        );
+
+          
+        // }// end of foreach
+        
+      } else {
+        $this->em->getRepository('BackendBundle:Log')
+             ->addLog(
+                $this->getWorkerSetting('service_id'),
+                'consultaPagados',
+                json_encode($param),
+                'No paid remittance today from this iIdAgencia'
+            );            
+      }
+      return;    
+    }
+
+    /**
+     * Method for confirming paid remittances.
+     *
+     * @param  varchar $vReferencia         [reference number of txn]
+     * @param  varchar $iConsecutivoAgencia [Remittances consecutive number]
+     * @return void
+     */
+    public function confirmaPagado($vReferencia=null,$iConsecutivoAgencia=null)
+    {        
+        $iIdAgencia=$this->conectar(
+                'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
+                '308901',
+                'ixrue308901p'
+                );
+        $param=array('iIdAgencia'=>$iIdAgencia,'vReferencia'=>$vReferencia,'iConsecutivoAgencia'=>$iConsecutivoAgencia);
+        $soap_client = new \SoapClient(
+                    $this->url,
+                    array(
+                          "trace" => 1,
+                          'exceptions' => 1,
+                          'cache_wsdl' => WSDL_CACHE_NONE,)
+                         );
+      $response_main = $soap_client->ConfirmaPagado($param);
+      $extractedData =explode('</xs:schema>',$response_main->ConfirmaPagadoResult->any);
+      $xmlFinal   = simplexml_load_string(
+            $extractedData[1],
+            'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
+        );
+      $response = json_decode(json_encode((array) $xmlFinal), true);
+      if (isset($response['NewDataSet']['CONFIRMADOS'])) {
+        $output=(object) $response['NewDataSet']['CONFIRMADOS'];       
+        $this->em->getRepository('BackendBundle:Log')
+             ->addLog(
+                $this->getWorkerSetting('service_id'),
+                'consultaPagados',
+                json_encode($param),
+                $response_main
+        );       
+      } else {
+        $this->em->getRepository('BackendBundle:Log')
+             ->addLog(
+                $this->getWorkerSetting('service_id'),
+                'consultaPagados',
+                json_encode($param),
+                'No Confirmation Paid Remittance Available'
+        );   
+      }
+      return $output;
+    }
+
+    /**
+     * Method to show the changes already made
+     *
+     * @return void
+     */
+    public function consultaCambios()
+    {      
+      $iIdAgencia=$this->conectar(
+                'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
+                '308901',
+                'ixrue308901p'
+                );
+      $param=array('iIdAgencia'=>$iIdAgencia);
+      $soap_client = new \SoapClient(
+                    $this->url,
+                    array(
+                        "trace" => 1,
+                        'exceptions' => 1,
+                        'cache_wsdl' => WSDL_CACHE_NONE,)
+                );
+      $response_main = $soap_client->ConsultaCambios($param);
+      $extractedData =explode('</xs:schema>',$response_main->ConsultaCambiosResult->any);
+      $xmlFinal   = simplexml_load_string(
+            $extractedData[1],
+            'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
+        );
+      $response = json_decode(json_encode((array) $xmlFinal), true);
+      if (isset($response['NewDataSet']['CAMBIOS'])) {
+        $output=$response['NewDataSet']['CAMBIOS'];
+        foreach ($output as $key => $value) {  
+           //@TODO nofity queue generate    
+           $data=$this->confirmaCambio(
+                                      $value['iIdOrden'],
+                                      $value['tiIdTipoOrden'],
+                                      $value['vReferencia']
+                                      );
+      
+            $this->em->getRepository('BackendBundle:Log')
+             ->addLog(
+                $this->getWorkerSetting('service_id'),
+                'consultaCambios',
+                json_encode($param),
+                $data
+            );      
+        }    
+      } else {
+         $this->em->getRepository('BackendBundle:Log')
+            ->addLog(
+                $this->getWorkerSetting('service_id'),
+                'consultaCambios',
+                json_encode($param),
+                'No paid remittance today from this iIdAgencia'
+            );     
+      }
+      return;
+    }
+
+    /**
+     * Method to Confirm a change requested
+     *
+     * @return void
+     */
+    public function confirmaCambio($iIdOrden=null,$id=null,$ref=null)
+    {
+      $type = array(
+                  '5'=>'Receiver Name change',
+                  '6'=>'Sender Name change',
+                  '7'=>'Receiver phone Number change',
+                  '10'=>'remittance Cancellation',
+                  );
+      $iIdAgencia=$this->conectar(
+                'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
+                '308901',
+                'ixrue308901p'
+                );
+      $param=array('iIdAgencia'=>$iIdAgencia,'iIdOrden'=>$iIdOrden);
+      $soap_client = new \SoapClient(
+                    $this->url,
+                    array(
+                        "trace" => 1,
+                        'exceptions' => 1,
+                        'cache_wsdl' => WSDL_CACHE_NONE,)
+                );
+      $response_main = $soap_client->ConfirmaCambio($param);
+      $extractedData =explode('</xs:schema>',$response_main->ConfirmaCambioResult->any);
+      $xmlFinal   = simplexml_load_string(
+            $extractedData[1],
+            'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
+        );
+      $response = json_decode(json_encode((array) $xmlFinal), true);
+      if (isset($response['NewDataSet']['CONFIRMADOS'])) {
+        $output=$response['NewDataSet']['CONFIRMADOS'];
+        if ($output['tiExito']=='1') {
+            $arr=array(
+                      'code'=>'200',
+                      'confirmation_number'=>$ref,
+                      'iIdOrden'=>$iIdOrden,
+                      'msg'=>$type[$id].' Successful'
+                      );
+            $this->addToQueue($arr);            
+        } else {
+            $arr=array(
+                      'code'=>'400',
+                      'confirmation_number'=>$ref,
+                      'iIdOrden'=>$iIdOrden,
+                      'msg'=>$type[$id].' Failed'
+                      );
+        }
+      } else {
+        $arr=array(
+                  'code'=>'400',
+                  'confirmation_number'=>$ref,
+                  'iIdOrden'=>$iIdOrden,
+                  'msg'=>$type[$id].' Failed'
+                  );
+      }
+
+      return $arr;
     }
 
     /**
@@ -186,7 +421,7 @@ class IntermexWorker extends BaseWorker
      * @throws \Exception
      */
     private function conectar($url, $username, $password)
-    {
+    {        
         $params = [
             'trace' => 1,
             'exception' => 1,
