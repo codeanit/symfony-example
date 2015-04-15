@@ -67,6 +67,10 @@ class PayoutV2Controller extends Controller
         ];
     }
 
+    /**
+     * @param Request $request
+     * @return array
+     */
     public function postChangesAction(Request $request)
     {
         $status = '';
@@ -137,21 +141,40 @@ class PayoutV2Controller extends Controller
         $statusCode = 500;
         $message = 'Unable to modify the Transaction.';
         $debug = [];
-        $postData = [];
         $responseData = [];
 
+        $uuid = $request->get('transaction_uuid');
+        $transactionData = $request->get('transaction');
+
         try {
-            $postData = array_merge([
+            if (! $uuid) {
+                throw new \Exception('Fatal Error :: UUID not found.');
+            }
+            $txn = $this->findTransactionByTransactionId($uuid);
+
+            if (! $txn) {
+                throw new \Exception("Fatal Error :: Transaction with id '{$uuid}' not found!!");
+            }
+
+            if ($this->isCancelRequestRegistered($txn['id'])) {
+                throw new \Exception("Fatal Error :: Transaction with id '{$uuid}' already queued for Cancellation!!");
+            }
+
+            $parentId = $txn['id'];
+            unset($txn['id']);
+            unset($txn['uuid']);
+            $transactionData = array_merge($txn, $transactionData, [
                 'source_transaction_id'=> mt_rand(1, 9999999),
                 'transaction_source'=> $request->get('source'), //isset($data['source'])?$data['source']:'',
                 'transaction_service'=> $request->get('service'), //isset($data['service'])?$data['service']:'',
                 'processing_status'=> $request->get('processing_status', 'hold'),
                 'created_at'=> date('Y-m-d H:i:s'),
-                'queue_operation' => Transactions::QUEUE_OPERATION_CANCEL
-            ], $postData);
+                'queue_operation' => Transactions::QUEUE_OPERATION_CANCEL,
+                'parent_id' => $parentId,
+            ]);
 
-            if (! $this->createTransaction($postData)) {
-                throw new \Exception('Fatal Error :: Unable to create new Transaction.');
+            if (! $this->createTransaction($transactionData)) {
+                throw new \Exception('Fatal Error :: Unable to create new Transaction for Cancellation.');
             }
 
             $status = 'Ok';
@@ -183,6 +206,10 @@ class PayoutV2Controller extends Controller
         return $connection->insert($tableName, $transactionData);
     }
 
+    /**
+     * @return bool|string
+     * @throws \Doctrine\DBAL\DBALException
+     */
     private function generateUuid()
     {
         $connection = $this->get('doctrine.dbal.default_connection');
