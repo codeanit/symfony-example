@@ -3,7 +3,6 @@ var/**/*
 
 #Ignore app folder
 app/cache/*
-app/bootstrap.php.cache
 app/config/parameters.yml
 app/phpunit.xml.dist
 

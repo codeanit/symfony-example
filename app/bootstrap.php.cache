@@ -2,7 +2,7 @@
 
 namespace { $loader = require_once __DIR__.'/./autoload.php'; }
 
- 
+
 namespace Symfony\Component\HttpFoundation
 {
 class ParameterBag implements \IteratorAggregate, \Countable
@@ -3148,4 +3148,3 @@ return $response;
 }
 
 namespace { return $loader; }
-            

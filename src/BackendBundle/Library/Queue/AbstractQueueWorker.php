@@ -134,7 +134,7 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
      * @param array $arg
      * @return mixed
      */
-    abstract public function confirmTransaction(array $arg = []);
+    abstract public function confirmTransaction();
 
     /**
      * @return string

@@ -185,16 +185,18 @@ class Intermex
       // print_r($response);die;
       if (isset($response['NewDataSet']['PAGADOS'])) {
         $output=(object) $response['NewDataSet']['PAGADOS'];
-        if($output->iIdTipoError == '0'){
-          $confirmResult=$this->confirmaPagado($output->vReferencia,$output->iConsecutivoAgencia);
-          if($confirmResult->iIdTipoError=='1'){
-            //notify TB queue prepare
+        // foreach ($output as $key => $value) { 
+          if($output->iIdTipoError == '0'){          
+            $confirmResult=$this->confirmaPagado($output->vReferencia,$output->iConsecutivoAgencia);
+            if($confirmResult->iIdTipoError=='1'){
+              //notify TB queue prepare
+            }
+            $this->log->addInfo($this->service_id, 'consultaPagados', $param, $response_main);
+          }else{
+            $arr=array('iIdTipoError'=>$output->iIdTipoError,'error_msg'=>$output->vMensajeError);
+            $this->log->addError($this->service_id, 'consultaPagados', $param, $response_main);
           }
-          $this->log->addInfo($this->service_id, 'consultaPagados', $param, $response_main);        
-        }else{
-          $arr=array('iIdTipoError'=>$output->iIdTipoError,'error_msg'=>$output->vMensajeError);
-          $this->log->addError($this->service_id, 'consultaPagados', $param, $response_main);
-        }
+        // }// end of foreach
       } else {
         $arr=array('code'=>400,'msg'=>'No paid remittance today from this iIdAgencia');
         $this->log->addError($this->service_id, 'consultaPagados', $param, $response_main);

@@ -147,4 +147,25 @@ class QueueManager
 
         return $counter;
     }
+
+    /**
+     * Executes all third parties transactions confirmation.
+     *
+     * @return void
+     */
+    public function confirmTransactionStatus()
+    {
+        //get all the active services
+        $services = $this->em->getRepository('BackendBundle:Services')
+            ->findAll();
+
+        foreach ($services as $service) {
+
+            if($service->getServiceName() == 'intermex') {
+                $this->queueFactory->forgeWorker('intermex')->confirmTransaction();
+            }
+        }
+        //execute confirm
+    }
+
 }

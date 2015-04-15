@@ -62,13 +62,13 @@ class TransNetworkWorker extends BaseWorker
         // TODO: Implement changeTransaction() method.
     }
 
-    /**
+
      * @param array $arg
      * @return mixed
      */
     public function confirmTransaction(array $arg = [])
     {
-        // TODO: Implement confirmTransaction() method.
+        //**/ TODO: Implement confirmTransaction() method.
     }
 
     /**
