@@ -70,7 +70,7 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
     /**
      * @return array|mixed
      */
-    public function getWorkerSetting()
+    public function getWorkerSetting($key = null)
     {
         if (! empty($this->settings)) {
             return $this->settings;
@@ -85,6 +85,10 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
         } else {
             $this->settings = json_decode(base64_decode($service->getCredentials()), true);
             $this->settings['service_id'] = $service->getId();
+        }
+
+        if ($key) {
+            return (isset($this->settings[$key])) ? $this->settings[$key] : null;
         }
 
         return $this->settings;
