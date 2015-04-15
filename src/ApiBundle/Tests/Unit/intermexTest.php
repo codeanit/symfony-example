@@ -65,11 +65,15 @@ class IntermexTest extends WebTestCase
     $expected='200';
     $this->assertEquals($expected,$resultData['code']);
   }
+  public function testconsultaPagados()
+  {
+    $resultData=$this->GB->consultaPagados();
+  }
   public function ptestConectar()
   {
     $resultData=$this->GB->conectar();
   }
-  public function testConsultaCambios()
+  public function ptestConsultaCambios()
   {
     $resultData=$this->GB->consultaCambios();
   }

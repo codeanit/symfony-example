@@ -182,10 +182,19 @@ class Intermex
             'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
         );
       $response = json_decode(json_encode((array) $xmlFinal), true);
+      // print_r($response);die;
       if (isset($response['NewDataSet']['PAGADOS'])) {
         $output=(object) $response['NewDataSet']['PAGADOS'];
-        $arr=array('iIdTipoError'=>$output->iIdTipoError,'error_msg'=>$output->vMensajeError);
-        $this->log->addInfo($this->service_id, 'consultaPagados', $param, $response_main);        
+        if($output->iIdTipoError == '0'){
+          $confirmResult=$this->confirmaPagado($output->vReferencia,$output->iConsecutivoAgencia);
+          if($confirmResult->iIdTipoError=='1'){
+            //notify TB queue prepare
+          }
+          $this->log->addInfo($this->service_id, 'consultaPagados', $param, $response_main);        
+        }else{
+          $arr=array('iIdTipoError'=>$output->iIdTipoError,'error_msg'=>$output->vMensajeError);
+          $this->log->addError($this->service_id, 'consultaPagados', $param, $response_main);
+        }
       } else {
         $arr=array('code'=>400,'msg'=>'No paid remittance today from this iIdAgencia');
         $this->log->addError($this->service_id, 'consultaPagados', $param, $response_main);
@@ -207,10 +216,10 @@ class Intermex
         $soap_client = new \SoapClient(
                     $this->url,
                     array(
-                        "trace" => 1,
-                        'exceptions' => 1,
-                        'cache_wsdl' => WSDL_CACHE_NONE,)
-                );
+                          "trace" => 1,
+                          'exceptions' => 1,
+                          'cache_wsdl' => WSDL_CACHE_NONE,)
+                         );
       $response_main = $soap_client->ConfirmaPagado($param);
       $extractedData =explode('</xs:schema>',$response_main->ConfirmaPagadoResult->any);
       $xmlFinal   = simplexml_load_string(
@@ -220,14 +229,15 @@ class Intermex
       $response = json_decode(json_encode((array) $xmlFinal), true);
       if (isset($response['NewDataSet']['CONFIRMADOS'])) {
         $output=(object) $response['NewDataSet']['CONFIRMADOS'];
-        $arr=array('tiExito'=>$output->tiExito,'iIdTipoError'=>$output->iIdTipoError,'error_msg'=>$output->vMensajeError);
-        $this->log->addInfo($this->service_id, 'confirmaPagado', $param, $response_main);        
-        
+        if($output->tiExito=='1'){   
+          $this->log->addInfo($this->service_id, 'confirmaPagado', $param, $response_main);
+        }else{
+          $this->log->addError($this->service_id, 'confirmaPagado', $param, $response_main);
+        }
       } else {
-        $arr=array('code'=>400,'msg'=>'confirming paid remittance failed');
-        $this->log->addInfo($this->service_id, 'confirmaPagado', $param, $response_main);
+        $this->log->addError($this->service_id, 'confirmaPagado', $param, $response_main);
       }
-
+      return $output;
     }
 
     /**
