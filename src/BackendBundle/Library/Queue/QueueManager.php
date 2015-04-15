@@ -107,6 +107,7 @@ class QueueManager
                 $queue->setOperation($transaction->getQueueOperation());
                 $queue->setCreationDatetime(new \DateTime());
                 $queue->setTransaction($transaction);
+                $queue->setIsExecuted(false);
 
                 $transaction->setQueueOperation(Transactions::QUEUE_OPERATION_ENQUEUE);
 
@@ -137,7 +138,6 @@ class QueueManager
                     ->findBy([
                         'isExecuted' => false
                     ]);
-
 
         foreach ($queues as $queue) {
             if ($this->processQueue($queue)) {
