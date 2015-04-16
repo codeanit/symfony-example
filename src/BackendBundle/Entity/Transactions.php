@@ -6,531 +6,451 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Transactions
- *
- * @ORM\Table(name="transactions")
- * @ORM\Entity(repositoryClass="BackendBundle\Entity\Repository\TransactionRepository")
  */
 class Transactions
 {
-    const QUEUE_OPERATION_CREATE = 'CREATE';
-    const QUEUE_OPERATION_CHANGE = 'CHANGE';
-    const QUEUE_OPERATION_CANCEL = 'CANCEL';
-    const QUEUE_OPERATION_ENQUEUE = 'ENQUEUE';
-
     /**
      * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="transaction_source", type="string", length=10, nullable=false)
+     */
+    private $uuid;
+
+    /**
+     * @var string
      */
     private $transactionSource;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="transaction_service", type="string", length=20, nullable=false)
      */
     private $transactionService;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="source_transaction_id", type="string", length=11, nullable=true)
      */
     private $sourceTransactionId;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="transaction_code", type="string", length=50, nullable=false)
      */
     private $transactionCode;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="tracking_number", type="string", length=50, nullable=true)
      */
     private $trackingNumber;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="transaction_type", type="string", length=10, nullable=false)
      */
     private $transactionType;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitting_currency", type="string", length=3, nullable=true)
      */
     private $remittingCurrency;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="payout_currency", type="string", length=3, nullable=true)
      */
     private $payoutCurrency;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitting_amount", type="decimal", precision=10, scale=2, nullable=true)
      */
     private $remittingAmount;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="payout_amount", type="decimal", precision=10, scale=2, nullable=true)
      */
     private $payoutAmount;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="exchange_rate", type="decimal", precision=10, scale=2, nullable=true)
      */
     private $exchangeRate;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="fee", type="decimal", precision=10, scale=2, nullable=true)
      */
     private $fee;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="remittance_date", type="datetime", nullable=true)
      */
     private $remittanceDate;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_first_name", type="string", length=45, nullable=true)
      */
     private $beneficiaryFirstName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_middle_name", type="string", length=45, nullable=true)
      */
     private $beneficiaryMiddleName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_last_name", type="string", length=45, nullable=true)
      */
     private $beneficiaryLastName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_email", type="string", length=45, nullable=true)
      */
     private $beneficiaryEmail;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_city", type="string", length=45, nullable=true)
      */
     private $beneficiaryCity;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_state", type="string", length=45, nullable=true)
      */
     private $beneficiaryState;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_country", type="string", length=20, nullable=true)
      */
     private $beneficiaryCountry;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_address", type="string", length=100, nullable=true)
      */
     private $beneficiaryAddress;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_phone_mobile", type="string", length=15, nullable=true)
      */
     private $beneficiaryPhoneMobile;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_phone_landline", type="string", length=15, nullable=true)
      */
     private $beneficiaryPhoneLandline;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_postal_code", type="string", length=10, nullable=true)
      */
     private $beneficiaryPostalCode;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="beneficiary_account_number", type="integer", nullable=true)
      */
     private $beneficiaryAccountNumber;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="beneficiary_bank_routing_no", type="integer", nullable=true)
      */
     private $beneficiaryBankRoutingNo;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_bank_branch", type="string", length=45, nullable=true)
      */
     private $beneficiaryBankBranch;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_bank_name", type="string", length=45, nullable=true)
      */
     private $beneficiaryBankName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_bank_account_type", type="string", length=6, nullable=true)
      */
     private $beneficiaryBankAccountType;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="beneficiary_id_number", type="integer", nullable=true)
      */
     private $beneficiaryIdNumber;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_id_type", type="string", length=45, nullable=true)
      */
     private $beneficiaryIdType;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_id_issued_country", type="string", length=20, nullable=true)
      */
     private $beneficiaryIdIssuedCountry;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_id_issued_city", type="string", length=45, nullable=true)
      */
     private $beneficiaryIdIssuedCity;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="beneficiary_id_issued_state", type="string", length=45, nullable=true)
      */
     private $beneficiaryIdIssuedState;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="beneficiary_id_issued_date", type="datetime", nullable=true)
      */
     private $beneficiaryIdIssuedDate;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="beneficiary_id_expiry_date", type="datetime", nullable=true)
      */
     private $beneficiaryIdExpiryDate;
 
     /**
+     * @var \DateTime
+     */
+    private $beneficiaryDob;
+
+    /**
+     * @var string
+     */
+    private $beneficiarySsn;
+
+    /**
+     * @var string
+     */
+    private $beneficiaryGender;
+
+    /**
+     * @var string
+     */
+    private $beneficiaryOccupation;
+
+    /**
      * @var integer
-     *
-     * @ORM\Column(name="payout_agent_id", type="integer", nullable=true)
      */
     private $payoutAgentId;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="payout_agent_name", type="string", length=25, nullable=true)
      */
     private $payoutAgentName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="payout_agent_city", type="string", length=45, nullable=true)
+     */
+    private $payoutPayerName;
+
+    /**
+     * @var string
+     */
+    private $payoutPayerCode;
+
+    /**
+     * @var string
      */
     private $payoutAgentCity;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="payout_agent_state", type="string", length=45, nullable=true)
      */
     private $payoutAgentState;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="payout_agent_country", type="string", length=20, nullable=true)
      */
     private $payoutAgentCountry;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_first_name", type="string", length=45, nullable=true)
      */
     private $remitterFirstName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_middle_name", type="string", length=45, nullable=true)
      */
     private $remitterMiddleName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_last_name", type="string", length=45, nullable=true)
      */
     private $remitterLastName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_email", type="string", length=45, nullable=true)
      */
     private $remitterEmail;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_city", type="string", length=45, nullable=true)
      */
     private $remitterCity;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_country", type="string", length=20, nullable=true)
      */
     private $remitterCountry;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_state", type="string", length=45, nullable=true)
      */
     private $remitterState;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_address", type="string", length=100, nullable=true)
      */
     private $remitterAddress;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_phone_mobile", type="string", length=15, nullable=true)
      */
     private $remitterPhoneMobile;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_phone_landline", type="string", length=15, nullable=true)
      */
     private $remitterPhoneLandline;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_postal_code", type="string", length=10, nullable=true)
      */
     private $remitterPostalCode;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="remitter_account_number", type="integer", nullable=true)
      */
     private $remitterAccountNumber;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="remitter_bank_routing_no", type="integer", nullable=true)
      */
     private $remitterBankRoutingNo;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_bank_branch", type="string", length=45, nullable=true)
      */
     private $remitterBankBranch;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_bank_name", type="string", length=45, nullable=true)
      */
     private $remitterBankName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_bank_account_type", type="string", length=6, nullable=true)
      */
     private $remitterBankAccountType;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="remitter_id_number", type="integer", nullable=true)
      */
     private $remitterIdNumber;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_id_type", type="string", length=45, nullable=true)
      */
     private $remitterIdType;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_id_issued_country", type="string", length=20, nullable=true)
      */
     private $remitterIdIssuedCountry;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_id_issued_city", type="string", length=45, nullable=true)
      */
     private $remitterIdIssuedCity;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitter_id_issued_state", type="string", length=45, nullable=true)
      */
     private $remitterIdIssuedState;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="remitter_id_issued_date", type="datetime", nullable=true)
      */
     private $remitterIdIssuedDate;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="remitter_id_expiry_date", type="datetime", nullable=true)
      */
     private $remitterIdExpiryDate;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="remitting_agent_id", type="integer", nullable=true)
      */
     private $remittingAgentId;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitting_agent_name", type="string", length=25, nullable=true)
      */
     private $remittingAgentName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitting_agent_city", type="string", length=45, nullable=true)
      */
     private $remittingAgentCity;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitting_agent_state", type="string", length=45, nullable=true)
      */
     private $remittingAgentState;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="remitting_agent_country", type="string", length=20, nullable=true)
      */
     private $remittingAgentCountry;
 
     /**
+     * @var \DateTime
+     */
+    private $remitterDob;
+
+    /**
      * @var string
-     *
-     * @ORM\Column(name="processing_status", type="string", length=25, nullable=false)
+     */
+    private $remitterSsn;
+
+    /**
+     * @var string
+     */
+    private $remitterGender;
+
+    /**
+     * @var string
+     */
+    private $remitterOccupation;
+
+    /**
+     * @var string
      */
     private $processingStatus;
 
     /**
+     * @var string
+     */
+    private $queueOperation;
+
+    /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
      */
     private $createdAt;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=false)
      */
     private $updatedAt;
 
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $queues;
 
+    /**
+     * @var \BackendBundle\Entity\Transactions
+     */
+    private $parentTransaction;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->queues = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     /**
      * Get id
@@ -540,6 +460,29 @@ class Transactions
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set uuid
+     *
+     * @param string $uuid
+     * @return Transactions
+     */
+    public function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    /**
+     * Get uuid
+     *
+     * @return string 
+     */
+    public function getUuid()
+    {
+        return $this->uuid;
     }
 
     /**
@@ -1371,6 +1314,98 @@ class Transactions
     }
 
     /**
+     * Set beneficiaryDob
+     *
+     * @param \DateTime $beneficiaryDob
+     * @return Transactions
+     */
+    public function setBeneficiaryDob($beneficiaryDob)
+    {
+        $this->beneficiaryDob = $beneficiaryDob;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryDob
+     *
+     * @return \DateTime 
+     */
+    public function getBeneficiaryDob()
+    {
+        return $this->beneficiaryDob;
+    }
+
+    /**
+     * Set beneficiarySsn
+     *
+     * @param string $beneficiarySsn
+     * @return Transactions
+     */
+    public function setBeneficiarySsn($beneficiarySsn)
+    {
+        $this->beneficiarySsn = $beneficiarySsn;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiarySsn
+     *
+     * @return string 
+     */
+    public function getBeneficiarySsn()
+    {
+        return $this->beneficiarySsn;
+    }
+
+    /**
+     * Set beneficiaryGender
+     *
+     * @param string $beneficiaryGender
+     * @return Transactions
+     */
+    public function setBeneficiaryGender($beneficiaryGender)
+    {
+        $this->beneficiaryGender = $beneficiaryGender;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryGender
+     *
+     * @return string 
+     */
+    public function getBeneficiaryGender()
+    {
+        return $this->beneficiaryGender;
+    }
+
+    /**
+     * Set beneficiaryOccupation
+     *
+     * @param string $beneficiaryOccupation
+     * @return Transactions
+     */
+    public function setBeneficiaryOccupation($beneficiaryOccupation)
+    {
+        $this->beneficiaryOccupation = $beneficiaryOccupation;
+
+        return $this;
+    }
+
+    /**
+     * Get beneficiaryOccupation
+     *
+     * @return string 
+     */
+    public function getBeneficiaryOccupation()
+    {
+        return $this->beneficiaryOccupation;
+    }
+
+    /**
      * Set payoutAgentId
      *
      * @param integer $payoutAgentId
@@ -1414,6 +1449,52 @@ class Transactions
     public function getPayoutAgentName()
     {
         return $this->payoutAgentName;
+    }
+
+    /**
+     * Set payoutPayerName
+     *
+     * @param string $payoutPayerName
+     * @return Transactions
+     */
+    public function setPayoutPayerName($payoutPayerName)
+    {
+        $this->payoutPayerName = $payoutPayerName;
+
+        return $this;
+    }
+
+    /**
+     * Get payoutPayerName
+     *
+     * @return string 
+     */
+    public function getPayoutPayerName()
+    {
+        return $this->payoutPayerName;
+    }
+
+    /**
+     * Set payoutPayerCode
+     *
+     * @param string $payoutPayerCode
+     * @return Transactions
+     */
+    public function setPayoutPayerCode($payoutPayerCode)
+    {
+        $this->payoutPayerCode = $payoutPayerCode;
+
+        return $this;
+    }
+
+    /**
+     * Get payoutPayerCode
+     *
+     * @return string 
+     */
+    public function getPayoutPayerCode()
+    {
+        return $this->payoutPayerCode;
     }
 
     /**
@@ -2130,240 +2211,6 @@ class Transactions
     }
 
     /**
-     * Set processingStatus
-     *
-     * @param string $processingStatus
-     * @return Transactions
-     */
-    public function setProcessingStatus($processingStatus)
-    {
-        $this->processingStatus = $processingStatus;
-
-        return $this;
-    }
-
-    /**
-     * Get processingStatus
-     *
-     * @return string 
-     */
-    public function getProcessingStatus()
-    {
-        return $this->processingStatus;
-    }
-
-    /**
-     * Set createdAt
-     *
-     * @param \DateTime $createdAt
-     * @return Transactions
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get createdAt
-     *
-     * @return \DateTime 
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set updatedAt
-     *
-     * @param \DateTime $updatedAt
-     * @return Transactions
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * Get updatedAt
-     *
-     * @return \DateTime 
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-    /**
-     * @var string
-     */
-    private $uuid;
-
-    /**
-     * @var \DateTime
-     */
-    private $beneficiaryDob;
-
-    /**
-     * @var string
-     */
-    private $beneficiarySsn;
-
-    /**
-     * @var string
-     */
-    private $beneficiaryGender;
-
-    /**
-     * @var string
-     */
-    private $beneficiaryOccupation;
-
-    /**
-     * @var \DateTime
-     */
-    private $remitterDob;
-
-    /**
-     * @var string
-     */
-    private $remitterSsn;
-
-    /**
-     * @var string
-     */
-    private $remitterGender;
-
-    /**
-     * @var string
-     */
-    private $remitterOccupation;
-
-    /**
-     * @var string
-     */
-    private $queueOperation;
-
-
-    /**
-     * Set uuid
-     *
-     * @param string $uuid
-     * @return Transactions
-     */
-    public function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
-
-        return $this;
-    }
-
-    /**
-     * Get uuid
-     *
-     * @return string 
-     */
-    public function getUuid()
-    {
-        return $this->uuid;
-    }
-
-    /**
-     * Set beneficiaryDob
-     *
-     * @param \DateTime $beneficiaryDob
-     * @return Transactions
-     */
-    public function setBeneficiaryDob($beneficiaryDob)
-    {
-        $this->beneficiaryDob = $beneficiaryDob;
-
-        return $this;
-    }
-
-    /**
-     * Get beneficiaryDob
-     *
-     * @return \DateTime 
-     */
-    public function getBeneficiaryDob()
-    {
-        return $this->beneficiaryDob;
-    }
-
-    /**
-     * Set beneficiarySsn
-     *
-     * @param string $beneficiarySsn
-     * @return Transactions
-     */
-    public function setBeneficiarySsn($beneficiarySsn)
-    {
-        $this->beneficiarySsn = $beneficiarySsn;
-
-        return $this;
-    }
-
-    /**
-     * Get beneficiarySsn
-     *
-     * @return string 
-     */
-    public function getBeneficiarySsn()
-    {
-        return $this->beneficiarySsn;
-    }
-
-    /**
-     * Set beneficiaryGender
-     *
-     * @param string $beneficiaryGender
-     * @return Transactions
-     */
-    public function setBeneficiaryGender($beneficiaryGender)
-    {
-        $this->beneficiaryGender = $beneficiaryGender;
-
-        return $this;
-    }
-
-    /**
-     * Get beneficiaryGender
-     *
-     * @return string 
-     */
-    public function getBeneficiaryGender()
-    {
-        return $this->beneficiaryGender;
-    }
-
-    /**
-     * Set beneficiaryOccupation
-     *
-     * @param string $beneficiaryOccupation
-     * @return Transactions
-     */
-    public function setBeneficiaryOccupation($beneficiaryOccupation)
-    {
-        $this->beneficiaryOccupation = $beneficiaryOccupation;
-
-        return $this;
-    }
-
-    /**
-     * Get beneficiaryOccupation
-     *
-     * @return string 
-     */
-    public function getBeneficiaryOccupation()
-    {
-        return $this->beneficiaryOccupation;
-    }
-
-    /**
      * Set remitterDob
      *
      * @param \DateTime $remitterDob
@@ -2456,6 +2303,29 @@ class Transactions
     }
 
     /**
+     * Set processingStatus
+     *
+     * @param string $processingStatus
+     * @return Transactions
+     */
+    public function setProcessingStatus($processingStatus)
+    {
+        $this->processingStatus = $processingStatus;
+
+        return $this;
+    }
+
+    /**
+     * Get processingStatus
+     *
+     * @return string 
+     */
+    public function getProcessingStatus()
+    {
+        return $this->processingStatus;
+    }
+
+    /**
      * Set queueOperation
      *
      * @param string $queueOperation
@@ -2477,17 +2347,51 @@ class Transactions
     {
         return $this->queueOperation;
     }
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    private $queues;
 
     /**
-     * Constructor
+     * Set createdAt
+     *
+     * @param \DateTime $createdAt
+     * @return Transactions
      */
-    public function __construct()
+    public function setCreatedAt($createdAt)
     {
-        $this->queues = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return \DateTime 
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Set updatedAt
+     *
+     * @param \DateTime $updatedAt
+     * @return Transactions
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedAt
+     *
+     * @return \DateTime 
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
     }
 
     /**
@@ -2522,11 +2426,6 @@ class Transactions
     {
         return $this->queues;
     }
-    /**
-     * @var \BackendBundle\Entity\Transactions
-     */
-    private $parentTransaction;
-
 
     /**
      * Set parentTransaction
@@ -2549,61 +2448,5 @@ class Transactions
     public function getParentTransaction()
     {
         return $this->parentTransaction;
-    }
-    /**
-     * @var string
-     */
-    private $payoutPayerName;
-
-    /**
-     * @var string
-     */
-    private $payoutPayerCode;
-
-
-    /**
-     * Set payoutPayerName
-     *
-     * @param string $payoutPayerName
-     * @return Transactions
-     */
-    public function setPayoutPayerName($payoutPayerName)
-    {
-        $this->payoutPayerName = $payoutPayerName;
-
-        return $this;
-    }
-
-    /**
-     * Get payoutPayerName
-     *
-     * @return string 
-     */
-    public function getPayoutPayerName()
-    {
-        return $this->payoutPayerName;
-    }
-
-    /**
-     * Set payoutPayerCode
-     *
-     * @param string $payoutPayerCode
-     * @return Transactions
-     */
-    public function setPayoutPayerCode($payoutPayerCode)
-    {
-        $this->payoutPayerCode = $payoutPayerCode;
-
-        return $this;
-    }
-
-    /**
-     * Get payoutPayerCode
-     *
-     * @return string 
-     */
-    public function getPayoutPayerCode()
-    {
-        return $this->payoutPayerCode;
     }
 }
