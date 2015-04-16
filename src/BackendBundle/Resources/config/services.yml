@@ -18,6 +18,8 @@ services:
     cdex_queue_worker.intrermex:
         class: BackendBundle\Library\Queue\Worker\IntermexWorker
         parent: abstarct_queue_worker
+        calls:
+            - [setSerializer, [@serializer]]
 
     cdex_queue_worker.bdo:
             class: BackendBundle\Library\Queue\Worker\BdoWorker
@@ -32,7 +34,7 @@ services:
         public: false
         arguments: [@twig.loader]
         tags:
-            - { name: twig.extension }
+            - {name: twig.extension}
 
     backend.listener:
          class: BackendBundle\EventListener\ControllerListener
