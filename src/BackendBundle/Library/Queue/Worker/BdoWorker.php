@@ -47,7 +47,7 @@ class BdoWorker extends BaseWorker
      */
     public function createTransaction(OperationsQueue $queue, $args = [])
     {
-        echo 1234; die;
+
         $settings = $this->getWorkerSetting();
         $parameters = [];
         $url = (isset($settings['url'])) ? $settings['url'] : false;
