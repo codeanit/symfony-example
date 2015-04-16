@@ -23,6 +23,10 @@ services:
             class: BackendBundle\Library\Queue\Worker\BdoWorker
             parent: abstarct_queue_worker
 
+    cdex_queue_worker.transnetwork:
+              class: BackendBundle\Library\Queue\Worker\TransNetworkWorker
+              parent: abstarct_queue_worker
+
     twig.extension.backend:
         class: BackendBundle\Twig\Extension\BackendExtension
         public: false
