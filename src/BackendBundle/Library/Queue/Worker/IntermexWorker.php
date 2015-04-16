@@ -6,6 +6,7 @@ namespace BackendBundle\Library\Queue\Worker;
 use BackendBundle\Entity\OperationsQueue;
 use BackendBundle\Entity\Transactions;
 use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
+use JMS\Serializer\Serializer;
 
 /**
  * Class IntermexWorker
@@ -56,7 +57,7 @@ class IntermexWorker extends BaseWorker
      * @return void
      */
     public function consultaPagados()
-    {      
+    {
       $iIdAgencia=$this->conectar(
                 'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
                 '308901',
@@ -80,13 +81,13 @@ class IntermexWorker extends BaseWorker
       // print_r($response);die;
       if (isset($response['NewDataSet']['PAGADOS'])) {
         $output=(object) $response['NewDataSet']['PAGADOS'];
-        // foreach ($output as $key => $value) { 
-          if($output->iIdTipoError == '0'){          
+        // foreach ($output as $key => $value) {
+          if($output->iIdTipoError == '0'){
             $confirmResult=$this->confirmaPagado($output->vReferencia,$output->iConsecutivoAgencia);
             if($confirmResult->iIdTipoError=='1'){
               //@TODO notify TB queue prepare
-            }            
-          }          
+            }
+          }
         $this->em->getRepository('BackendBundle:Log')
          ->addLog(
             $this->getWorkerSetting('service_id'),
@@ -95,9 +96,9 @@ class IntermexWorker extends BaseWorker
             $response_main
         );
 
-          
+
         // }// end of foreach
-        
+
       } else {
         $this->em->getRepository('BackendBundle:Log')
              ->addLog(
@@ -105,9 +106,9 @@ class IntermexWorker extends BaseWorker
                 'consultaPagados',
                 json_encode($param),
                 'No paid remittance today from this iIdAgencia'
-            );            
+            );
       }
-      return;    
+      return;
     }
 
     /**
@@ -118,7 +119,7 @@ class IntermexWorker extends BaseWorker
      * @return void
      */
     public function confirmaPagado($vReferencia=null,$iConsecutivoAgencia=null)
-    {        
+    {
         $iIdAgencia=$this->conectar(
                 'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
                 '308901',
@@ -140,14 +141,14 @@ class IntermexWorker extends BaseWorker
         );
       $response = json_decode(json_encode((array) $xmlFinal), true);
       if (isset($response['NewDataSet']['CONFIRMADOS'])) {
-        $output=(object) $response['NewDataSet']['CONFIRMADOS'];       
+        $output=(object) $response['NewDataSet']['CONFIRMADOS'];
         $this->em->getRepository('BackendBundle:Log')
              ->addLog(
                 $this->getWorkerSetting('service_id'),
                 'consultaPagados',
                 json_encode($param),
                 $response_main
-        );       
+        );
       } else {
         $this->em->getRepository('BackendBundle:Log')
              ->addLog(
@@ -155,7 +156,7 @@ class IntermexWorker extends BaseWorker
                 'consultaPagados',
                 json_encode($param),
                 'No Confirmation Paid Remittance Available'
-        );   
+        );
       }
       return $output;
     }
@@ -166,7 +167,7 @@ class IntermexWorker extends BaseWorker
      * @return void
      */
     public function consultaCambios()
-    {      
+    {
       $iIdAgencia=$this->conectar(
                 'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
                 '308901',
@@ -189,22 +190,22 @@ class IntermexWorker extends BaseWorker
       $response = json_decode(json_encode((array) $xmlFinal), true);
       if (isset($response['NewDataSet']['CAMBIOS'])) {
         $output=$response['NewDataSet']['CAMBIOS'];
-        foreach ($output as $key => $value) {  
-           //@TODO nofity queue generate    
+        foreach ($output as $key => $value) {
+           //@TODO nofity queue generate
            $data=$this->confirmaCambio(
                                       $value['iIdOrden'],
                                       $value['tiIdTipoOrden'],
                                       $value['vReferencia']
                                       );
-      
+
             $this->em->getRepository('BackendBundle:Log')
              ->addLog(
                 $this->getWorkerSetting('service_id'),
                 'consultaCambios',
                 json_encode($param),
                 $data
-            );      
-        }    
+            );
+        }
       } else {
          $this->em->getRepository('BackendBundle:Log')
             ->addLog(
@@ -212,7 +213,7 @@ class IntermexWorker extends BaseWorker
                 'consultaCambios',
                 json_encode($param),
                 'No paid remittance today from this iIdAgencia'
-            );     
+            );
       }
       return;
     }
@@ -259,7 +260,7 @@ class IntermexWorker extends BaseWorker
                       'iIdOrden'=>$iIdOrden,
                       'msg'=>$type[$id].' Successful'
                       );
-            $this->addToQueue($arr);            
+            $this->addToQueue($arr);
         } else {
             $arr=array(
                       'code'=>'400',
@@ -426,7 +427,7 @@ class IntermexWorker extends BaseWorker
      * @throws \Exception
      */
     private function conectar($url, $username, $password)
-    {        
+    {
         $params = [
             'trace' => true,
             'exception' => true,
@@ -552,19 +553,233 @@ class IntermexWorker extends BaseWorker
     {
         $transaction = $queue->getTransaction();
         $parentTransaction = $transaction->getParentTransaction();
-        $fieldsOfIntrest = [
+        $fieldsOfInterest = [
             'beneficiary_first_name',
             'remitter_first_name',
             'beneficiary_phone_mobile',
         ];
+        $fieldActionMap = [
+            'beneficiary_first_name' => 'changeBeneficiaryFirstName',
+            'remitter_first_name' => 'changeRemitterFirstName',
+            'beneficiary_phone_mobile' => 'changeBeneficiaryMobile',
+        ];
 
         $differences = $this->findTransactionDifferences($parentTransaction, $transaction);
+        $isDifferenceFound = false;
 
-        dump($differences);
+        try {
+            foreach ($fieldsOfInterest as $field) {
+                if (array_key_exists($field, $differences)) {
+                    $isDifferenceFound = true;
+
+                    $method = $fieldActionMap[$field];
+
+                    if (method_exists($this, $method)) {
+                        $this->$method($transaction);
+                    }
+                }
+            }
+
+            if (! $isDifferenceFound) {
+                throw new \Exception('Fatal Error :: No difference found!!');
+            }
+
+        } catch(\Exception $e) {
+
+        }
+
     }
 
+    /**
+     * @param Transactions $transaction
+     * @throws \Exception
+     */
+    public function changeBeneficiaryFirstName(Transactions $transaction)
+    {
+        $flag               = false;
+        $url                = $this->getWorkerSetting('url');
+        $username           = $this->getWorkerSetting('username');
+        $password           = $this->getWorkerSetting('password');
+        $action             = 'CambiaBeneficiario';
+        $webServiceResponse = [];
 
-    public function setSerializer($serializer)
+        $dataPattern = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
+
+        try {
+            $params = [
+                'iIdAgencia' => $this->conectar($url, $username, $password),
+                'vReferencia' => $transaction->getTransactionCode(),
+                'vNuevoBeneficiario' => $transaction->getBeneficiaryFirstName(),//$txn['transaction']->beneficiary_first_name,
+                'vMotivoModificacion' => 'reason to change'
+            ];
+
+            $response = $this->sendHttpRequest($url, $params, $action);
+
+            preg_match_all(
+                $dataPattern,
+                $response->AltaEnvioNResult->any, //$response_main->AltaEnvioNResult->any
+                $matches
+            );
+
+            $webServiceResponse = simplexml_load_string(
+               $matches[0][0],
+               'SimpleXMLElement',
+               LIBXML_NOCDATA | LIBXML_PARSEHUGE
+            );
+
+            if (! property_exists($webServiceResponse, 'DocumentElement') or
+                ! property_exists($webServiceResponse->DocumentElement, 'RESP')) {
+                throw new \Exception('Fatal Error :: Unexpected error encountered');
+            }
+
+            if ($webServiceResponse->DocumentElement->RESP->tiExito != 1) {
+                throw new \Exception('Fatal Error :: Request not successful!!');
+            }
+
+            $flag = true;
+
+        } catch(\Exception $e) {
+            $flag = false;
+        }
+
+        $this->em->getRepository('BackendBundle:Log')
+                ->addLog(
+                    $this->getWorkerSetting('service_id'),
+                    json_encode($parameters),
+                    json_encode($webServiceResponse),
+                    ($flag) ? 'Success': 'Failed'
+                );
+
+        return $flag;
+
+    }
+
+    public function changeRemitterFirstName(Transactions $transaction)
+    {
+        $flag     = false;
+        $url      = $this->getWorkerSetting('url');
+        $username = $this->getWorkerSetting('username');
+        $password = $this->getWorkerSetting('password');
+        $action   = 'CambiaRemitente';
+        $webServiceResponse = null;
+
+        $dataPattern = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
+
+        try {
+            $params = [
+                'iIdAgencia' => $this->conectar($url, $username, $password),
+                'vReferencia' => $transaction->getTransactionCode(),
+                'vNuevoBeneficiario' => $transaction->getRemitterFirstName(),//$txn['transaction']->remitter_first_name,
+                'vMotivoModificacion' => 'reason to change'
+            ];
+
+            $response = $this->sendHttpRequest($url, $params, $action);
+
+            preg_match_all(
+                $dataPattern,
+                $response->AltaEnvioNResult->any, //$response_main->AltaEnvioNResult->any
+                $matches
+            );
+
+            $webServiceResponse = simplexml_load_string(
+               $matches[0][0],
+               'SimpleXMLElement',
+               LIBXML_NOCDATA | LIBXML_PARSEHUGE
+            );
+
+            if (! property_exists($webServiceResponse, 'DocumentElement') or
+                ! property_exists($webServiceResponse->DocumentElement, 'RESP')) {
+                throw new \Exception('Fatal Error :: Unexpected error encountered');
+            }
+
+            if ($webServiceResponse->DocumentElement->RESP->tiExito != 1) {
+                throw new \Exception('Fatal Error :: Request not successful!!');
+            }
+
+            $flag = true;
+
+        } catch(\Exception $e) {
+            $flag = false;
+        }
+
+        $this->em->getRepository('BackendBundle:Log')
+                ->addLog(
+                    $this->getWorkerSetting('service_id'),
+                    json_encode($parameters),
+                    json_encode($webServiceResponse),
+                    ($flag) ? 'Success': 'Failed'
+                );
+
+        return $flag;
+    }
+
+    /**
+     * @param Transactions $transaction
+     * @throws \Exception
+     */
+    public function changeBeneficiaryMobile(Transactions $transaction)
+    {
+        $flag     = false;
+        $url      = $this->getWorkerSetting('url');
+        $username = $this->getWorkerSetting('username');
+        $password = $this->getWorkerSetting('password');
+        $action   = 'CambiaTelBeneficiario';
+        $webServiceResponse = null;
+
+        $dataPattern = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
+
+        try {
+            $params = [
+                'iIdAgencia' => $this->conectar($url, $username, $password),
+                'vReferencia' => $transaction->getTransactionCode(),
+                'vNuevoBeneficiario' => $transaction->getBeneficiaryPhoneMobile(),//$txn['transaction']->beneficiary_first_name,
+                'vMotivoModificacion' => 'reason to change'
+            ];
+
+            $response = $this->sendHttpRequest($url, $params, $action);
+
+            preg_match_all(
+                $dataPattern,
+                $response->AltaEnvioNResult->any, //$response_main->AltaEnvioNResult->any
+                $matches
+            );
+
+            $webServiceResponse = simplexml_load_string(
+               $matches[0][0],
+               'SimpleXMLElement',
+               LIBXML_NOCDATA | LIBXML_PARSEHUGE
+            );
+
+            if (! property_exists($webServiceResponse, 'DocumentElement') or
+                ! property_exists($webServiceResponse->DocumentElement, 'RESP')) {
+                throw new \Exception('Fatal Error :: Unexpected error encountered');
+            }
+
+            if ($webServiceResponse->DocumentElement->RESP->tiExito != 1) {
+                throw new \Exception('Fatal Error :: Request not successful!!');
+            }
+
+            $flag = true;
+
+        } catch(\Exception $e) {
+            $flag = false;
+        }
+
+        $this->em->getRepository('BackendBundle:Log')
+                ->addLog(
+                    $this->getWorkerSetting('service_id'),
+                    json_encode($parameters),
+                    json_encode($webServiceResponse),
+                    ($flag) ? 'Success': 'Failed'
+                );
+
+        return $flag;
+    }
+
+    /**
+     * @param Serializer $serializer
+     */
+    public function setSerializer(Serializer $serializer)
     {
         $this->serializer = $serializer;
     }
