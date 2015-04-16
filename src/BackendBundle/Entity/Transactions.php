@@ -2550,4 +2550,60 @@ class Transactions
     {
         return $this->parentTransaction;
     }
+    /**
+     * @var string
+     */
+    private $payoutPayerName;
+
+    /**
+     * @var string
+     */
+    private $payoutPayerCode;
+
+
+    /**
+     * Set payoutPayerName
+     *
+     * @param string $payoutPayerName
+     * @return Transactions
+     */
+    public function setPayoutPayerName($payoutPayerName)
+    {
+        $this->payoutPayerName = $payoutPayerName;
+
+        return $this;
+    }
+
+    /**
+     * Get payoutPayerName
+     *
+     * @return string 
+     */
+    public function getPayoutPayerName()
+    {
+        return $this->payoutPayerName;
+    }
+
+    /**
+     * Set payoutPayerCode
+     *
+     * @param string $payoutPayerCode
+     * @return Transactions
+     */
+    public function setPayoutPayerCode($payoutPayerCode)
+    {
+        $this->payoutPayerCode = $payoutPayerCode;
+
+        return $this;
+    }
+
+    /**
+     * Get payoutPayerCode
+     *
+     * @return string 
+     */
+    public function getPayoutPayerCode()
+    {
+        return $this->payoutPayerCode;
+    }
 }

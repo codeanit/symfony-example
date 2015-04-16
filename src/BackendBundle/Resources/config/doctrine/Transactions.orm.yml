@@ -313,6 +313,20 @@ BackendBundle\Entity\Transactions:
             fixed: false
             comment: ''
             column: payout_agent_name
+        payoutPayerName:
+            type: string
+            nullable: true
+            length: 25
+            fixed: false
+            comment: ''
+            column: payout_payer_name
+        payoutPayerCode:
+            type: string
+            nullable: true
+            length: 25
+            fixed: false
+            comment: ''
+            column: payout_payer_code
         payoutAgentCity:
             type: string
             nullable: true
