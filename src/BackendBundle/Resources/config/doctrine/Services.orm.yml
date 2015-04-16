@@ -19,10 +19,8 @@ BackendBundle\Entity\Services:
             comment: 'Name of third party service'
             column: service_name
         credentials:
-            type: string
-            nullable: false
-            length: 255
-            fixed: false
+            type: text
+            nullable: true
             comment: 'encoded credentials fields'
         status:
             type: integer

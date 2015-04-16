@@ -14,12 +14,11 @@ class BdoTest extends WebTestCase {
   {
     $client = $this->createClient(); 
     $this->container = $client->getContainer();
-    $this->bdo=$this->container->get('bdo');
+    $this->bdo=$this->container->get('cdex_queue_worker.bdo');
   }
 
   public function testBDOPicuup()
-  {
-    // $bdo = new Bdo();
+  {    
     $data=array(
     "source"=> "tb",
     "service"=> "bdo",
@@ -33,7 +32,7 @@ class BdoTest extends WebTestCase {
         "payout_amount"=>21.00,
         "exchange_rate"=> 0.90,
         "fee"=> 4.00,
-        "remittance_date"=> "2015-01-28 11=>05=>13",
+        "remittance_date"=> "2015-01-28",
         "beneficiary_first_name"=> "Alejandro",
         "beneficiary_middle_name"=> "Test",
         "beneficiary_last_name"=> "Rodriguez",
@@ -69,7 +68,7 @@ class BdoTest extends WebTestCase {
         "remitter_state"=> "ON",
         "remitter_city"=> "Toronto",
         "remitter_address"=> "555 Richmond Street West",
-        "remitter_phone_mobile"=> "(866)504-3813",
+        "remitter_phone_mobile"=> "8665043813",
         "remitter_postal_code"=> "M5V3B1",
         "remitter_account_number"=> "8596556",
         "remitter_bank_routing_no"=> "85469",
@@ -90,8 +89,8 @@ class BdoTest extends WebTestCase {
     ));
     
     print_r($this->bdo->pickupCash($data));
-    print_r($this->bdo->pickupMLLhuillier($data));
-    print_r($this->bdo->pickupCebuana($data));
+    // print_r($this->bdo->pickupMLLhuillier($data));
+    // print_r($this->bdo->pickupCebuana($data));
     die;
   }
 }
