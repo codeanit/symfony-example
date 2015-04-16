@@ -29,7 +29,7 @@ BackendBundle\Entity\Transactions:
         uuid:
             type: string
             nullable: false
-            length: 32
+            length: 40
             fixed: false
             comment: 'Transaction UUID generated from CDEX API. Its is used to uniquely track transactions at CDEX.'
         transactionSource:
