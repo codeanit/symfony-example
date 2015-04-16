@@ -21,6 +21,10 @@ services:
         calls:
             - [setSerializer, [@serializer]]
 
+    cdex_queue_worker.bdo:
+            class: BackendBundle\Library\Queue\Worker\BdoWorker
+            parent: abstarct_queue_worker
+
     twig.extension.backend:
         class: BackendBundle\Twig\Extension\BackendExtension
         public: false

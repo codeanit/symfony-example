@@ -1,7 +1,6 @@
 <?php 
-namespace Api\PayoutBundle\Tests\Unit;
+namespace ApiBundle\Tests\Unit;
 
-use Api\PayoutBundle\Library\Greenbelt;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -26,7 +25,7 @@ class TransNetworkTest extends WebTestCase
   }
 
   public function testForUpdate()
-  {
+  { 
     $data=$this->GB->queryUpdate();
     print_r($data);die;
   }
