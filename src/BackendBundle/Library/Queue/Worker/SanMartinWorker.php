@@ -12,10 +12,19 @@ use BackendBundle\Entity\OperationsQueue;
 use BackendBundle\Entity\Transactions;
 use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
 use JMS\Serializer\Serializer;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 
 class SanMartinWorker extends BaseWorker {
 
+    protected $container;
 
+    /**
+     * [__construct description]
+     */
+    function __construct(ContainerInterface $container) {
+        $this->container = $container;
+    }
     /**
      * @param OperationsQueue $queue
      * @param array $args
@@ -23,50 +32,83 @@ class SanMartinWorker extends BaseWorker {
      */
     public function createTransaction(OperationsQueue $queue, $args = [])
     {
+        try {
+            $transaction = $queue->getTransaction();     
+                if (strtolower($transaction->getTransactionType())=='bank') {
+                    $paymentType=2;            
+                    $bankBranch=$transaction->getBeneficiaryBankBranch();
+                    $bankAccountNumber=$transaction->getBeneficiaryAccountNumber();
+                    $bankName=$transaction->getBeneficiaryBankName();
+                }else{
+                    $bankBranch=$bankAccountNumber='';
+                    $paymentType=1;
+                }
+                $dataToGenerate=array(
+                           "Date of the order"=>$transaction->getRemittanceDate()->format('y/m/d'),
+                           "Number of Shipping"=>$transaction->getTransactionCode(),
+                           "Sender Name"=>$transaction->getRemitterfirstName(),
+                           "Sender Name Paternal"=>$transaction->getRemitterLastName(),
+                           "Sender Name Mother"=>$transaction->getRemitterMiddleName(),
+                           "Beneficiary Name"=>$transaction->getBeneficiaryFirstName(),
+                           "Recipient Name Paterno"=>$transaction->getBeneficiaryLastName(),
+                           "Recipient Name Mother"=>$transaction->getBeneficiaryMiddleName(),
+                           "Currency Shipping"=>$transaction->getRemittingCurrency(),
+                           "Currency of Payment"=>$transaction->getPayoutCurrency(),
+                           "Exchange rate"=>$transaction->getExchangeRate(),
+                           "Key Branch payment"=>"",
+                           "Shipping Amount"=>$transaction->getRemittingAmount(),
+                           "Reference"=>"",
+                           "Country code source"=>$transaction->getRemitterCountry(),
+                           "Tel Sender"=>$transaction->getRemitterPhoneMobile(),
+                           "Recipient Street"=>$transaction->getBeneficiaryAddress(),
+                           "Recipient City"=>$transaction->getBeneficiaryCity(),
+                           "beneficiary State"=>$transaction->getBeneficiaryState(),
+                           "Recipient Zip Code"=>$transaction->getBeneficiaryPostalCode(),
+                           "Recipient Phone"=>$transaction->getBeneficiaryPhoneMobile(),
+                           "Payment Type"=>$paymentType,
+                           "Account No. Feed"=>$bankAccountNumber,
+                           "Bank"=>$bankName,
+                           "Bank Branch"=>$bankBranch,
+                           "Message or Comment"=>"message",
+                           "City / Town Sender"=>$transaction->getRemitterCity(),
+                           "Sender State"=>$transaction->getRemitterState()
+                    );
+                $output='';       
+                $path=dirname($this->container->getParameter('kernel.root_dir'))
+                        .'/web/generated_files/sanmartin/SM'
+                        .date('ymd').$transaction->getTransactionCode()
+                        .'.txt';
+        
+                foreach ($dataToGenerate as $value) {
+                    $output .= $value.'|';
+                }     
+                file_put_contents($path,$output.PHP_EOL,FILE_APPEND | LOCK_EX);
+                $check=file_exists($path);
+                if($check==1){
+                    $this->em->getRepository('BackendBundle:Log')
+                         ->addLog(
+                            $this->getWorkerSetting('service_id'),
+                            'Create',
+                            json_encode($dataToGenerate),
+                            $output,
+                            'SUCCESS'
+                        );
+                    $this->updateExecutedQueue($queue);
 
-//        Data to be mapped
-//                    "Date of the order"=>"12/12/12",
-//                    "Number of Shipping"=>"2",
-//                    "Sender Name"=>"Manish",
-//                    "Sender Name Paternal"=>"Chalise",
-//                    "Sender Name Mother"=>"",
-//                    "Beneficiary Name"=>"Anit",
-//                    "Recipient Name Paterno"=>"Shrestha",
-//                    "Recipient Name Mother"=>"manandhar",
-//                    "Currency Shipping"=>"USD",
-//                    "Currency of Payment"=>"USD",
-//                    "Exchange rate"=>"1.5",
-//                    "Key Branch payment"=>"",
-//                    "Shipping Amount"=>"1000",
-//                    "Reference"=>"",
-//                    "Country code source"=>"USA",
-//                    "Tel Sender"=>"123123",
-//                    "Recipient Street"=>"ktm-12 avinue road",
-//                    "Recipient City"=>"kathmandu",
-//                    "beneficiary State"=>"bagmati",
-//                    "Recipient Zip Code"=>"97701",
-//                    "Recipient Phone"=>"4894894",
-//                    "Payment Type"=>"02",
-//                    "Account No. Feed"=>"12313",
-//                    "Bank"=>"global bank",
-//                    "Bank Branch"=>"chabahil",
-//                    "Message or Comment"=>"hello world",
-//                    "City / Town Sender"=>"Dolkha",
-//                    "Sender State"=>"Baglung"
-
-
-        $output='';
-        if($p==null){
-            $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.'Sanmartin.txt';
+                }else{
+                    $this->em->getRepository('BackendBundle:Log')
+                         ->addLog(
+                            $this->getWorkerSetting('service_id'),
+                            'Create',
+                            json_encode($dataToGenerate),
+                            'File Generation Error',
+                            "ERROR"
+                        );
+                }
+        } catch (\Exception $e) {
+            $this->logger->error('SANMARTIN_CREATE', [$e->getMessage()]);
         }
-        else{
-            $path= $p.'Sanmartin.txt';
-        }
-
-        foreach ($data as $key => $value) {
-            $output .= $value.'|';
-        }
-        file_put_contents($path,$output.PHP_EOL,FILE_APPEND | LOCK_EX);
+        return $check;
     }
 
     /**
@@ -103,7 +145,7 @@ class SanMartinWorker extends BaseWorker {
      */
     protected function getWorkerServiceName()
     {
-        // TODO: Implement getWorkerServiceName() method.
+        return 'sanmartin';       
     }
 
     /**
