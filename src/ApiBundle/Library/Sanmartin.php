@@ -20,7 +20,6 @@ class Sanmartin extends Common
         $this->connection = $this->container->get('database_connection');        
     }  
 
-
     public function parse($results,$p=null){
                
         $log = new \Symfony\Bridge\Monolog\Logger('FILE_QUEUE');

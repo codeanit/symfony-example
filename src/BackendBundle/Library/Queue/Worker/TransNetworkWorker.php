@@ -179,7 +179,6 @@ class TransNetworkWorker extends BaseWorker
         // TODO: Implement changeTransaction() method.
     }
 
-
     /**
      * @param array $arg
      * @return mixed
@@ -211,57 +210,29 @@ class TransNetworkWorker extends BaseWorker
 
         if (array_key_exists('UpdatesList', $response))
         {
-            $this->__processUpdatedList($response['UpdatesList']['Updates']);
-        }
-    }
+            $count=0;
 
-    /**
-     * @param $list
-     */
-    private function __processUpdatedList($list)
-    {
-        $count=0;
+            foreach ($list as $value) {
 
-        foreach ($list as $value) {
-
-            if( $value['Update_Code']=='1000'|| $value['Update_Code']=='1001')
-            {
-                $paramConfirm=array(
-                    "Username"=>"samsos",
-                    "Password"=>"TNC1234!",
-                    "UpdateID"=>$value['Update_Number'],
-                    "ClaimNumber"=>$value['Claim_Number']
-                );
-                $confData=$this->confirmUpdate($paramConfirm);
-
-                $this->log->addInfo($this->service_id, 'queryUpdate', $param, $list[$count]);
-
-                if($confData->ReturnCode == '1000'){
-                    $return = array('code' => '200',
-                        'operation'=>'notify',
-                        'message' => $list[$count]['Message'],
-                        'notify_source'=>'tb',
-                        'source'=>'transnetwork',
-                        'status' => 'complete' ,
-                        'change_status'=>'',
-                        'confirmation_number' =>$list[$count]['Update_Number']
+                if( $value['Update_Code']=='1000'|| $value['Update_Code']=='1001') {
+                    $paramConfirm = array(
+                        "Username" => "samsos",
+                        "Password" => "TNC1234!",
+                        "UpdateID" => $value['Update_Number'],
+                        "ClaimNumber" => $value['Claim_Number']
                     );
-                    $this->addToQueue($return);
+
+                    $confData = $this->confirmUpdate($paramConfirm);
                 }
-            }else{
-                $this->log->addError($this->service_id, 'queryUpdate', $param, $list[$count]);
-                $return = array('code' => '400',
-                    'operation'=>'notify',
-                    'message' => $list[$count]['Message'],
-                    'notify_source'=>'tb',
-                    'source'=>'transnetwork',
-                    'status' => 'failed' ,
-                    'change_status'=>'',
-                    'confirmation_number' =>$list[$count]['Update_Number']
+
+                $this->log->addInfo(
+                    $this->service_id,
+                    'queryUpdate',
+                    $param,
+                    $list[$count]
                 );
-                $this->addToQueue($return);
+                $count++;
             }
-            $count++;
         }
     }
 
