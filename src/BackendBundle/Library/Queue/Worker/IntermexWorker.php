@@ -286,7 +286,7 @@ class IntermexWorker extends BaseWorker
      * @param array $args
      * @return mixed
      */
-    public function createTransaction(OperationsQueue $queue, $args = [])
+    public function createTransaction(OperationsQueue &$queue, $args = [])
     {
         $settings = $this->getWorkerSetting();
         $parameters = [];
@@ -298,7 +298,10 @@ class IntermexWorker extends BaseWorker
             'notify_source' => $queue->getTransactionSource(),
             'source' => 'intermex',
             'status' => '' ,
+            'code' => '',
             'confirmation_number' => $queue->getTransaction()->getTransactionCode(),
+            'change_status' => '',
+            'data' => [],
         ];
         $serverResponse = null;
 
@@ -323,13 +326,16 @@ class IntermexWorker extends BaseWorker
             if ($xmlFinal->NewDataSet->ENVIO->tiExito == '1') {
                 $outputToSend['message'] = 'Transaction Successfully Created.';
                 $outputToSend['status'] = 'paid';
+                $outputToSend['code'] = 200;
 
             } else {
                 $outputToSend['message'] = 'Unable to create Transaction.';
                 $outputToSend['status'] = 'failed';
+                $outputToSend['code'] = 400;
             }
 
             $this->updateExecutedQueue($queue);
+            $this->notifyTb($outputToSend);
 
         } catch(\Exception $e) {
             $this->logger->error('main', [$e->getMessage()]);
@@ -478,11 +484,23 @@ class IntermexWorker extends BaseWorker
         $transaction            = $queue->getTransaction();
         $dataPattern            = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
         $cancellationMotivation = 'Cancelled from TB.';
+        $notiDump = [
+            'operation' => 'create',
+            'message' => '' ,
+            'notify_source' => $queue->getTransactionSource(),
+            'source' => 'intermex',
+            'status' => '' ,
+            'code' => '',
+            'confirmation_number' => $queue->getTransaction()->getTransactionCode(),
+            'change_status' => '',
+            'data' => [],
+        ];
 
         $outputMessage = '';
         $outputStatus = 'Failed';
         $outputStatusCode = 500;
         $outputData = [];
+        $flag = false;
 
         try {
             if (! $transaction or ! $transaction->getTransactionCode()) {
@@ -495,10 +513,9 @@ class IntermexWorker extends BaseWorker
                 'vMotivoModificacion' => $cancellationMotivation,
             ];
             $response = $this->sendHttpRequest($url, $parameters, 'AnulaEnvio');
-
             preg_match_all(
                 $dataPattern,
-                $response->AltaEnvioNResult->any, //$response_main->AltaEnvioNResult->any
+                $response->AnulaEnvioResult->any, //$response_main->AltaEnvioNResult->any
                 $matches
             );
 
@@ -517,16 +534,26 @@ class IntermexWorker extends BaseWorker
                 throw new \Exception('Fatal Error :: Request not successful!!');
             }
 
+            $this->updateExecutedQueue($queue);
+
             $outputStatus     = 'Ok';
             $outputMessage    = 'Success!! Transaction successfully sent for Cancellation.';
             $outputStatusCode = 200;
             $outputData['confirmation_number'] = $transaction->getTransactionCode();
+            $flag = true;
+
+            $notiDump['code'] = 200;
+            $notiDump['message'] = $outputMessage;
 
         } catch(\Exception $e) {
+            $notiDump['code'] = 400;
+            $notiDump['message'] = 'Unable to cancel transaction';
+
             $outputData['debug'][] = [$e->getMessage(), $e->getFile(), $e->getLine()];
-            $this->logger->addError('INTERMEX_CANCEL_ERROR', [$e->getTraceAsString()]);
+            $this->logger->addError('INTERMEX_CANCEL_ERROR', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
+        $this->notifyTb($notiDump);
         $this->em->getRepository('BackendBundle:Log')
                     ->addLog(
                         $this->getWorkerSetting('service_id'),
@@ -536,12 +563,13 @@ class IntermexWorker extends BaseWorker
                         $outputStatus
                     );
 
-        return [
-            'message'     => $outputMessage,
-            'status'      => $outputStatus,
-            'status_code' => $outputStatusCode,
-            'data'        => $outputData
-        ];
+//        return [
+//            'message'     => $outputMessage,
+//            'status'      => $outputStatus,
+//            'status_code' => $outputStatusCode,
+//            'data'        => $outputData
+//        ];
+        return $flag;
     }
 
     /**
@@ -575,7 +603,9 @@ class IntermexWorker extends BaseWorker
                     $method = $fieldActionMap[$field];
 
                     if (method_exists($this, $method)) {
-                        $this->$method($transaction);
+                        if (! $this->$method($transaction)) {
+                            throw new \Exception("Fatal Error :: Change not successful!!");
+                        }
                     }
                 }
             }
@@ -584,10 +614,11 @@ class IntermexWorker extends BaseWorker
                 throw new \Exception('Fatal Error :: No difference found!!');
             }
 
+            $this->updateExecutedQueue($queue);
+
         } catch(\Exception $e) {
-
+            $this->logger->addError('INTERMEX_CHANGE_ERROR', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
-
     }
 
     /**
@@ -602,6 +633,7 @@ class IntermexWorker extends BaseWorker
         $password           = $this->getWorkerSetting('password');
         $action             = 'CambiaBeneficiario';
         $webServiceResponse = [];
+        $params = [];
 
         $dataPattern = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
 
@@ -617,7 +649,7 @@ class IntermexWorker extends BaseWorker
 
             preg_match_all(
                 $dataPattern,
-                $response->AltaEnvioNResult->any, //$response_main->AltaEnvioNResult->any
+                $response->CambiaBeneficiarioResult->any, //$response_main->AltaEnvioNResult->any
                 $matches
             );
 
@@ -640,12 +672,14 @@ class IntermexWorker extends BaseWorker
 
         } catch(\Exception $e) {
             $flag = false;
+            $this->logger->addError('INTERMEX_CHANGE_ERROR', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
         $this->em->getRepository('BackendBundle:Log')
                 ->addLog(
                     $this->getWorkerSetting('service_id'),
-                    json_encode($parameters),
+                    $action,
+                    json_encode($params),
                     json_encode($webServiceResponse),
                     ($flag) ? 'Success': 'Failed'
                 );
@@ -700,11 +734,13 @@ class IntermexWorker extends BaseWorker
 
         } catch(\Exception $e) {
             $flag = false;
+            $this->logger->addError('INTERMEX_CHANGE_ERROR', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
         $this->em->getRepository('BackendBundle:Log')
                 ->addLog(
                     $this->getWorkerSetting('service_id'),
+                    $action,
                     json_encode($parameters),
                     json_encode($webServiceResponse),
                     ($flag) ? 'Success': 'Failed'
@@ -763,11 +799,13 @@ class IntermexWorker extends BaseWorker
 
         } catch(\Exception $e) {
             $flag = false;
+            $this->logger->addError('INTERMEX_CHANGE_ERROR', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
         $this->em->getRepository('BackendBundle:Log')
                 ->addLog(
                     $this->getWorkerSetting('service_id'),
+                    $action,
                     json_encode($parameters),
                     json_encode($webServiceResponse),
                     ($flag) ? 'Success': 'Failed'

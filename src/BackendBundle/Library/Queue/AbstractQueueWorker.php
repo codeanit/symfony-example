@@ -5,6 +5,8 @@ namespace BackendBundle\Library\Queue;
 
 use BackendBundle\Entity\OperationsQueue;
 use Doctrine\ORM\EntityManager;
+use GuzzleHttp\Client;
+use GuzzleHttp\Message\Response;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\Validator\Constraints\DateTime;
 
@@ -81,9 +83,9 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
             if (! $service) {
                 $this->settings = [];
             } else {
-                $this->settings = (json_decode(base64_decode($service->getCredentials()), true)) ? 
+                $this->settings = (json_decode(base64_decode($service->getCredentials()), true)) ?
                     json_decode(base64_decode($service->getCredentials()), true): [];
-                $this->settings['service_id'] = $service->getId();         
+                $this->settings['service_id'] = $service->getId();
             }
         }
 
@@ -98,7 +100,7 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
      * @param OperationsQueue $queue
      * @return bool
      */
-    protected function updateExecutedQueue(OperationsQueue $queue)
+    protected function updateExecutedQueue(OperationsQueue &$queue)
     {
         $queue->setIsExecuted(true);
         $queue->setExecutionTimestamp(new \DateTime());
@@ -109,12 +111,31 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
         return true;
     }
 
+    protected function notifyTb(array $params)
+    {
+        $tbUrl = 'http://172.16.1.50/fgm/Webservice/cdex.php';
+        $client = new Client();
+        $options = [
+            'body' => json_encode($params),
+        ];
+
+        $request = $client->createRequest('POST', $tbUrl, $options);
+        /**
+         * @var Response
+         */
+        $response = $client->send($request);
+        echo $response;
+
+        $this->logger->addError('NOTI_RESPONSE_DUMP', [$response->getBody()]);
+        $this->logger->addError('NOTI_RESPONSE_DUMP', $params);
+    }
+
     /**
      * @param OperationsQueue $queue
      * @param array $args
      * @return mixed
      */
-    abstract public function createTransaction(OperationsQueue $queue, $args = []);
+    abstract public function createTransaction(OperationsQueue &$queue, $args = []);
 
     /**
      * @param OperationsQueue $queue
