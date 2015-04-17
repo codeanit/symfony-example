@@ -483,6 +483,7 @@ class IntermexWorker extends BaseWorker
         $outputStatus = 'Failed';
         $outputStatusCode = 500;
         $outputData = [];
+        $flag = false;
 
         try {
             if (! $transaction or ! $transaction->getTransactionCode()) {
@@ -522,6 +523,7 @@ class IntermexWorker extends BaseWorker
             $outputMessage    = 'Success!! Transaction successfully sent for Cancellation.';
             $outputStatusCode = 200;
             $outputData['confirmation_number'] = $transaction->getTransactionCode();
+            $flag = true;
 
         } catch(\Exception $e) {
             $outputData['debug'][] = [$e->getMessage(), $e->getFile(), $e->getLine()];
@@ -537,12 +539,13 @@ class IntermexWorker extends BaseWorker
                         $outputStatus
                     );
 
-        return [
-            'message'     => $outputMessage,
-            'status'      => $outputStatus,
-            'status_code' => $outputStatusCode,
-            'data'        => $outputData
-        ];
+//        return [
+//            'message'     => $outputMessage,
+//            'status'      => $outputStatus,
+//            'status_code' => $outputStatusCode,
+//            'data'        => $outputData
+//        ];
+        return $flag;
     }
 
     /**
@@ -619,7 +622,7 @@ class IntermexWorker extends BaseWorker
             ];
 
             $response = $this->sendHttpRequest($url, $params, $action);
-            $this->logger->addError('RESP_DUMP', [$response]);
+            
             preg_match_all(
                 $dataPattern,
                 $response->CambiaBeneficiarioResult->any, //$response_main->AltaEnvioNResult->any
