@@ -298,7 +298,10 @@ class IntermexWorker extends BaseWorker
             'notify_source' => $queue->getTransactionSource(),
             'source' => 'intermex',
             'status' => '' ,
+            'code' => '',
             'confirmation_number' => $queue->getTransaction()->getTransactionCode(),
+            'change_status' => '',
+            'data' => [],
         ];
         $serverResponse = null;
 
@@ -323,13 +326,16 @@ class IntermexWorker extends BaseWorker
             if ($xmlFinal->NewDataSet->ENVIO->tiExito == '1') {
                 $outputToSend['message'] = 'Transaction Successfully Created.';
                 $outputToSend['status'] = 'paid';
+                $outputToSend['code'] = 200;
 
             } else {
                 $outputToSend['message'] = 'Unable to create Transaction.';
                 $outputToSend['status'] = 'failed';
+                $outputToSend['code'] = 400;
             }
 
             $this->updateExecutedQueue($queue);
+            $this->notifyTb($outputToSend);
 
         } catch(\Exception $e) {
             $this->logger->error('main', [$e->getMessage()]);
@@ -478,6 +484,17 @@ class IntermexWorker extends BaseWorker
         $transaction            = $queue->getTransaction();
         $dataPattern            = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
         $cancellationMotivation = 'Cancelled from TB.';
+        $notiDump = [
+            'operation' => 'create',
+            'message' => '' ,
+            'notify_source' => $queue->getTransactionSource(),
+            'source' => 'intermex',
+            'status' => '' ,
+            'code' => '',
+            'confirmation_number' => $queue->getTransaction()->getTransactionCode(),
+            'change_status' => '',
+            'data' => [],
+        ];
 
         $outputMessage = '';
         $outputStatus = 'Failed';
@@ -525,11 +542,18 @@ class IntermexWorker extends BaseWorker
             $outputData['confirmation_number'] = $transaction->getTransactionCode();
             $flag = true;
 
+            $notiDump['code'] = 200;
+            $notiDump['message'] = $outputMessage;
+
         } catch(\Exception $e) {
+            $notiDump['code'] = 400;
+            $notiDump['message'] = 'Unable to cancel transaction';
+
             $outputData['debug'][] = [$e->getMessage(), $e->getFile(), $e->getLine()];
             $this->logger->addError('INTERMEX_CANCEL_ERROR', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
+        $this->notifyTb($notiDump);
         $this->em->getRepository('BackendBundle:Log')
                     ->addLog(
                         $this->getWorkerSetting('service_id'),
@@ -622,7 +646,7 @@ class IntermexWorker extends BaseWorker
             ];
 
             $response = $this->sendHttpRequest($url, $params, $action);
-            
+
             preg_match_all(
                 $dataPattern,
                 $response->CambiaBeneficiarioResult->any, //$response_main->AltaEnvioNResult->any
