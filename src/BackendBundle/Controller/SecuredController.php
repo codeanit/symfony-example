@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Finder\Finder;
 
 /**
  * @Route("/demo/secured")
@@ -100,9 +101,38 @@ class SecuredController extends Controller
     { 
         $DB=$this->get('connection');
         $services=$DB->getServices();
-
         return array('services' => $services);
     }
+
+    /**
+     * @Route("/list/{name}/{id}", name="list")
+     * @Template()
+     */
+    public function listFilesAction()
+    { 
+        $contents=array();
+        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/sanmartin/';
+        $finder = new Finder();
+        $finder->files()->in($path);
+        foreach ($finder as $file) {
+         $contents [] = $file->getRelativePathname();
+        }
+        return array('files' => $contents ,'path'=>$path);
+    }
+
+    /**
+     * @Route("/download/{name}/", name="download")
+     * 
+     */
+    public function downloadFilesAction($name=null)
+    { 
+        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/sanmartin/'.$name; 
+        header('Content-Type: application/octet-stream');
+        header("Content-Transfer-Encoding: Binary"); 
+        header("Content-disposition: attachment; filename=\"" . basename($path) . "\""); 
+        readfile($path); 
+    }
+
 
      /**
      * @Route("/service/add/{name}/{id}", name="_demo_secured_service_add")

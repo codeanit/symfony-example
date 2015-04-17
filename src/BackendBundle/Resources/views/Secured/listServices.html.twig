@@ -28,11 +28,11 @@
                   value='{{entry.id}}' name='status'>{{(status in entry.status)?'Deactivate':'Activate'}}</a>
 
                   <a href="{{url('_demo_secured_service_logs', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-default btn-xs'>Logs</a>
-{#                  
-                  {% if entry.is_ftp_service == 2 %}  
-                    <a href="{{url('upload', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-primary btn-xs'>Upload</a>
+                 
+                  {% if entry.is_ftp_service == 1 %}  
+                    <a href="{{url('list', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-primary btn-xs'>Generated Files</a>
                   {% endif %}
-#}
+
                 </td>
             </tr>
             {% endfor %}

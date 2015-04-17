@@ -77,4 +77,9 @@ class QueueWorkerFactory
     {
         return $this->container->get('cdex_queue_worker.bdo');
     }
+
+    public function forgeSanmartinWorker()
+    {
+        return $this->container->get('cdex_queue_worker.sanmartin');
+    }
 }
