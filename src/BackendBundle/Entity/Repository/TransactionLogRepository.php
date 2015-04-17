@@ -45,6 +45,7 @@ class TransactionLogRepository extends EntityRepository
             $flag = true;
 
         } catch(\Exception $e) {
+           throw $e;           
         }
 
         return $flag;
