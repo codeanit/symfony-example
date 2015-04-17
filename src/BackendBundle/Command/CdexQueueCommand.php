@@ -27,7 +27,7 @@ class CdexQueueCommand extends ContainerAwareCommand
         $this
             ->setName('cdex:queue')
             ->setDescription('Enqueue CDEX Transactions.')
-            ->addArgument('operation', InputArgument::OPTIONAL, 'What operation.', '')
+            ->addArgument('operation', InputArgument::OPTIONAL, 'What operation.', 'both')
 /*
     <info>php %command.full_name%</info>
 
