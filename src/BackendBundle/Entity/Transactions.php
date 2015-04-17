@@ -9,6 +9,12 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Transactions
 {
+    const QUEUE_OPERATION_CREATE = 'CREATE';
+    const QUEUE_OPERATION_CHANGE = 'CHANGE';
+    const QUEUE_OPERATION_CANCEL = 'CANCEL';
+    const QUEUE_OPERATION_ENQUEUE = 'ENQUEUE';
+
+
     /**
      * @var integer
      */
