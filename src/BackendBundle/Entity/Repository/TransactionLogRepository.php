@@ -40,12 +40,11 @@ class TransactionLogRepository extends EntityRepository
         try {
             $this->getEntityManager()->persist($log);
             $this->getEntityManager()->flush();
-            $this->getEntityManager()->clear();
 
             $flag = true;
 
         } catch(\Exception $e) {
-           throw $e;           
+           throw $e;
         }
 
         return $flag;
