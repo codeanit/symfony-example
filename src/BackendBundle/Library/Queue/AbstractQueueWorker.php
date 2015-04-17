@@ -135,7 +135,7 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
      * @param array $args
      * @return mixed
      */
-    abstract public function createTransaction(OperationsQueue &$queue, $args = []);
+    abstract public function createTransaction(OperationsQueue $queue, $args = []);
 
     /**
      * @param OperationsQueue $queue

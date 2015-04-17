@@ -286,7 +286,7 @@ class IntermexWorker extends BaseWorker
      * @param array $args
      * @return mixed
      */
-    public function createTransaction(OperationsQueue &$queue, $args = [])
+    public function createTransaction(OperationsQueue $queue, $args = [])
     {
         $settings = $this->getWorkerSetting();
         $parameters = [];
