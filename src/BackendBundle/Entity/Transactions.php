@@ -14,7 +14,6 @@ class Transactions
     const QUEUE_OPERATION_CANCEL = 'CANCEL';
     const QUEUE_OPERATION_ENQUEUE = 'ENQUEUE';
 
-
     /**
      * @var integer
      */

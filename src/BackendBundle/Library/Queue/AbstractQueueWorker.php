@@ -81,9 +81,9 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
             if (! $service) {
                 $this->settings = [];
             } else {
-                $this->settings = (json_decode(base64_decode($service->getCredentials()), true)) ? 
+                $this->settings = (json_decode(base64_decode($service->getCredentials()), true)) ?
                     json_decode(base64_decode($service->getCredentials()), true): [];
-                $this->settings['service_id'] = $service->getId();         
+                $this->settings['service_id'] = $service->getId();
             }
         }
 
@@ -98,7 +98,7 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
      * @param OperationsQueue $queue
      * @return bool
      */
-    protected function updateExecutedQueue(OperationsQueue $queue)
+    protected function updateExecutedQueue(OperationsQueue &$queue)
     {
         $queue->setIsExecuted(true);
         $queue->setExecutionTimestamp(new \DateTime());
@@ -114,7 +114,7 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
      * @param array $args
      * @return mixed
      */
-    abstract public function createTransaction(OperationsQueue $queue, $args = []);
+    abstract public function createTransaction(OperationsQueue &$queue, $args = []);
 
     /**
      * @param OperationsQueue $queue
