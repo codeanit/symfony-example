@@ -5,6 +5,8 @@ namespace BackendBundle\Library\Queue;
 
 use BackendBundle\Entity\OperationsQueue;
 use Doctrine\ORM\EntityManager;
+use GuzzleHttp\Client;
+use GuzzleHttp\Message\Response;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\Validator\Constraints\DateTime;
 
@@ -107,6 +109,25 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
         $this->em->flush();
 
         return true;
+    }
+
+    protected function notifyTb(array $params)
+    {
+        $tbUrl = 'http://172.16.1.50/fgm/Webservice/cdex.php';
+        $client = new Client();
+        $options = [
+            'body' => json_encode($params),
+        ];
+
+        $request = $client->createRequest('POST', $tbUrl, $options);
+        /**
+         * @var Response
+         */
+        $response = $client->send($request);
+        echo $response;
+
+        $this->logger->addError('NOTI_RESPONSE_DUMP', [$response->getBody()]);
+        $this->logger->addError('NOTI_RESPONSE_DUMP', $params);
     }
 
     /**
