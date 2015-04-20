@@ -20,21 +20,24 @@ class TransactionRepository  extends EntityRepository
 
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addRootEntityFromClassMetadata('BackendBundle\Entity\Transactions', 't');
+        $processStatPending = Transactions::TRANSACTION_STATUS_PENDING;
 
         /*
          * Get Latest change Transactions
          */
         $changeTransactions = $this->getEntityManager()
                     ->createNativeQuery("SELECT t1.*
-                        FROM transactions t1
-                        INNER JOIN
-                          (SELECT max(created_at) LatestCreatedDate,
-                                  parent_id
-                           FROM transactions
-                           WHERE queue_operation = 'CHANGE'
-                           GROUP BY parent_id) t2 ON t2.parent_id = t1.parent_id
-                        AND t1.created_at = t2.LatestCreatedDate
-                        WHERE t1.queue_operation = 'CHANGE'", $rsm)
+                                    FROM transactions t1
+                                    INNER JOIN
+                                      (SELECT max(created_at) LatestCreatedDate,
+                                              parent_id
+                                       FROM transactions
+                                       WHERE queue_operation = 'CHANGE'
+                                         AND process_status = '{$processStatPending}'
+                                       GROUP BY parent_id) t2 ON t2.parent_id = t1.parent_id
+                                    AND t1.created_at = t2.LatestCreatedDate
+                                    WHERE t1.queue_operation = 'CHANGE'
+                                      AND t1.process_status = '{$processStatPending}'", $rsm)
                     ->getResult()
         ;
 
@@ -44,6 +47,8 @@ class TransactionRepository  extends EntityRepository
         $transactions = $this->createQueryBuilder('t')
                             ->select('t')
                             ->where('t.queueOperation IN (:validStats)')
+                            ->andWhere('t.processingStatus = :pendingStatus')
+                            ->setParameter('pendingStatus', $processStatPending)
                             ->setParameter('validStats', [
                                 Transactions::QUEUE_OPERATION_CANCEL,
                                 Transactions::QUEUE_OPERATION_CREATE
