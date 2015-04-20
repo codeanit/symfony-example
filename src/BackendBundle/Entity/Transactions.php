@@ -14,6 +14,13 @@ class Transactions
     const QUEUE_OPERATION_CANCEL = 'CANCEL';
     const QUEUE_OPERATION_ENQUEUE = 'ENQUEUE';
 
+
+    const TRANSACTION_STATUS_CANCELLED = 'cancelled';
+    const TRANSACTION_STATUS_PAID = 'paid';
+    const TRANSACTION_STATUS_ERROR = 'error';
+    const TRANSACTION_STATUS_ENQUEUE = 'enqueue';
+    const TRANSACTION_STATUS_PENDING = 'pending';
+
     /**
      * @var integer
      */
