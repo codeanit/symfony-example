@@ -50,8 +50,15 @@ BackendBundle\Entity\OperationsQueue:
             type: boolean
             nullable: true
             comment: 'Identifies if the operation is performed or not'
-            default: '0'
+            options:
+                default: 0
             column: is_executed
+        executionCount:
+            type: integer
+            nullable: false
+            comment: 'No of times Queue is executed'
+            default: '0'
+            column: execution_count
         creationDatetime:
             type: datetime
             nullable: true
