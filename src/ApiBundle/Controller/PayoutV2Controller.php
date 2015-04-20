@@ -15,6 +15,10 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
+/**
+ * Class PayoutV2Controller
+ * @package ApiBundle\Controller
+ */
 class PayoutV2Controller extends Controller
 {
     /**
@@ -34,7 +38,7 @@ class PayoutV2Controller extends Controller
             'source_transaction_id'=> mt_rand(1, 9999999),
             'transaction_source'=> $request->get('source'), //isset($data['source'])?$data['source']:'',
             'transaction_service'=> $request->get('service'), //isset($data['service'])?$data['service']:'',
-            'processing_status'=> $request->get('processing_status', 'hold'),
+            'processing_status'=> Transactions::TRANSACTION_STATUS_PENDING,
             'created_at'=> date('Y-m-d H:i:s'),
             'uuid' => $uuid,
             'queue_operation' => Transactions::QUEUE_OPERATION_CREATE,
@@ -102,7 +106,7 @@ class PayoutV2Controller extends Controller
                 'source_transaction_id'=> mt_rand(1, 9999999),
                 'transaction_source'=> $request->get('source'), //isset($data['source'])?$data['source']:'',
                 'transaction_service'=> $request->get('service'), //isset($data['service'])?$data['service']:'',
-                'processing_status'=> $request->get('processing_status', 'hold'),
+                'processing_status'=> Transactions::TRANSACTION_STATUS_PENDING,
                 'created_at'=> date('Y-m-d H:i:s'),
                 'queue_operation' => Transactions::QUEUE_OPERATION_CHANGE,
                 'parent_id' => $parentId,
@@ -167,7 +171,7 @@ class PayoutV2Controller extends Controller
                 'source_transaction_id'=> mt_rand(1, 9999999),
                 'transaction_source'=> $request->get('source'), //isset($data['source'])?$data['source']:'',
                 'transaction_service'=> $request->get('service'), //isset($data['service'])?$data['service']:'',
-                'processing_status'=> $request->get('processing_status', 'hold'),
+                'processing_status'=> Transactions::TRANSACTION_STATUS_PENDING,
                 'created_at'=> date('Y-m-d H:i:s'),
                 'queue_operation' => Transactions::QUEUE_OPERATION_CANCEL,
                 'parent_id' => $parentId,
