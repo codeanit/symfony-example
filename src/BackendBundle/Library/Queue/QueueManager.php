@@ -160,9 +160,10 @@ class QueueManager
             ->findAll();
 
         foreach ($services as $service) {
+            $serviceName =$service->getServiceName();
 
-            if($service->getServiceName() == 'intermex') {
-                $this->queueFactory->forgeWorker('intermex')->confirmTransaction();
+            if( $serviceName == 'intermex' || $serviceName == 'sanmartin' ) {
+                $this->queueFactory->forgeWorker($serviceName)->confirmTransaction();
             }
         }
         //execute confirm
