@@ -184,7 +184,7 @@ class DB
                                ->setParameter('service_name', $service);
                 $count=$qb->execute()->fetchColumn();      
             } catch ( \Exception $e) {
-                  $e->getMessage();
+                  throw $e;                  
             }  
            
         $enc=base64_encode(json_encode($cred));    

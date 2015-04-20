@@ -40,7 +40,7 @@ class SanMartinWorker extends BaseWorker {
                     $bankAccountNumber=$transaction->getBeneficiaryAccountNumber();
                     $bankName=$transaction->getBeneficiaryBankName();
                 }else{
-                    $bankBranch=$bankAccountNumber='';
+                    $bankBranch=$bankAccountNumber=$bankName='';
                     $paymentType=1;
                 }
                 $dataToGenerate=array(
