@@ -26,7 +26,4 @@ app/logs/*
 app/logs/**/*
 app/logs/dev.log
 
-
-
-
 app/bootstrap.php.cache
