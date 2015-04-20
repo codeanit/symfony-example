@@ -57,7 +57,7 @@ class QueueManager
         $queue->setCreationDatetime(new \DateTime());
         $queue->setTransaction($transaction);
 
-        $transaction->setQueueOperation(Transactions::QUEUE_OPERATION_ENQUEUE);
+        $transaction->setProcessingStatus(Transactions::TRANSACTION_STATUS_ENQUEUE);
 
         try {
             $this->em->persist($queue);
@@ -109,7 +109,7 @@ class QueueManager
                 $queue->setTransaction($transaction);
                 $queue->setIsExecuted(false);
 
-                $transaction->setQueueOperation(Transactions::QUEUE_OPERATION_ENQUEUE);
+                $transaction->setProcessingStatus(Transactions::TRANSACTION_STATUS_ENQUEUE);
 
                 $this->em->persist($transaction);
                 $this->em->persist($queue);
