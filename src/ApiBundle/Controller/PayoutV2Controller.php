@@ -15,6 +15,10 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
+/**
+ * Class PayoutV2Controller
+ * @package ApiBundle\Controller
+ */
 class PayoutV2Controller extends Controller
 {
     /**
