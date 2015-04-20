@@ -45,7 +45,7 @@ class SanMartinWorker extends BaseWorker {
                 }
                 $dataToGenerate=array(
                            "Date of the order"=>$transaction->getRemittanceDate()->format('y/m/d'),
-                           "Number of Shipping"=>$transaction->getTransactionCode(),
+                           "MTCN number"=>$transaction->getTransactionCode(),
                            "Sender Name"=>$transaction->getRemitterfirstName(),
                            "Sender Name Paternal"=>$transaction->getRemitterLastName(),
                            "Sender Name Mother"=>$transaction->getRemitterMiddleName(),
@@ -73,7 +73,11 @@ class SanMartinWorker extends BaseWorker {
                            "City / Town Sender"=>$transaction->getRemitterCity(),
                            "Sender State"=>$transaction->getRemitterState()
                     );
-                $output='';       
+                $output=''; 
+                $rootPath=dirname($this->container->getParameter('kernel.root_dir'));
+                if (!is_dir($rootPath.'/web/generated_files/sanmartin/')) {               
+                      mkdir($rootPath.'/web/generated_files/sanmartin/', 0777, true);
+                    }
                 $path=dirname($this->container->getParameter('kernel.root_dir'))
                         .'/web/generated_files/sanmartin/SM'
                         .date('ymd').$transaction->getTransactionCode()
