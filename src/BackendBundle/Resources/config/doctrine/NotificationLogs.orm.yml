@@ -1,0 +1,13 @@
+BackendBundle\Entity\NotificationLogs:
+    type: entity
+    table: notification_log
+    repositoryClass: BackendBundle\Entity\Repository\NotificationLogRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            comment: ''
+            id: true
+            generator:
+                strategy: IDENTITY
