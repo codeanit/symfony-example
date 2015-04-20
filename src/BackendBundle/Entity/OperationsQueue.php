@@ -270,4 +270,32 @@ class OperationsQueue
     {
         return $this->transaction;
     }
+    /**
+     * @var integer
+     */
+    private $executionCount;
+
+
+    /**
+     * Set executionCount
+     *
+     * @param integer $executionCount
+     * @return OperationsQueue
+     */
+    public function setExecutionCount($executionCount)
+    {
+        $this->executionCount = $executionCount;
+
+        return $this;
+    }
+
+    /**
+     * Get executionCount
+     *
+     * @return integer 
+     */
+    public function getExecutionCount()
+    {
+        return $this->executionCount;
+    }
 }
