@@ -6,70 +6,58 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * OperationsQueue
- *
- * @ORM\Table(name="operations_queue")
- * @ORM\Entity
  */
 class OperationsQueue
 {
     /**
      * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="transaction_source", type="string", length=10, nullable=false)
      */
     private $transactionSource;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="transaction_service", type="string", length=45, nullable=false)
      */
     private $transactionService;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="operation", type="string", length=25, nullable=false)
      */
     private $operation;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="parameter", type="text", nullable=true)
      */
     private $parameter;
 
     /**
      * @var boolean
-     *
-     * @ORM\Column(name="is_executed", type="boolean", nullable=true)
      */
-    private $isExecuted;
+    private $isExecutable;
+
+    /**
+     * @var integer
+     */
+    private $executionCount;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="creation_datetime", type="datetime", nullable=true)
      */
     private $creationDatetime;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="execution_timestamp", type="datetime", nullable=true)
      */
     private $executionTimestamp;
 
+    /**
+     * @var \BackendBundle\Entity\Transactions
+     */
+    private $transaction;
 
 
     /**
@@ -175,26 +163,49 @@ class OperationsQueue
     }
 
     /**
-     * Set isExecuted
+     * Set isExecutable
      *
-     * @param boolean $isExecuted
+     * @param boolean $isExecutable
      * @return OperationsQueue
      */
-    public function setIsExecuted($isExecuted)
+    public function setIsExecutable($isExecutable)
     {
-        $this->isExecuted = $isExecuted;
+        $this->isExecutable = $isExecutable;
 
         return $this;
     }
 
     /**
-     * Get isExecuted
+     * Get isExecutable
      *
      * @return boolean 
      */
-    public function getIsExecuted()
+    public function getIsExecutable()
     {
-        return $this->isExecuted;
+        return $this->isExecutable;
+    }
+
+    /**
+     * Set executionCount
+     *
+     * @param integer $executionCount
+     * @return OperationsQueue
+     */
+    public function setExecutionCount($executionCount)
+    {
+        $this->executionCount = $executionCount;
+
+        return $this;
+    }
+
+    /**
+     * Get executionCount
+     *
+     * @return integer 
+     */
+    public function getExecutionCount()
+    {
+        return $this->executionCount;
     }
 
     /**
@@ -242,11 +253,6 @@ class OperationsQueue
     {
         return $this->executionTimestamp;
     }
-    /**
-     * @var \BackendBundle\Entity\Transactions
-     */
-    private $transaction;
-
 
     /**
      * Set transaction
@@ -269,33 +275,5 @@ class OperationsQueue
     public function getTransaction()
     {
         return $this->transaction;
-    }
-    /**
-     * @var integer
-     */
-    private $executionCount;
-
-
-    /**
-     * Set executionCount
-     *
-     * @param integer $executionCount
-     * @return OperationsQueue
-     */
-    public function setExecutionCount($executionCount)
-    {
-        $this->executionCount = $executionCount;
-
-        return $this;
-    }
-
-    /**
-     * Get executionCount
-     *
-     * @return integer 
-     */
-    public function getExecutionCount()
-    {
-        return $this->executionCount;
     }
 }
