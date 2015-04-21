@@ -820,7 +820,7 @@ class IntermexWorker extends BaseWorker
                 ->addLog(
                     $this->getWorkerSetting('service_id'),
                     $action,
-                    json_encode($parameters),
+                    json_encode($params),
                     json_encode($webServiceResponse),
                     ($flag) ? 'Success': 'Failed'
                 );
