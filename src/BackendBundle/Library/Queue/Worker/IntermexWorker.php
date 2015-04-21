@@ -328,7 +328,7 @@ class IntermexWorker extends BaseWorker
                 $outputToSend['status'] = 'error';
             }
 
-//            $this->notifyTb($outputToSend);
+            $this->notifyTb($outputToSend);
 
         } catch(\Exception $e) {
             $this->logger->error('main', [$e->getMessage()]);
