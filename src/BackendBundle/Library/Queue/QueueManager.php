@@ -111,7 +111,6 @@ class QueueManager
                 $queue->setOperation($transaction->getQueueOperation());
                 $queue->setCreationDatetime(new \DateTime());
                 $queue->setTransaction($transaction);
-                $queue->setIsExecuted(false);
 
                 $transaction->setProcessingStatus(Transactions::TRANSACTION_STATUS_ENQUEUE);
 
@@ -139,9 +138,7 @@ class QueueManager
     {
         $counter = 0;
         $queues = $this->em->getRepository('BackendBundle:OperationsQueue')
-                    ->findBy([
-                        'isExecutable' => true
-                    ]);
+                    ->getOperationQueues();
 
         foreach ($queues as $queue) {
             if ($this->processQueue($queue)) {
