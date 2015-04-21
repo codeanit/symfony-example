@@ -14,7 +14,7 @@ app/phpunit.xml
 vendor/**/*
 
 #Ignore composer files
-composer.*
+composer.lock   
 
 #Ignore web/
 web/bundles/**/*
