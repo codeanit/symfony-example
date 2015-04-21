@@ -1,6 +1,7 @@
 BackendBundle\Entity\OperationsQueue:
     type: entity
     table: operations_queue
+    repositoryClass: BackendBundle\Entity\Repository\OperationQueueRepository
     id:
         id:
             type: integer
@@ -50,6 +51,7 @@ BackendBundle\Entity\OperationsQueue:
             type: boolean
             nullable: true
             comment: 'Identifies if the operation is performed or not'
+            default: 1
             options:
                 default: 1
             column: is_executable

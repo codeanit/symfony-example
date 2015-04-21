@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class OperationsQueue
 {
+    const MAX_QUEUE_THRESHOLD = 3;
+
     /**
      * @var integer
      */
@@ -37,12 +39,12 @@ class OperationsQueue
     /**
      * @var boolean
      */
-    private $isExecutable;
+    private $isExecutable = true;
 
     /**
      * @var integer
      */
-    private $executionCount;
+    private $executionCount = 0;
 
     /**
      * @var \DateTime
