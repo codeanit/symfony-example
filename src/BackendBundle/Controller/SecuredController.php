@@ -108,26 +108,26 @@ class SecuredController extends Controller
      * @Route("/list/{name}/{id}", name="list")
      * @Template()
      */
-    public function listFilesAction()
-    { 
+    public function listFilesAction($name=null)
+    {
         $contents=array();
-        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/sanmartin/';
+        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$name;
         $finder = new Finder();
         $finder->files()->in($path);
         foreach ($finder as $file) {
          $contents [] = $file->getRelativePathname();
         }
-        return array('files' => $contents ,'path'=>$path);
+        return array('files' => $contents ,'path'=>$path,'service'=>$name);
     }
 
     /**
-     * @Route("/download/{name}/", name="download")
+     * @Route("/download/{name}/{service}/", name="download")
      * 
      */
-    public function downloadFilesAction($name=null)
+    public function downloadFilesAction($name=null,$service=null)
     {
-        $file = $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/sanmartin/'.$name;
-
+        $file = $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$service.'/'.$name;
+        if(file_exists($file)){       
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename='.basename($file));
@@ -139,7 +139,9 @@ class SecuredController extends Controller
         ob_clean();
         flush();
         readfile($file);
+        }
         exit;
+
     }
 
 

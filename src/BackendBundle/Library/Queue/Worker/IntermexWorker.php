@@ -290,6 +290,7 @@ class IntermexWorker extends BaseWorker
     {
         $settings = $this->getWorkerSetting();
         $parameters = [];
+        $flag = false;
         $url = (isset($settings['url'])) ? $settings['url'] : false;
         $dataPattern = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
         $outputToSend = [
@@ -327,6 +328,7 @@ class IntermexWorker extends BaseWorker
                 $outputToSend['message'] = 'Transaction Successfully Created.';
                 $outputToSend['status'] = 'paid';
                 $outputToSend['code'] = 200;
+                $flag = true;
 
             } else {
                 $outputToSend['message'] = 'Unable to create Transaction.';
@@ -334,13 +336,19 @@ class IntermexWorker extends BaseWorker
                 $outputToSend['code'] = 400;
             }
 
-            $this->updateExecutedQueue($queue);
-            $this->notifyTb($outputToSend);
+//            $this->notifyTb($outputToSend);
 
         } catch(\Exception $e) {
             $this->logger->error('main', [$e->getMessage()]);
         }
 
+        /**
+         * if $flag = true > then reExecute > false
+         * if $flag = false > then reExecute > true
+         *
+         */
+        $reExecute = !$flag;
+        $this->updateExecutedQueue($queue, $reExecute);
         $this->em->getRepository('BackendBundle:Log')
             ->addLog(
                 $settings['service_id'],
@@ -534,7 +542,7 @@ class IntermexWorker extends BaseWorker
                 throw new \Exception('Fatal Error :: Request not successful!!');
             }
 
-            $this->updateExecutedQueue($queue);
+//            $this->updateExecutedQueue($queue);
 
             $outputStatus     = 'Ok';
             $outputMessage    = 'Success!! Transaction successfully sent for Cancellation.';
@@ -553,6 +561,13 @@ class IntermexWorker extends BaseWorker
             $this->logger->addError('INTERMEX_CANCEL_ERROR', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
+        /**
+         * if $flag = true > then reExecute > false
+         * if $flag = false > then reExecute > true
+         *
+         */
+        $reExecute = !$flag;
+        $this->updateExecutedQueue($queue, $reExecute);
         $this->notifyTb($notiDump);
         $this->em->getRepository('BackendBundle:Log')
                     ->addLog(
@@ -594,6 +609,7 @@ class IntermexWorker extends BaseWorker
 
         $differences = $this->findTransactionDifferences($parentTransaction, $transaction);
         $isDifferenceFound = false;
+        $flag = false;
 
         try {
             foreach ($fieldsOfInterest as $field) {
@@ -614,11 +630,22 @@ class IntermexWorker extends BaseWorker
                 throw new \Exception('Fatal Error :: No difference found!!');
             }
 
-            $this->updateExecutedQueue($queue);
+//            $this->updateExecutedQueue($queue);
+            $flag = true;
 
         } catch(\Exception $e) {
             $this->logger->addError('INTERMEX_CHANGE_ERROR', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
+
+        /**
+         * if $flag = true > then reExecute > false
+         * if $flag = false > then reExecute > true
+         *
+         */
+        $reExecute = !$flag;
+        $this->updateExecutedQueue($queue, $reExecute);
+
+        return $flag;
     }
 
     /**
