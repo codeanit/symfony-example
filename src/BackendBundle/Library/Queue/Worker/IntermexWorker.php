@@ -361,7 +361,7 @@ class IntermexWorker extends BaseWorker
     {
         $transaction    = $queue->getTransaction();
         $payoutId       = $transaction->getTransactionType();
-        $payoutId       = (strtoupper($payoutId) == "BANK") ? '2' : '1';
+        $payoutId       = (strtoupper($payoutId) == "BANK") ? '3' : '1';
         $currencyId     = $transaction->getPayoutCurrency();
         $currencyId     = (strtoupper($currencyId) == "USD" ||
                             strtoupper($currencyId) == "CAD") ? '2' : '1';
