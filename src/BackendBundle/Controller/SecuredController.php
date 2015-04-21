@@ -268,5 +268,34 @@ class SecuredController extends Controller
         print_r($Q->executeQueuedOperation());        
         die;      
     }
+
+    /**
+     * @Route("/upload/{name}/{id}", name="upload")
+     * @Template()
+     */
+    public function uploadAction($name,$id)
+    {    
+        return array('service_name'=>$name,'service_id'=>$id); 
+    }
+
+    /**
+     * @Route("/uploadFile/", name="uploadFile")
+     * 
+     */
+    public function uploadFileAction(Request $request)
+    {
+        $path=$this->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/sanmartin/unparsed/';
+         
+        if($request->files){
+            foreach ($request->files as $uploadedFile) {                
+               $uploadedFile->move($path,$uploadedFile->getClientOriginalName());                                 
+               if(file_exists($path.$uploadedFile->getClientOriginalName()))
+               {                   
+                return $this->redirect($this->generateUrl('_demo_secured_services')); 
+               }
+            }
+        }
+            
+    }
 }
 

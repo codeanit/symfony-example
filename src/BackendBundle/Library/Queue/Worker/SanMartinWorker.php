@@ -13,6 +13,8 @@ use BackendBundle\Entity\Transactions;
 use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
 use JMS\Serializer\Serializer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
+
 
 
 class SanMartinWorker extends BaseWorker {
@@ -140,8 +142,39 @@ class SanMartinWorker extends BaseWorker {
      * @return mixed
      */
     public function confirmTransaction()
-    {
-        // TODO: Implement confirmTransaction() method.
+    { 
+        try {
+            $rootPath=dirname($this->container->getParameter('kernel.root_dir'));
+              if (!is_dir($rootPath.'/web/generated_files/sanmartin/unparsed/')) 
+              {               
+                mkdir($rootPath.'/web/generated_files/sanmartin/unparsed/', 0777, true);
+                mkdir($rootPath.'/web/generated_files/sanmartin/parsed/', 0777, true);
+              }
+            $unparsedPath= $rootPath.'/web/generated_files/sanmartin/unparsed/';
+            $parsedPath= $rootPath.'/web/generated_files/sanmartin/parsed/';
+            $contents=array();
+            $getMTCN=array();
+            $fileCount=0;        
+            $finder = new Finder();
+            $finder->files()->in($unparsedPath);
+            foreach ($finder as $file) {
+               $contents [] = $file->getRelativePathname();
+               $data=file_get_contents($unparsedPath.$contents[$fileCount++]);            
+               $txnData=explode("\n", str_replace("\r", '', trim($data)));             
+               foreach ($txnData as $txnDatas) {
+                  $MTCN= explode('|',$txnDatas);
+                  $getMTCN[]=$MTCN[1];               
+               } 
+               if(copy($unparsedPath.$file->getRelativePathname(),$parsedPath.$file->getRelativePathname())){
+                  unlink($unparsedPath.$file->getRelativePathname());
+               }                             
+            }            
+           // print_r($getMTCN);die;
+          } catch (\Exception $e) {         
+              echo $e->getMessage();die;                     
+          }               
+        die;
+        return;
     }
 
     /**
