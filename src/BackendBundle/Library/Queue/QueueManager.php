@@ -80,6 +80,10 @@ class QueueManager
      */
     public function processQueue(OperationsQueue $queue)
     {
+        if ($queue->getExecutionCount() >= OperationsQueue::MAX_QUEUE_THRESHOLD) {
+            return false;
+        }
+
         $status = $this->queueFactory->forgeWorkerForQueue($queue)
                         ->processQueue($queue);
 
