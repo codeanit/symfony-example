@@ -20,7 +20,14 @@ class SanmartinFileGeneratorTest extends WebTestCase
     $this->GB=$this->container->get('cdex_queue_worker.sanmartin');
   }
 
-  public function testGenerator()
+  public function testParser()
+  {
+    $this->GB->confirmTransaction();
+    
+  }
+
+
+  public function ptestGenerator()
   { 
    $testData= array("Date of the order"=>"12/12/12",
                     "Number of Shipping"=>"2",
