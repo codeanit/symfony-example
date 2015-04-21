@@ -127,7 +127,7 @@ class SecuredController extends Controller
     public function downloadFilesAction($name=null)
     {
         $file = $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/sanmartin/'.$name;
-
+        if(file_exists($file)){       
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename='.basename($file));
@@ -139,7 +139,9 @@ class SecuredController extends Controller
         ob_clean();
         flush();
         readfile($file);
+        }
         exit;
+
     }
 
 
