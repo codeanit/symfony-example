@@ -57,7 +57,7 @@ class QueueManager
         $queue->setCreationDatetime(new \DateTime());
         $queue->setTransaction($transaction);
 
-        $transaction->setQueueOperation(Transactions::QUEUE_OPERATION_ENQUEUE);
+        $transaction->setProcessingStatus(Transactions::TRANSACTION_STATUS_ENQUEUE);
 
         try {
             $this->em->persist($queue);
@@ -80,6 +80,10 @@ class QueueManager
      */
     public function processQueue(OperationsQueue $queue)
     {
+        if ($queue->getExecutionCount() >= OperationsQueue::MAX_QUEUE_THRESHOLD) {
+            return false;
+        }
+
         $status = $this->queueFactory->forgeWorkerForQueue($queue)
                         ->processQueue($queue);
 
@@ -107,9 +111,8 @@ class QueueManager
                 $queue->setOperation($transaction->getQueueOperation());
                 $queue->setCreationDatetime(new \DateTime());
                 $queue->setTransaction($transaction);
-                $queue->setIsExecuted(false);
 
-                $transaction->setQueueOperation(Transactions::QUEUE_OPERATION_ENQUEUE);
+                $transaction->setProcessingStatus(Transactions::TRANSACTION_STATUS_ENQUEUE);
 
                 $this->em->persist($transaction);
                 $this->em->persist($queue);
@@ -135,9 +138,7 @@ class QueueManager
     {
         $counter = 0;
         $queues = $this->em->getRepository('BackendBundle:OperationsQueue')
-                    ->findBy([
-                        'isExecuted' => false
-                    ]);
+                    ->getOperationQueues();
 
         foreach ($queues as $queue) {
             if ($this->processQueue($queue)) {

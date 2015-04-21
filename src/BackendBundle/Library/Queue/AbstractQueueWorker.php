@@ -98,12 +98,14 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
 
     /**
      * @param OperationsQueue $queue
+     * @param bool $reExecute
      * @return bool
      */
-    protected function updateExecutedQueue(OperationsQueue &$queue)
+    protected function updateExecutedQueue(OperationsQueue &$queue, $reExecute = false)
     {
-        $queue->setIsExecuted(true);
+        $queue->setIsExecutable($reExecute);
         $queue->setExecutionTimestamp(new \DateTime());
+        $queue->setExecutionCount(($queue->getExecutionCount() + 1));
 
         $this->em->persist($queue);
         $this->em->flush();

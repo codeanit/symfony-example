@@ -1,6 +1,7 @@
 BackendBundle\Entity\OperationsQueue:
     type: entity
     table: operations_queue
+    repositoryClass: BackendBundle\Entity\Repository\OperationQueueRepository
     id:
         id:
             type: integer
@@ -46,12 +47,21 @@ BackendBundle\Entity\OperationsQueue:
             length: null
             fixed: false
             comment: 'Parameter for the operation'
-        isExecuted:
+        isExecutable:
             type: boolean
             nullable: true
             comment: 'Identifies if the operation is performed or not'
-            default: '0'
-            column: is_executed
+            default: 1
+            options:
+                default: 1
+            column: is_executable
+        executionCount:
+            type: integer
+            nullable: false
+            comment: 'No of times Queue is executed'
+            options:
+                default: 0
+            column: execution_count
         creationDatetime:
             type: datetime
             nullable: true
