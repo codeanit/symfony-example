@@ -38,12 +38,17 @@ security:
             form_login:
                 check_path: _demo_security_check
                 login_path: _demo_login
+                default_target_path: _demo_secured_services
             logout:
                 path:   _demo_logout
                 target: _demo
             #anonymous: ~
             #http_basic:
             #    realm: "Secured Demo Area"
+        #main:
+        #  form_login:
+            # ...
+        #    default_target_path: _demo_secured_services
 
     # with these settings you can restrict or allow access for different parts
     # of your application based on roles, ip, host or methods
