@@ -150,26 +150,30 @@ class SanMartinWorker extends BaseWorker {
                 mkdir($rootPath.'/web/generated_files/sanmartin/unparsed/', 0777, true);
                 mkdir($rootPath.'/web/generated_files/sanmartin/parsed/', 0777, true);
               }
-            $path= $rootPath.'/web/generated_files/sanmartin/unparsed/';
+            $unparsedPath= $rootPath.'/web/generated_files/sanmartin/unparsed/';
+            $parsedPath= $rootPath.'/web/generated_files/sanmartin/parsed/';
             $contents=array();
             $getMTCN=array();
             $fileCount=0;        
             $finder = new Finder();
-            $finder->files()->in($path);
+            $finder->files()->in($unparsedPath);
             foreach ($finder as $file) {
                $contents [] = $file->getRelativePathname();
-               $data=file_get_contents($path.$contents[$fileCount++]);            
+               $data=file_get_contents($unparsedPath.$contents[$fileCount++]);            
                $txnData=explode("\n", str_replace("\r", '', trim($data)));             
                foreach ($txnData as $txnDatas) {
                   $MTCN= explode('|',$txnDatas);
                   $getMTCN[]=$MTCN[1];               
-               }                
-            }
-           print_r($getMTCN);die;
+               } 
+               if(copy($unparsedPath.$file->getRelativePathname(),$parsedPath.$file->getRelativePathname())){
+                  unlink($unparsedPath.$file->getRelativePathname());
+               }                             
+            }            
+           // print_r($getMTCN);die;
           } catch (\Exception $e) {         
               echo $e->getMessage();die;                     
           }               
-   
+        die;
         return;
     }
 
