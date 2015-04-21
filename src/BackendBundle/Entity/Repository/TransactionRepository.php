@@ -33,11 +33,11 @@ class TransactionRepository  extends EntityRepository
                                               parent_id
                                        FROM transactions
                                        WHERE queue_operation = 'CHANGE'
-                                         AND process_status = '{$processStatPending}'
+                                         AND processing_status = '{$processStatPending}'
                                        GROUP BY parent_id) t2 ON t2.parent_id = t1.parent_id
                                     AND t1.created_at = t2.LatestCreatedDate
                                     WHERE t1.queue_operation = 'CHANGE'
-                                      AND t1.process_status = '{$processStatPending}'", $rsm)
+                                      AND t1.processing_status = '{$processStatPending}'", $rsm)
                     ->getResult()
         ;
 
