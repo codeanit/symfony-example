@@ -108,29 +108,40 @@ class SecuredController extends Controller
      * @Route("/list/{name}/{id}", name="list")
      * @Template()
      */
-    public function listFilesAction()
-    { 
+    public function listFilesAction($name=null)
+    {
         $contents=array();
-        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/sanmartin/';
+        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$name;
         $finder = new Finder();
         $finder->files()->in($path);
         foreach ($finder as $file) {
          $contents [] = $file->getRelativePathname();
         }
-        return array('files' => $contents ,'path'=>$path);
+        return array('files' => $contents ,'path'=>$path,'service'=>$name);
     }
 
     /**
-     * @Route("/download/{name}/", name="download")
+     * @Route("/download/{name}/{service}/", name="download")
      * 
      */
-    public function downloadFilesAction($name=null)
-    { 
-        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/sanmartin/'.$name; 
+    public function downloadFilesAction($name=null,$service=null)
+    {
+        $file = $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$service.'/'.$name;
+        if(file_exists($file)){       
+        header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header("Content-Transfer-Encoding: Binary"); 
-        header("Content-disposition: attachment; filename=\"" . basename($path) . "\""); 
-        readfile($path); 
+        header('Content-Disposition: attachment; filename='.basename($file));
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($file));
+        ob_clean();
+        flush();
+        readfile($file);
+        }
+        exit;
+
     }
 
 
