@@ -33,7 +33,7 @@ class SanMartinWorker extends BaseWorker {
      * @return mixed
      */
     public function createTransaction(OperationsQueue $queue, $args = [])
-    {
+    {       
         try {
             $transaction = $queue->getTransaction();             
             if (strtolower($transaction->getTransactionType())=='bank') {
@@ -79,10 +79,13 @@ class SanMartinWorker extends BaseWorker {
             $rootPath=dirname($this->container->getParameter('kernel.root_dir'));
             if (!is_dir($rootPath.'/web/generated_files/sanmartin/generated')) {               
                   mkdir($rootPath.'/web/generated_files/sanmartin/generated', 0777, true);
-                }
+                }            
+            $finder = new Finder();                 
+            $finder->files()->in($rootPath.'/web/generated_files/sanmartin/generated/');                  
+            $fileCount=str_pad(count($finder)+1, 3, '0', STR_PAD_LEFT);
             $path=dirname($this->container->getParameter('kernel.root_dir'))
-                    .'/web/generated_files/sanmartin/generated/SM'
-                    .date('ymd').$transaction->getTransactionCode()
+                    .'/web/generated_files/sanmartin/generate/SM'
+                    .date('ymd').$fileCount
                     .'.txt';
     
             foreach ($dataToGenerate as $value) {
@@ -99,13 +102,12 @@ class SanMartinWorker extends BaseWorker {
                         $output,
                         'SUCCESS'
                     );
-                $notiDump = [
-                            'message' => 'transaction create success for sanmartin' ,
-                            'status' => 'success' ,
-                            'code' => '200',
-                            'transaction_code' => $queue->getTransaction()->getTransactionCode(),
-                            ];              
-                $this->notifyTb($notiDump);
+                // $notiDump = [
+                //             'message' => 'transaction create success for sanmartin' ,
+                //             'status' => 'processing' ,                            
+                //             'transaction_code' => $queue->getTransaction()->getTransactionCode(),
+                //             ];              
+                // $this->notifyTb($notiDump);
                 $this->updateExecutedQueue($queue);
 
             }else{
