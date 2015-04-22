@@ -9,6 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NotificationRequest
 {
+    const STATUS_SUCCESS = 'success';
+    const STATUS_QUEUED = 'queued';
+    const STATUS_FAILED = 'failed';
+
     /**
      * @var integer
      */
@@ -96,11 +100,14 @@ class NotificationRequest
     /**
      * Set payload
      *
-     * @param string $payload
+     * @param array $payload
      * @return NotificationRequest
      */
     public function setPayload($payload)
     {
+        $payload = (array) $payload;
+        $payload = json_encode($payload);
+
         $this->payload = $payload;
 
         return $this;
@@ -113,7 +120,10 @@ class NotificationRequest
      */
     public function getPayload()
     {
-        return $this->payload;
+        $payload = $this->payload;
+        $payload = json_decode($payload, true);
+
+        return $payload;
     }
 
     /**
@@ -211,12 +221,13 @@ class NotificationRequest
     /**
      * Set lastResponse
      *
-     * @param string $lastResponse
+     * @param mixed $lastResponse
      * @return NotificationRequest
      */
     public function setLastResponse($lastResponse)
     {
-        $this->lastResponse = $lastResponse;
+        $lastResponse = (array) $lastResponse;
+        $this->lastResponse = json_encode($lastResponse);
 
         return $this;
     }
@@ -228,7 +239,9 @@ class NotificationRequest
      */
     public function getLastResponse()
     {
-        return $this->lastResponse;
+        $lastResp = $this->lastResponse;
+
+        return json_decode($lastResp, true);
     }
 
     /**
