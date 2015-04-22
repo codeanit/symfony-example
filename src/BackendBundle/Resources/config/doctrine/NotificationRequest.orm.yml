@@ -1,0 +1,61 @@
+BackendBundle\Entity\NotificationRequest:
+    type: entity
+    table: notification_request
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            comment: ''
+            id: true
+            generator:
+                strategy: IDENTITY
+
+    manyToOne:
+        transaction:
+            targetEntity: BackendBundle\Entity\Transactions
+            joinColumn:
+                name: transaction_id
+                referencedColumnName: id
+                onDelete: cascade
+
+    fields:
+        reciever:
+            type: string
+            nullable: true
+            length: 155
+            fixed: false
+            comment: 'Notification receiver'
+            column: receiver
+        payload:
+            type: text
+            nullable: true
+            comment: 'Notification payload'
+            column: payload
+        notificationStatus:
+            type: string
+            nullable: true
+            length: 25
+            fixed: false
+            comment: 'Status of the notification'
+            column: notification_status
+        notificationAction:
+            type: string
+            nullable: true
+            length: 25
+            fixed: false
+            comment: 'Action of the notification'
+            column: notification_action
+        lastResponse:
+            type: text
+            nullable: true
+            comment: 'Last notification response.'
+            column: last_response
+        createdAt:
+            type: datetime
+            nullable: false
+            column: crated_at
+            gedmo:
+                timestampable:
+                    on: create
+    lifecycleCallbacks: {  }
