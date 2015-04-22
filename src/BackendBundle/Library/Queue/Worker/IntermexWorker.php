@@ -27,7 +27,8 @@ class IntermexWorker extends BaseWorker
      */
     protected $serializer;
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->url='http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl';
     }
 
@@ -335,7 +336,13 @@ class IntermexWorker extends BaseWorker
                 $outputToSend['status'] = 'error';
             }
 
-            $this->notifyTb($outputToSend);
+            $this->tbNotifier->notify(
+                'create',
+                $outputToSend['status'],
+                $outputToSend['message'],
+                $queue->getTransaction()
+            );
+//            $this->notifyTb($outputToSend);
 
         } catch(\Exception $e) {
             $this->logger->error('main', [$e->getMessage()]);
@@ -563,7 +570,13 @@ class IntermexWorker extends BaseWorker
          */
         $reExecute = !$flag;
         $this->updateExecutedQueue($queue, $reExecute);
-        $this->notifyTb($notiDump);
+//        $this->notifyTb($notiDump);
+        $this->tbNotifier->notify(
+            'cancel',
+            $notiDump['status'],
+            $notiDump['message'],
+            $queue->getTransaction()
+        );
         $this->em->getRepository('BackendBundle:Log')
                     ->addLog(
                         $this->getWorkerSetting('service_id'),
