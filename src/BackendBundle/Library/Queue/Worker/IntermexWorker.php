@@ -362,6 +362,7 @@ class IntermexWorker extends BaseWorker
         $transaction    = $queue->getTransaction();
         $payoutId       = $transaction->getTransactionType();
         $payoutId       = (strtoupper($payoutId) == "BANK") ? '3' : '1';
+        $iIdDestino     = $payoutId == 1 ? 49 : $transaction->getPayoutAgentId();
         $currencyId     = $transaction->getPayoutCurrency();
         $currencyId     = (strtoupper($currencyId) == "USD" ||
                             strtoupper($currencyId) == "CAD") ? '2' : '1';
@@ -411,7 +412,7 @@ class IntermexWorker extends BaseWorker
             'vTelefonoBen'        => $transaction->getBeneficiaryPhoneMobile(),// $data['transaction']->beneficiary_phone_mobile,
             'vCiudadBenef'        => $transaction->getBeneficiaryCountry(),// $data['transaction']->beneficiary_country,
             'vEstadoBenef'        => $transaction->getBeneficiaryState(),// $data['transaction']->beneficiary_state,
-            'iIdDestino'          => $transaction->getPayoutAgentId(),// $data['transaction']->payout_agent_id,
+            'iIdDestino'          => $iIdDestino,// $data['transaction']->payout_agent_id,
             'vMensaje'            => 'message to beneficiary',
             'vInstruccionPago'    => 'agency comment',
             'vSucursal'           => $isBankDeposit,
