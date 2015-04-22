@@ -1,0 +1,14 @@
+parameters:
+    abstract_notifier.class: BackendBundle\Library\Notification\AbstractNotifier
+    transaction.notifier.tb.class: BackendBundle\Library\Notification\Notifier\TbNotifier
+
+services:
+    abstract_notifier:
+        class: %abstract_notifier.class%
+        abstrct: true
+        calls:
+            - [setDoctrine, [@doctrine.orm.entity_manager]]
+
+    transaction.notifier.tb:
+        class: %transaction.notifier.tb.class%
+        parent: @abstract_notifier
