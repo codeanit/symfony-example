@@ -20,6 +20,7 @@ services:
         parent: abstarct_queue_worker
         calls:
             - [setSerializer, [@serializer]]
+            - [setTbNotifier, [@transaction.notifier.tb]]
 
     cdex_queue_worker.bdo:
           class: BackendBundle\Library\Queue\Worker\BdoWorker

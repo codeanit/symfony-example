@@ -5,6 +5,7 @@ namespace BackendBundle\Library\Queue\Worker;
 
 use BackendBundle\Entity\OperationsQueue;
 use BackendBundle\Entity\Transactions;
+use BackendBundle\Library\Notification\Notifier\TbNotifier;
 use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
 use JMS\Serializer\Serializer;
 
@@ -16,13 +17,19 @@ class IntermexWorker extends BaseWorker
 {
     private $url;
 
-    public function __construct(){
-        $this->url='http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl';
-    }
+    /**
+     * @var TbNotifier
+     */
+    private $tbNotifier;
+
     /**
      * @var \JMS\Serializer\Serializer
      */
     protected $serializer;
+
+    public function __construct(){
+        $this->url='http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl';
+    }
 
     /**
      * @param array $arg
@@ -855,5 +862,13 @@ class IntermexWorker extends BaseWorker
         unset($baseTxnDump['queues']);
 
         return array_diff_assoc($newTxnDump, $baseTxnDump);
+    }
+
+    /**
+     * @param TbNotifier $tbNotifier
+     */
+    public function setTbNotifier($tbNotifier)
+    {
+        $this->tbNotifier = $tbNotifier;
     }
 }
