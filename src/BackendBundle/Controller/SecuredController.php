@@ -113,10 +113,13 @@ class SecuredController extends Controller
         $contents=array();
         $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$name.'/generated/';
         $finder = new Finder();
-        $finder->files()->in($path);
-        foreach ($finder as $file) {
-         $contents [] = $file->getRelativePathname();
-        }
+        $i=0;
+        $finder->files()->in($path)->sortByName();
+        foreach ($finder as $file) {          
+            $contents [$i]['name'] = $file->getRelativePathname();
+            $contents [$i]['date'] = date ("Y-m-d H:i:s.", filemtime($path.$file->getRelativePathname()));
+            ++$i;
+        }        
         return array('files' => $contents ,'path'=>$path,'service'=>$name);
     }
 
