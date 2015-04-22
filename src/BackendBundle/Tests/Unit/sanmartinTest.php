@@ -26,6 +26,12 @@ class SanmartinFileGeneratorTest extends WebTestCase
     
   }
 
+  public function ptestCreate()
+  {
+    $this->GB->createTransaction();
+    
+  }
+
 
   public function ptestGenerator()
   { 

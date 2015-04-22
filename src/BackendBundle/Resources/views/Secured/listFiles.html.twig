@@ -11,15 +11,17 @@
             <tr>
                 <th>S.N</th>
                 <th>File Name</th>               
+                <th>Date</th>               
                 <th>Download</th>               
             </tr>       
           
             {% for entry in files %}            
             <tr>
                 <td>{{loop.index}}</td>
-                <td>{{ entry }}</td>
+                <td>{{ entry.name }}</td>
+                <td>{{ entry.date }}</td>
                 <td>
-                  <a href="{{ url('download', {'name': entry,'service':service}) }}" target="">Download</a>                  
+                  <a href="{{ url('download', {'name': entry.name,'service':service}) }}" target="">Download</a>
                 </td>
             </tr>
             {% endfor %}

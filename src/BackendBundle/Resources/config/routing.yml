@@ -3,10 +3,10 @@ _welcome:
 #    defaults: { _controller: BackendBundle:Welcome:index }
     defaults: { _controller: BackendBundle:Secured:login }
 
-backend_test:
-    resource: @BackendBundle/Controller/TestController.php
-    type: annotation
-    prefix: /test
+# backend_test:
+#     resource: @BackendBundle/Controller/TestController.php
+#     type: annotation
+#     prefix: /test
 
 _demo_secured:
     resource: "@BackendBundle/Controller/SecuredController.php"
