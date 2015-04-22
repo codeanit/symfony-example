@@ -28,4 +28,4 @@ app/logs/dev.log
 
 app/bootstrap.php.cache
 src/BackendBundle/Controller/TestController.php
-src/BackendBundle/Resources/config/routing.yml
+web/generated_files/*
