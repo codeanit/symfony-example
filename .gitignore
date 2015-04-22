@@ -27,3 +27,5 @@ app/logs/**/*
 app/logs/dev.log
 
 app/bootstrap.php.cache
+src/BackendBundle/Controller/TestController.php
+web/generated_files/*

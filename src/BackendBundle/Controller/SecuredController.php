@@ -111,7 +111,7 @@ class SecuredController extends Controller
     public function listFilesAction($name=null)
     {
         $contents=array();
-        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$name;
+        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$name.'/generated/';
         $finder = new Finder();
         $finder->files()->in($path);
         foreach ($finder as $file) {
@@ -124,9 +124,9 @@ class SecuredController extends Controller
      * @Route("/download/{name}/{service}/", name="download")
      * 
      */
-    public function downloadFilesAction($name=null,$service=null)
+    public function downloadFilesAction($name=null, $service=null)
     {
-        $file = $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$service.'/'.$name;
+        $file = $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$service.'/generated/'.$name;
         if(file_exists($file)){       
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');

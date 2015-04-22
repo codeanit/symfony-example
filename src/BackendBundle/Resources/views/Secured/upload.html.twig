@@ -1,0 +1,25 @@
+{% extends "BackendBundle:Secured:secured-layout.html.twig" %}
+
+{% block body %}
+   
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h2>Upload</h2>
+        <span class="bg-danger error" id="err">{% if error_msg is defined %}{{ error_msg }}{% endif %}</span>
+        <br>
+        <style>.form-control{width:40% !important;} .error{color: red}</style>
+        <form action='{{ url('uploadFile')}}' method='POST' name='form' id='form' enctype='multipart/form-data'>
+          <div class="form-group">
+            <label for="username">Service Name: <b>{{ service_name }}</b></label>
+            <input type="file" class="form-control " id="file" name="file">
+            <input type='hidden'  name='service_id' value='{% if service_id is defined %}{{ service_id }}{% endif %}' >
+            <input type='hidden'  name='service_name' value='{% if service_name is defined %}{{ service_name }}{% endif %}' >
+          </div>         
+          <button type="submit" class="btn btn-default" name='submit'>Submit</button> <a href="{{url('_demo_secured_services')}}">Back</a>
+        </form>       
+      </div>
+ 
+    
+{% endblock %}
+
