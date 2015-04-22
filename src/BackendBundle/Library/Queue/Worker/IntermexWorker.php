@@ -710,6 +710,11 @@ class IntermexWorker extends BaseWorker
 
     }
 
+    /**
+     * @param Transactions $transaction
+     * @return bool
+     * @throws \Exception
+     */
     public function changeRemitterFirstName(Transactions $transaction)
     {
         $flag     = false;
