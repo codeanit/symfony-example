@@ -44,6 +44,7 @@ abstract class AbstractNotifier
         $payload = [
             'status' => $notiStatus,
             'message' => $message,
+            'transaction_code' => $transaction->getTransactionCode(),
         ];
         $notifyRequest = new NotificationRequest();
 
