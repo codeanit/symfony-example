@@ -813,10 +813,11 @@ class IntermexWorker extends BaseWorker
             ];
 
             $response = $this->sendHttpRequest($url, $params, $action);
+            $this->logger->addError('CHANGE_RESP_LOG', [$response]);
 
             preg_match_all(
                 $dataPattern,
-                $response->AltaEnvioNResult->any, //$response_main->AltaEnvioNResult->any
+                $response->CambiaTelBeneficiarioResult->any, //$response_main->AltaEnvioNResult->any
                 $matches
             );
 
