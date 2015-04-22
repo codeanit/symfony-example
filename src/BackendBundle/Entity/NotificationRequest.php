@@ -9,6 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NotificationRequest
 {
+    const STATUS_SUCCESS = 'success';
+    const STATUS_QUEUED = 'queued';
+    const STATUS_FAILED = 'failed';
+
     /**
      * @var integer
      */
