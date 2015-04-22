@@ -47,3 +47,6 @@ services:
          arguments: [@twig.extension.backend]
          tags:
             - {name: kernel.event_listener, event: kernel.controller, method: onKernelController}
+
+imports:
+    - {resource: notification_services.yml}
