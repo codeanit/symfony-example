@@ -22,18 +22,18 @@ services:
             - [setSerializer, [@serializer]]
 
     cdex_queue_worker.bdo:
-            class: BackendBundle\Library\Queue\Worker\BdoWorker
-            parent: abstarct_queue_worker
+          class: BackendBundle\Library\Queue\Worker\BdoWorker
+          parent: abstarct_queue_worker
 
     cdex_queue_worker.transnetwork:
-              class: BackendBundle\Library\Queue\Worker\TransNetworkWorker
-              parent: abstarct_queue_worker
+          class: BackendBundle\Library\Queue\Worker\TransNetworkWorker
+          parent: abstarct_queue_worker
 
     cdex_queue_worker.sanmartin:
-              class: BackendBundle\Library\Queue\Worker\SanMartinWorker
-              parent: abstarct_queue_worker  
-              arguments: [@service_container]
-              lazy: true
+          class: BackendBundle\Library\Queue\Worker\SanMartinWorker
+          parent: abstarct_queue_worker
+          arguments: [@service_container]
+          lazy: true
               
     twig.extension.backend:
         class: BackendBundle\Twig\Extension\BackendExtension
