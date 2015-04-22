@@ -8,7 +8,8 @@ services:
         abstrct: true
         calls:
             - [setDoctrine, [@doctrine.orm.entity_manager]]
+            - [setLogger, [@logger]]
 
     transaction.notifier.tb:
         class: %transaction.notifier.tb.class%
-        parent: @abstract_notifier
+        parent: abstract_notifier
