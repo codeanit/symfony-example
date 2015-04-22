@@ -35,82 +35,89 @@ class SanMartinWorker extends BaseWorker {
     public function createTransaction(OperationsQueue $queue, $args = [])
     {
         try {
-            $transaction = $queue->getTransaction();     
-                if (strtolower($transaction->getTransactionType())=='bank') {
-                    $paymentType=2;            
-                    $bankBranch=$transaction->getBeneficiaryBankBranch();
-                    $bankAccountNumber=$transaction->getBeneficiaryAccountNumber();
-                    $bankName=$transaction->getBeneficiaryBankName();
-                }else{
-                    $bankBranch=$bankAccountNumber=$bankName='';
-                    $paymentType=1;
+            $transaction = $queue->getTransaction();             
+            if (strtolower($transaction->getTransactionType())=='bank') {
+                $paymentType=2;            
+                $bankBranch=$transaction->getBeneficiaryBankBranch();
+                $bankAccountNumber=$transaction->getBeneficiaryAccountNumber();
+                $bankName=$transaction->getBeneficiaryBankName();
+            }else{
+                $bankBranch=$bankAccountNumber=$bankName='';
+                $paymentType=1;
+            }
+            $dataToGenerate=array(
+                       "Date of the order"=>$transaction->getRemittanceDate()->format('y/m/d'),
+                       "MTCN number"=>$transaction->getTransactionCode(),
+                       "Sender Name"=>$transaction->getRemitterfirstName(),
+                       "Sender Name Paternal"=>$transaction->getRemitterLastName(),
+                       "Sender Name Mother"=>$transaction->getRemitterMiddleName(),
+                       "Beneficiary Name"=>$transaction->getBeneficiaryFirstName(),
+                       "Recipient Name Paterno"=>$transaction->getBeneficiaryLastName(),
+                       "Recipient Name Mother"=>$transaction->getBeneficiaryMiddleName(),
+                       "Currency Shipping"=>$transaction->getRemittingCurrency(),
+                       "Currency of Payment"=>$transaction->getPayoutCurrency(),
+                       "Exchange rate"=>$transaction->getExchangeRate(),
+                       "Key Branch payment"=>"",
+                       "Shipping Amount"=>$transaction->getRemittingAmount(),
+                       "Reference"=>"",
+                       "Country code source"=>$transaction->getRemitterCountry(),
+                       "Tel Sender"=>$transaction->getRemitterPhoneMobile(),
+                       "Recipient Street"=>$transaction->getBeneficiaryAddress(),
+                       "Recipient City"=>$transaction->getBeneficiaryCity(),
+                       "beneficiary State"=>$transaction->getBeneficiaryState(),
+                       "Recipient Zip Code"=>$transaction->getBeneficiaryPostalCode(),
+                       "Recipient Phone"=>$transaction->getBeneficiaryPhoneMobile(),
+                       "Payment Type"=>$paymentType,
+                       "Account No. Feed"=>$bankAccountNumber,
+                       "Bank"=>$bankName,
+                       "Bank Branch"=>$bankBranch,
+                       "Message or Comment"=>"message",
+                       "City / Town Sender"=>$transaction->getRemitterCity(),
+                       "Sender State"=>$transaction->getRemitterState()
+                );
+            $output=''; 
+            $rootPath=dirname($this->container->getParameter('kernel.root_dir'));
+            if (!is_dir($rootPath.'/web/generated_files/sanmartin/generated')) {               
+                  mkdir($rootPath.'/web/generated_files/sanmartin/generated', 0777, true);
                 }
-                $dataToGenerate=array(
-                           "Date of the order"=>$transaction->getRemittanceDate()->format('y/m/d'),
-                           "MTCN number"=>$transaction->getTransactionCode(),
-                           "Sender Name"=>$transaction->getRemitterfirstName(),
-                           "Sender Name Paternal"=>$transaction->getRemitterLastName(),
-                           "Sender Name Mother"=>$transaction->getRemitterMiddleName(),
-                           "Beneficiary Name"=>$transaction->getBeneficiaryFirstName(),
-                           "Recipient Name Paterno"=>$transaction->getBeneficiaryLastName(),
-                           "Recipient Name Mother"=>$transaction->getBeneficiaryMiddleName(),
-                           "Currency Shipping"=>$transaction->getRemittingCurrency(),
-                           "Currency of Payment"=>$transaction->getPayoutCurrency(),
-                           "Exchange rate"=>$transaction->getExchangeRate(),
-                           "Key Branch payment"=>"",
-                           "Shipping Amount"=>$transaction->getRemittingAmount(),
-                           "Reference"=>"",
-                           "Country code source"=>$transaction->getRemitterCountry(),
-                           "Tel Sender"=>$transaction->getRemitterPhoneMobile(),
-                           "Recipient Street"=>$transaction->getBeneficiaryAddress(),
-                           "Recipient City"=>$transaction->getBeneficiaryCity(),
-                           "beneficiary State"=>$transaction->getBeneficiaryState(),
-                           "Recipient Zip Code"=>$transaction->getBeneficiaryPostalCode(),
-                           "Recipient Phone"=>$transaction->getBeneficiaryPhoneMobile(),
-                           "Payment Type"=>$paymentType,
-                           "Account No. Feed"=>$bankAccountNumber,
-                           "Bank"=>$bankName,
-                           "Bank Branch"=>$bankBranch,
-                           "Message or Comment"=>"message",
-                           "City / Town Sender"=>$transaction->getRemitterCity(),
-                           "Sender State"=>$transaction->getRemitterState()
+            $path=dirname($this->container->getParameter('kernel.root_dir'))
+                    .'/web/generated_files/sanmartin/generated/SM'
+                    .date('ymd').$transaction->getTransactionCode()
+                    .'.txt';
+    
+            foreach ($dataToGenerate as $value) {
+                $output .= $value.'|';
+            }     
+            file_put_contents($path,$output.PHP_EOL,FILE_APPEND | LOCK_EX);
+            $check=file_exists($path);
+            if($check==1){
+                $this->em->getRepository('BackendBundle:Log')
+                     ->addLog(
+                        $this->getWorkerSetting('service_id'),
+                        'Create',
+                        json_encode($dataToGenerate),
+                        $output,
+                        'SUCCESS'
                     );
-                $output=''; 
-                $rootPath=dirname($this->container->getParameter('kernel.root_dir'));
-                if (!is_dir($rootPath.'/web/generated_files/sanmartin/')) {               
-                      mkdir($rootPath.'/web/generated_files/sanmartin/', 0777, true);
-                    }
-                $path=dirname($this->container->getParameter('kernel.root_dir'))
-                        .'/web/generated_files/sanmartin/SM'
-                        .date('ymd').$transaction->getTransactionCode()
-                        .'.txt';
-        
-                foreach ($dataToGenerate as $value) {
-                    $output .= $value.'|';
-                }     
-                file_put_contents($path,$output.PHP_EOL,FILE_APPEND | LOCK_EX);
-                $check=file_exists($path);
-                if($check==1){
-                    $this->em->getRepository('BackendBundle:Log')
-                         ->addLog(
-                            $this->getWorkerSetting('service_id'),
-                            'Create',
-                            json_encode($dataToGenerate),
-                            $output,
-                            'SUCCESS'
-                        );
-                    $this->updateExecutedQueue($queue);
+                $notiDump = [
+                            'message' => 'transaction create success for sanmartin' ,
+                            'status' => 'success' ,
+                            'code' => '200',
+                            'transaction_code' => $queue->getTransaction()->getTransactionCode(),
+                            ];              
+                $this->notifyTb($notiDump);
+                $this->updateExecutedQueue($queue);
 
-                }else{
-                    $this->em->getRepository('BackendBundle:Log')
-                         ->addLog(
-                            $this->getWorkerSetting('service_id'),
-                            'Create',
-                            json_encode($dataToGenerate),
-                            'File Generation Error',
-                            "ERROR"
-                        );
-                }
+            }else{
+                $this->em->getRepository('BackendBundle:Log')
+                     ->addLog(
+                        $this->getWorkerSetting('service_id'),
+                        'Create',
+                        json_encode($dataToGenerate),
+                        'File Generation Error',
+                        "ERROR"
+                    );
+            }
         } catch (\Exception $e) {
             $this->logger->error('SANMARTIN_CREATE', [$e->getMessage()]);
         }
