@@ -35,6 +35,8 @@ services:
           parent: abstarct_queue_worker
           arguments: [@service_container]
           lazy: true
+          calls:
+            - [setTbNotifier, [@transaction.notifier.tb]]
               
     twig.extension.backend:
         class: BackendBundle\Twig\Extension\BackendExtension

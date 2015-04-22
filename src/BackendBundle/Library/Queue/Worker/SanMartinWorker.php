@@ -19,6 +19,11 @@ use Symfony\Component\Finder\Finder;
 
 class SanMartinWorker extends BaseWorker {
 
+  /**
+   * @var TbNotifier
+   */
+    private $tbNotifier;
+
     protected $container;
 
     /**
@@ -93,7 +98,8 @@ class SanMartinWorker extends BaseWorker {
             }     
             file_put_contents($path,$output.PHP_EOL,FILE_APPEND | LOCK_EX);
             $check=file_exists($path);
-            if($check==1){
+
+            if ( $check == 1 ) {
                 $this->em->getRepository('BackendBundle:Log')
                      ->addLog(
                         $this->getWorkerSetting('service_id'),
@@ -102,27 +108,34 @@ class SanMartinWorker extends BaseWorker {
                         $output,
                         'SUCCESS'
                     );
-                // $notiDump = [
-                //             'message' => 'transaction create success for sanmartin' ,
-                //             'status' => 'processing' ,                            
-                //             'transaction_code' => $queue->getTransaction()->getTransactionCode(),
-                //             ];              
-                // $this->notifyTb($notiDump);
-                $this->updateExecutedQueue($queue);
+                
+                    $status = "processing";
+                    $message = "Sanmartin transacton created successfully";
+                    
+                    $this->updateExecutedQueue($queue);
 
-            }else{
-                $this->em->getRepository('BackendBundle:Log')
-                     ->addLog(
-                        $this->getWorkerSetting('service_id'),
-                        'Create',
-                        json_encode($dataToGenerate),
-                        'File Generation Error',
-                        "ERROR"
-                    );
             }
         } catch (\Exception $e) {
-            $this->logger->error('SANMARTIN_CREATE', [$e->getMessage()]);
+          $status = "error";
+          $message = $e->getMessage();
+          $this->logger->error('SANMARTIN_CREATE', [$e->getMessage()]);
+          $this->em->getRepository('BackendBundle:Log')
+             ->addLog(
+                $this->getWorkerSetting('service_id'),
+                'Create',
+                json_encode($dataToGenerate),
+                'File Generation Error',
+                "ERROR"
+            );
         }
+
+        $this->tbNotifier->notify(
+            'create',
+            $status,
+            $message,
+            $queue->getTransaction()
+        );
+
         return $check;
     }
 
@@ -202,5 +215,13 @@ class SanMartinWorker extends BaseWorker {
     public function enqueueTransaction(Transactions $transaction, $args = [])
     {
         // TODO: Implement enqueueTransaction() method.
+    }
+
+    /**
+     * @param TbNotifier $tbNotifier
+     */
+    public function setTbNotifier($tbNotifier)
+    {
+        $this->tbNotifier = $tbNotifier;
     }
 }

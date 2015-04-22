@@ -18,6 +18,11 @@ abstract class AbstractNotifier
     private $em;
 
     /**
+     * @var \Symfony\Bridge\Monolog\Logger
+     */
+    protected $logger;
+
+    /**
      * @param \Doctrine\ORM\EntityManager $em
      */
     public function setDoctrine(EntityManager $em)
@@ -39,6 +44,7 @@ abstract class AbstractNotifier
         $payload = [
             'status' => $notiStatus,
             'message' => $message,
+            'transaction_code' => $transaction->getTransactionCode(),
         ];
         $notifyRequest = new NotificationRequest();
 
@@ -65,9 +71,18 @@ abstract class AbstractNotifier
         } catch(\Exception $e) {
 //            throw $e;
             //@todo log error
+            $this->logger->addError('aaaxxx', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
         return false;
+    }
+
+    /**
+     * @param \Symfony\Bridge\Monolog\Logger $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
