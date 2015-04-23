@@ -118,14 +118,45 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
         return $this->settings;
     }
 
-    public function setWorkerSetting($key, $value, $persist = false)
+    /**
+     * @param $key
+     * @param $value
+     * @param bool $persist
+     * @return $this
+     */
+    public function setWorkerSetting($key, $value, $persist = true)
     {
-        
+        $this->settings[$key] = $value;
+
+        if ($persist) {
+            $this->saveWorkerSetting();
+        }
+
+        return $this;
     }
 
-    private function saveWorkerSetting()
+    /**
+     * @return bool
+     */
+    protected function saveWorkerSetting()
     {
+        $service = $this->em->getRepository('BackendBundle:Services')
+            ->findOneBy([
+                'serviceName' => $this->getWorkerServiceName()
+            ]);
 
+        $settingDump = base64_encode(json_encode($this->settings));
+        $service->setCredentials($settingDump);
+
+        $this->em->persist($service);
+
+        try {
+            $this->em->flush();
+            return true;
+        } catch(\Exception $e) {
+        }
+
+        return false;
     }
 
     /**
