@@ -76,23 +76,6 @@ class BdoWorker extends BaseWorker
     }
 
     /**
-     * @param array $credentials
-     */
-    private function sendHttpRequest($wsdlUrl, array $credentials, $action)
-    {
-        $params = [
-            'trace' => true,
-            'exception' => true,
-            'cache_wsdl' => WSDL_CACHE_NONE,
-        ];
-        $client = new \SoapClient($wsdlUrl, $params);
-        $response = $client->{$action}($credentials);
-
-        return $response;
-    }
-
-
-    /**
      * @param OperationsQueue $queue
      * @param array $args
      * @return mixed
