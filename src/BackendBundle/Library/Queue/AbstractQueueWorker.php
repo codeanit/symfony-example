@@ -16,7 +16,29 @@ use Symfony\Component\Validator\Constraints\DateTime;
  */
 abstract class AbstractQueueWorker implements QueueWorkerInterface
 {
+    /**
+     * @var array
+     */
     private $settings = [];
+
+    /**
+     *
+     * @var
+     */
+    protected  $url;
+
+    /**
+     *
+     * @var
+     */
+    protected  $username;
+
+    /**
+     *
+     * @var
+     */
+    protected  $password;
+
 
     /**
      * @var \Doctrine\ORM\EntityManager
