@@ -59,7 +59,11 @@ class IntermexWorker extends BaseWorker
             throw new \Exception('Internal Error :: Invalid response from "Conectar"!!');
         }
 
-        return $response->ConectarResult;
+        $token = $response->ConectarResult;
+
+        $this->setWorkerSetting('token', $token);
+
+        return $token;
     }
 
     /**
