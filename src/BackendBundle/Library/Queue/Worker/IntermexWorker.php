@@ -87,7 +87,7 @@ class IntermexWorker extends BaseWorker
 
             preg_match_all(
                 $dataPattern,
-                $response->AltaEnvioNResult->any, //$response_main->AltaEnvioNResult->any
+                $response->AltaEnvioNResult->any,
                 $matches
             );
 
@@ -115,7 +115,6 @@ class IntermexWorker extends BaseWorker
                 $outputToSend['message'],
                 $queue->getTransaction()->getTransactionCode()
             );
-//            $this->notifyTb($outputToSend);
 
         } catch(\Exception $e) {
             $this->logger->error('main', [$e->getMessage()]);
@@ -239,22 +238,6 @@ class IntermexWorker extends BaseWorker
         }
 
         return $response->ConectarResult;
-    }
-
-    /**
-     * @param array $credentials
-     */
-    private function sendHttpRequest($wsdlUrl, array $credentials, $action)
-    {
-        $params = [
-            'trace' => true,
-            'exception' => true,
-            'cache_wsdl' => WSDL_CACHE_NONE,
-        ];
-        $client = new \SoapClient($wsdlUrl, $params);
-        $response = $client->{$action}($credentials);
-
-        return $response;
     }
 
     /**
