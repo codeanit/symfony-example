@@ -96,6 +96,16 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
         return $this->settings;
     }
 
+    public function setWorkerSetting($key, $value, $persist = false)
+    {
+        
+    }
+
+    private function saveWorkerSetting()
+    {
+
+    }
+
     /**
      * @param OperationsQueue $queue
      * @param bool $reExecute
