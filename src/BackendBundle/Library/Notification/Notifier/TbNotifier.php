@@ -26,9 +26,11 @@ class TbNotifier extends BaseNotifier
         $client = new Client();
         $options = [
             'body' => json_encode($payload),
+            'exceptions' => false
         ];
 
         $request = $client->createRequest('POST', 'http://172.16.1.50/fgm/Webservice/cdex.php', $options);
+
         $response = $client->send($request);
 
         $response = json_decode($response->getBody(), true);
