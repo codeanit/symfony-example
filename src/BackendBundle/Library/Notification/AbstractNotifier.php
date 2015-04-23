@@ -34,21 +34,21 @@ abstract class AbstractNotifier
      * @param $action
      * @param $notiStatus
      * @param $message
-     * @param $transaction
+     * @param $transactionCode
      * @param bool $queue
      * @return bool
-     * @throws \Exception
      */
-    public function notify($action, $notiStatus, $message, $transaction, $queue = false)
+    public function notify($action, $notiStatus, $message, $transactionCode, $queue = false)
     {
         $payload = [
             'status' => $notiStatus,
             'message' => $message,
-            'transaction_code' => $transaction->getTransactionCode(),
+            'transaction_code' => $transactionCode,
         ];
         $notifyRequest = new NotificationRequest();
 
-        $notifyRequest->setTransaction($transaction);
+        $notifyRequest->setTransactionCode($transactionCode);
+        $notifyRequest->setReciever($this->getSource());
         $notifyRequest->setNotificationAction($action);
         $notifyRequest->setPayload($payload);
 
@@ -91,4 +91,9 @@ abstract class AbstractNotifier
      * @return array
      */
     abstract public function sendNotificationRequest(NotificationRequest $notificationRequest, array $args = []);
+
+    /**
+     * @return string
+     */
+    abstract public function getSource();
 }

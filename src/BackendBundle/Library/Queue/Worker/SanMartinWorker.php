@@ -133,7 +133,7 @@ class SanMartinWorker extends BaseWorker {
             'create',
             $status,
             $message,
-            $queue->getTransaction()
+            $transaction->getTransactionCode()
         );
 
         return $check;
@@ -185,17 +185,21 @@ class SanMartinWorker extends BaseWorker {
                $txnData=explode("\n", str_replace("\r", '', trim($data)));             
                foreach ($txnData as $txnDatas) {
                   $MTCN= explode('|',$txnDatas);
-                  $getMTCN[]=$MTCN[1];               
+                  $getMTCN[]=$MTCN[1];
+                  $this->tbNotifier->notify(
+                        'confirm',
+                        'paid',
+                        'Sanmartin Transaction Confirmation successfull',
+                        $MTCN[1]
+                    );            
                } 
                if(copy($unparsedPath.$file->getRelativePathname(),$parsedPath.$file->getRelativePathname())){
                   unlink($unparsedPath.$file->getRelativePathname());
                }                             
-            }            
-           // print_r($getMTCN);die;
+            }
           } catch (\Exception $e) {         
               echo $e->getMessage();die;                     
-          }               
-        die;
+          } 
         return;
     }
 

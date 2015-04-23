@@ -340,7 +340,7 @@ class IntermexWorker extends BaseWorker
                 'create',
                 $outputToSend['status'],
                 $outputToSend['message'],
-                $queue->getTransaction()
+                $queue->getTransaction()->getTransactionCode()
             );
 //            $this->notifyTb($outputToSend);
 
@@ -575,7 +575,7 @@ class IntermexWorker extends BaseWorker
             'cancel',
             $notiDump['status'],
             $notiDump['message'],
-            $queue->getTransaction()
+            $queue->getTransaction()->getTransactionCode()
         );
         $this->em->getRepository('BackendBundle:Log')
                     ->addLog(
