@@ -196,7 +196,6 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
         $this->logger->addError('NOTI_RESPONSE_DUMP', $params);
     }
 
-
     /**
      * @param array $credentials
      */
