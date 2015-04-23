@@ -14,6 +14,14 @@ use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
 class TransNetworkWorker extends BaseWorker
 {
     /**
+     * @return mixed
+     */
+    protected function prepareCredentials()
+    {
+        // TODO: Implement prepareCredentials() method.
+    }
+
+    /**
      * @param Transactions $transaction
      * @param array $args
      */

@@ -18,7 +18,7 @@ class IntermexWorker extends BaseWorker
     /**
      * Third party token $iIdAgencia
      */
-    private $_token;
+    private $token;
 
     /**
      * @var TbNotifier
@@ -30,20 +30,42 @@ class IntermexWorker extends BaseWorker
      */
     protected $serializer;
 
-    public function __construct()
+    public function prepareCredentials()
     {
-        $settings = $this->getWorkerSetting();
-        $this->url = $settings['url'];
-        $this->username = $settings['username'];
-        $this->pasword = $settings['password'];
+        $this->url = $this->getWorkerSetting('url');
+        $this->username = $this->getWorkerSetting('username');
+        $this->password = $this->getWorkerSetting('password');
 
-        $this->token = array_key_exists('token', $settings)
-            ? $settings['token'] : $this->_generateToken();
+        $this->token = $this->getWorkerSetting('token')
+            ? $this->getWorkerSetting('token') : $this->generateToken();
     }
 
-    private function _generateToken()
+    /**
+     * Calls Conectar and sets token if not set.
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    private function generateToken()
     {
+        $response = $this->sendWSDLHttpRequest(
+            $this->url,
+            ['vPassword' => $this->password, 'vUsuario' => $this->username],
+            'Conectar'
+        );
 
+        $this->logger->error('response_log', ['vPassword' => $this->password, 'vUsuario' => $this->username]);
+
+        if (! $response->ConectarResult) {
+            throw new \Exception('Internal Error :: Invalid response from "Conectar"!!');
+        }
+
+        $token = $response->ConectarResult;
+
+        $this->setWorkerSetting('token', $token);
+
+        return $token;
     }
 
     /**
@@ -69,10 +91,8 @@ class IntermexWorker extends BaseWorker
      */
     public function createTransaction(OperationsQueue $queue, $args = [])
     {
-        $settings = $this->getWorkerSetting();
         $parameters = [];
         $flag = false;
-        $url = (isset($settings['url'])) ? $settings['url'] : false;
         $dataPattern = '/(\<diffgr:diffgram)[\s\S]+(\<\/diffgr:diffgram>)/';
         $outputToSend = [
             'message'             => '' ,
@@ -83,7 +103,7 @@ class IntermexWorker extends BaseWorker
 
         try {
             $parameters = $this->prepareCreateParameters($queue);
-            $response = $this->sendHttpRequest($url, $parameters, 'AltaEnvioN');
+            $response = $this->sendWSDLHttpRequest($this->url, $parameters, 'AltaEnvioN');
 
             preg_match_all(
                 $dataPattern,
@@ -117,7 +137,7 @@ class IntermexWorker extends BaseWorker
             );
 
         } catch(\Exception $e) {
-            $this->logger->error('main', [$e->getMessage()]);
+            $this->logger->error('main', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
         /**
@@ -129,7 +149,7 @@ class IntermexWorker extends BaseWorker
         $this->updateExecutedQueue($queue, $reExecute);
         $this->em->getRepository('BackendBundle:Log')
             ->addLog(
-                $settings['service_id'],
+                $this->getWorkerSetting('service_id'),
                 'AltaEnvioN',
                 json_encode($parameters),
                 $serverResponse
@@ -177,7 +197,7 @@ class IntermexWorker extends BaseWorker
         }
 
         $credentials = [
-            'iIdAgencia'          => $this->conectar($url, $username, $password),
+            'iIdAgencia'          => $this->token,
             'vReferencia'         => $transaction->getTransactionCode(),
             'dtFechaEnvio'        => $remittanceDate,
             'iConsecutivoAgencia' => $transaction->getId(),
@@ -213,43 +233,12 @@ class IntermexWorker extends BaseWorker
     }
 
     /**
-     * @param $url
-     * @param $username
-     * @param $password
-     * @return mixed
-     * @throws \Exception
-     */
-    private function conectar($url, $username, $password)
-    {
-        $params = [
-            'trace' => true,
-            'exception' => true,
-            'cache_wsdl' => WSDL_CACHE_NONE,
-        ];
-
-        $client = new \SoapClient($url, $params);
-        $response = $client->Conectar([
-            'vUsuario' => $username,
-            'vPassword' => $password
-        ]);
-
-        if (! $response->ConectarResult) {
-            throw new \Exception('Internal Error :: Invalid response from "Conectar"!!');
-        }
-
-        return $response->ConectarResult;
-    }
-
-    /**
      * @param OperationsQueue $queue
      * @param array $args
      * @return mixed
      */
     public function cancelTransaction(OperationsQueue $queue, $args = [])
     {
-        $url                    = $this->getWorkerSetting('url');
-        $username               = $this->getWorkerSetting('username');
-        $password               = $this->getWorkerSetting('password');
         $parameters             = [];
         $webServiceResponse     = [];
         $transaction            = $queue->getTransaction();
@@ -274,11 +263,11 @@ class IntermexWorker extends BaseWorker
             }
 
             $parameters = [
-                'iIdAgencia' => $this->conectar($url, $username, $password),
+                'iIdAgencia' => $this->token,
                 'vReferencia' => $transaction->getTransactionCode(),
                 'vMotivoModificacion' => $cancellationMotivation,
             ];
-            $response = $this->sendHttpRequest($url, $parameters, 'AnulaEnvio');
+            $response = $this->sendHttpRequest($this->url, $parameters, 'AnulaEnvio');
             preg_match_all(
                 $dataPattern,
                 $response->AnulaEnvioResult->any, //$response_main->AltaEnvioNResult->any

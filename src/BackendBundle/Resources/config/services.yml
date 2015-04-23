@@ -5,6 +5,7 @@ services:
         calls:
             - [setDoctrine, [@doctrine.orm.entity_manager]]
             - [setLogger, [@logger]]
+            - [prepareCredentials, []]
 
     cdex_queue_worker_factory:
         class: BackendBundle\Library\Queue\QueueWorkerFactory

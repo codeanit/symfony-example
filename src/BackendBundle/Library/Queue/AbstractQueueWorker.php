@@ -243,4 +243,9 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
      * @return string
      */
     abstract protected function getWorkerServiceName();
+
+    /**
+     * @return mixed
+     */
+    abstract protected function prepareCredentials();
 }
