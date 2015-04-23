@@ -11,14 +11,6 @@ BackendBundle\Entity\NotificationRequest:
             generator:
                 strategy: IDENTITY
 
-    manyToOne:
-        transaction:
-            targetEntity: BackendBundle\Entity\Transactions
-            joinColumn:
-                name: transaction_id
-                referencedColumnName: id
-                onDelete: cascade
-
     fields:
         reciever:
             type: string
@@ -32,6 +24,13 @@ BackendBundle\Entity\NotificationRequest:
             nullable: true
             comment: 'Notification payload'
             column: payload
+        transactionCode:
+            type: string
+            nullable: true
+            length: 55
+            fixed: false
+            comment: 'Transaction code'
+            column: transaction_code
         notificationStatus:
             type: string
             nullable: true

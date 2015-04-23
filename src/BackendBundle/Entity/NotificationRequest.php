@@ -59,9 +59,9 @@ class NotificationRequest
     private $createdAt;
 
     /**
-     * @var \BackendBundle\Entity\Transactions
+     * @var string
      */
-    private $transaction;
+    private $transactionCode;
 
 
     /**
@@ -268,25 +268,25 @@ class NotificationRequest
     }
 
     /**
-     * Set transaction
+     * Set transactionCode
      *
-     * @param \BackendBundle\Entity\Transactions $transaction
+     * @param string $transactionCode
      * @return NotificationRequest
      */
-    public function setTransaction(\BackendBundle\Entity\Transactions $transaction = null)
+    public function setTransactionCode($transactionCode)
     {
-        $this->transaction = $transaction;
+        $this->transactionCode = $transactionCode;
 
         return $this;
     }
 
     /**
-     * Get transaction
+     * Get transactionCode
      *
-     * @return \BackendBundle\Entity\Transactions 
+     * @return string 
      */
-    public function getTransaction()
+    public function getTransactionCode()
     {
-        return $this->transaction;
+        return $this->transactionCode;
     }
 }
