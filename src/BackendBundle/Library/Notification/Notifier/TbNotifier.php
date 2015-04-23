@@ -38,4 +38,9 @@ class TbNotifier extends BaseNotifier
             'message' => 'Fatal Error :: Unexpected response from TB!!',
         ];
     }
+
+    protected function getSource()
+    {
+        return 'tb';
+    }
 }
