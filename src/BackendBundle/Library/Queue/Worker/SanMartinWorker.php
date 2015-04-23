@@ -211,7 +211,7 @@ class SanMartinWorker extends BaseWorker {
                  ->addLog(
                     $this->getWorkerSetting('service_id'),
                     'Confirm',
-                    json_encode($contents),
+                    json_encode($contents[$fileCount]),
                     $e->getMessage(),
                     "ERROR"
                 );                    
