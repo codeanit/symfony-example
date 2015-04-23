@@ -16,7 +16,29 @@ use Symfony\Component\Validator\Constraints\DateTime;
  */
 abstract class AbstractQueueWorker implements QueueWorkerInterface
 {
+    /**
+     * @var array
+     */
     private $settings = [];
+
+    /**
+     *
+     * @var
+     */
+    protected  $url;
+
+    /**
+     *
+     * @var
+     */
+    protected  $username;
+
+    /**
+     *
+     * @var
+     */
+    protected  $password;
+
 
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -126,6 +148,7 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
     protected function notifyTb(array $params)
     {
         $tbUrl = 'http://172.16.1.50/fgm/Webservice/cdex.php';
+        $localtbUrl = 'http://172.16.1.50/fgm/Webservice/cdex.php';
         $client = new Client();
         $options = [
             'body' => json_encode($params),
