@@ -47,7 +47,7 @@ abstract class AbstractNotifier
         ];
         $notifyRequest = new NotificationRequest();
 
-        // $notifyRequest->setTransaction($transaction);
+        $notifyRequest->setTransactionCode($transactionCode);
         $notifyRequest->setReciever($this->getSource());
         $notifyRequest->setNotificationAction($action);
         $notifyRequest->setPayload($payload);
