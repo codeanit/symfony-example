@@ -50,10 +50,11 @@ BackendBundle\Entity\NotificationRequest:
             nullable: true
             comment: 'Last notification response.'
             column: last_response
+        
         createdAt:
             type: datetime
             nullable: false
-            column: crated_at
+            column: created_at
             gedmo:
                 timestampable:
                     on: create
