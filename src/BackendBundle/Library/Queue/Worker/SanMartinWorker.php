@@ -18,8 +18,15 @@ use Symfony\Component\Finder\Finder;
 
 
 class SanMartinWorker extends BaseWorker {
+    /**
+     * @return mixed
+     */
+    protected function prepareCredentials()
+    {
+        // TODO: Implement prepareCredentials() method.
+    }
 
-  /**
+    /**
    * @var TbNotifier
    */
     private $tbNotifier;

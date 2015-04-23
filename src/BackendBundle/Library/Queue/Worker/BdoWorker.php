@@ -267,4 +267,12 @@ class BdoWorker extends BaseWorker
         );     
         return $wsdl;
     }
+
+    /**
+     * @return mixed
+     */
+    protected function prepareCredentials()
+    {
+        // TODO: Implement prepareCredentials() method.
+    }
 }

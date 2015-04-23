@@ -30,11 +30,11 @@ class IntermexWorker extends BaseWorker
      */
     protected $serializer;
 
-    public function __construct()
+    public function prepareCredentials()
     {
         $this->url = $this->getWorkerSetting('url');
         $this->username = $this->getWorkerSetting('username');
-        $this->pasword = $this->getWorkerSetting('password');
+        $this->password = $this->getWorkerSetting('password');
 
         $this->token = $this->getWorkerSetting('token')
             ? $this->getWorkerSetting('token') : $this->generateToken();
@@ -54,6 +54,8 @@ class IntermexWorker extends BaseWorker
             ['vPassword' => $this->password, 'vUsuario' => $this->username],
             'Conectar'
         );
+
+        $this->logger->error('response_log', ['vPassword' => $this->password, 'vUsuario' => $this->username]);
 
         if (! $response->ConectarResult) {
             throw new \Exception('Internal Error :: Invalid response from "Conectar"!!');
@@ -101,7 +103,7 @@ class IntermexWorker extends BaseWorker
 
         try {
             $parameters = $this->prepareCreateParameters($queue);
-            $response = $this->sendHttpRequest($this->url, $parameters, 'AltaEnvioN');
+            $response = $this->sendWSDLHttpRequest($this->url, $parameters, 'AltaEnvioN');
 
             preg_match_all(
                 $dataPattern,
@@ -135,7 +137,7 @@ class IntermexWorker extends BaseWorker
             );
 
         } catch(\Exception $e) {
-            $this->logger->error('main', [$e->getMessage()]);
+            $this->logger->error('main', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
         /**
