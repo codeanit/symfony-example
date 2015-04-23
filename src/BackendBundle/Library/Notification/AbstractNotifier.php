@@ -93,5 +93,8 @@ abstract class AbstractNotifier
      */
     abstract public function sendNotificationRequest(NotificationRequest $notificationRequest, array $args = []);
 
-    abstract protected function getSource();
+    /**
+     * @return string
+     */
+    abstract public function getSource();
 }

@@ -39,7 +39,10 @@ class TbNotifier extends BaseNotifier
         ];
     }
 
-    protected function getSource()
+    /**
+     * @return string
+     */
+    public function getSource()
     {
         return 'tb';
     }
