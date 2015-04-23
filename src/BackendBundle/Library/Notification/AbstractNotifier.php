@@ -34,10 +34,9 @@ abstract class AbstractNotifier
      * @param $action
      * @param $notiStatus
      * @param $message
-     * @param $transaction
+     * @param $transactionCode
      * @param bool $queue
      * @return bool
-     * @throws \Exception
      */
     public function notify($action, $notiStatus, $message, $transactionCode, $queue = false)
     {
