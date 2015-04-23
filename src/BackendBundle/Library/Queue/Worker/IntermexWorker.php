@@ -554,7 +554,7 @@ class IntermexWorker extends BaseWorker
                 ->addLog(
                     $this->getWorkerSetting('service_id'),
                     $action,
-                    json_encode($parameters),
+                    json_encode($params),
                     json_encode($webServiceResponse),
                     ($flag) ? 'Success': 'Failed'
                 );
@@ -733,13 +733,6 @@ class IntermexWorker extends BaseWorker
         }
     }
 
-    /**
-     * Method for confirming paid remittances.
-     *
-     * @param  varchar $vReferencia         [reference number of txn]
-     * @param  varchar $iConsecutivoAgencia [Remittances consecutive number]
-     * @return void
-     */
     public function confirmaPagado($vReferencia, $iConsecutivoAgencia)
     {
         $iIdAgencia=$this->conectar(
@@ -791,118 +784,115 @@ class IntermexWorker extends BaseWorker
         );
 
     }
-}
 
-/**
- * Method to show the changes already made
- *
- * @return void
- */
-public function consultaCambios()
-{
-    $iIdAgencia=$this->conectar(
-        'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
-        '308901',
-        'ixrue308901p'
-    );
-    $param=array('iIdAgencia'=>$iIdAgencia);
-    $soap_client = new \SoapClient(
-        $this->url,
-        array(
-            "trace" => 1,
-            'exceptions' => 1,
-            'cache_wsdl' => WSDL_CACHE_NONE,)
-    );
-    $response_main = $soap_client->ConsultaCambios($param);
-    $extractedData =explode('</xs:schema>',$response_main->ConsultaCambiosResult->any);
-    $xmlFinal   = simplexml_load_string(
-        $extractedData[1],
-        'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
-    );
-    $response = json_decode(json_encode((array) $xmlFinal), true);
-    if (isset($response['NewDataSet']['CAMBIOS'])) {
-        $output=$response['NewDataSet']['CAMBIOS'];
-        foreach ($output as $key => $value) {
-            //@TODO nofity queue generate
-            $data=$this->confirmaCambio(
-                $value['iIdOrden'],
-                $value['tiIdTipoOrden'],
-                $value['vReferencia']
-            );
+    /**
+     * Method to show the changes already made
+     *
+     * @return void
+     */
+    public function consultaCambios()
+    {
+        $iIdAgencia=$this->conectar(
+            'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
+            '308901',
+            'ixrue308901p'
+        );
+        $param=array('iIdAgencia'=>$iIdAgencia);
+        $soap_client = new \SoapClient(
+            $this->url,
+            array(
+                "trace" => 1,
+                'exceptions' => 1,
+                'cache_wsdl' => WSDL_CACHE_NONE,)
+        );
+        $response_main = $soap_client->ConsultaCambios($param);
+        $extractedData =explode('</xs:schema>',$response_main->ConsultaCambiosResult->any);
+        $xmlFinal   = simplexml_load_string(
+            $extractedData[1],
+            'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
+        );
+        $response = json_decode(json_encode((array) $xmlFinal), true);
+        if (isset($response['NewDataSet']['CAMBIOS'])) {
+            $output=$response['NewDataSet']['CAMBIOS'];
+            foreach ($output as $key => $value) {
+                //@TODO nofity queue generate
+                $data=$this->confirmaCambio(
+                    $value['iIdOrden'],
+                    $value['tiIdTipoOrden'],
+                    $value['vReferencia']
+                );
 
-        }
-    } else {
-        $this->em->getRepository('BackendBundle:Log')
-            ->addLog(
-                $this->getWorkerSetting('service_id'),
-                'consultaCambios',
-                json_encode($param),
-                'No paid remittance today from this iIdAgencia'
-            );
-    }
-    return;
-}
-
-/**
- * Method to Confirm a change requested
- *
- * @return void
- */
-public function confirmaCambio($iIdOrden=null,$id=null,$ref=null)
-{
-    $type = array(
-        '5'=>'Receiver Name change',
-        '6'=>'Sender Name change',
-        '7'=>'Receiver phone Number change',
-        '10'=>'Remittance Cancellation',
-    );
-    $iIdAgencia=$this->conectar(
-        'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
-        '308901',
-        'ixrue308901p'
-    );
-    $param=array('iIdAgencia'=>$iIdAgencia,'iIdOrden'=>$iIdOrden);
-    $soap_client = new \SoapClient(
-        $this->url,
-        array(
-            "trace" => 1,
-            'exceptions' => 1,
-            'cache_wsdl' => WSDL_CACHE_NONE,)
-    );
-    $response_main = $soap_client->ConfirmaCambio($param);
-    $extractedData =explode('</xs:schema>',$response_main->ConfirmaCambioResult->any);
-    $xmlFinal   = simplexml_load_string(
-        $extractedData[1],
-        'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
-    );
-    $response = json_decode(json_encode((array) $xmlFinal), true);
-
-    if (isset($response['NewDataSet']['CONFIRMADOS'])) {
-
-        $output = $response['NewDataSet']['CONFIRMADOS'];
-
-        if ( $output['tiExito'] == '1' ) {
-
-            $status = $output['tiIdTipoOrden'] == 10 ? "cancel" : "processing";
-            $message = $status == "cancel" ? "Transaction is cancelled." : "Transaction is in process.";
-
+            }
+        } else {
             $this->em->getRepository('BackendBundle:Log')
                 ->addLog(
                     $this->getWorkerSetting('service_id'),
                     'consultaCambios',
                     json_encode($param),
-                    $response
+                    'No paid remittance today from this iIdAgencia'
                 );
+        }
+        return;
+    }
 
-            $this->tbNotifier->notify(
-                'confirm',
-                $status,
-                $message,
-                $output['vReferencia']
-            );
+    /**
+     * Method to Confirm a change requested
+     *
+     * @return void
+     */
+    public function confirmaCambio($iIdOrden=null,$id=null,$ref=null)
+    {
+        $type = array(
+            '5'=>'Receiver Name change',
+            '6'=>'Sender Name change',
+            '7'=>'Receiver phone Number change',
+            '10'=>'Remittance Cancellation',
+        );
+        $iIdAgencia=$this->conectar(
+            'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
+            '308901',
+            'ixrue308901p'
+        );
+        $param=array('iIdAgencia'=>$iIdAgencia,'iIdOrden'=>$iIdOrden);
+        $soap_client = new \SoapClient(
+            $this->url,
+            array(
+                "trace" => 1,
+                'exceptions' => 1,
+                'cache_wsdl' => WSDL_CACHE_NONE,)
+        );
+        $response_main = $soap_client->ConfirmaCambio($param);
+        $extractedData =explode('</xs:schema>',$response_main->ConfirmaCambioResult->any);
+        $xmlFinal   = simplexml_load_string(
+            $extractedData[1],
+            'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_PARSEHUGE
+        );
+        $response = json_decode(json_encode((array) $xmlFinal), true);
+
+        if (isset($response['NewDataSet']['CONFIRMADOS'])) {
+
+            $output = $response['NewDataSet']['CONFIRMADOS'];
+
+            if ( $output['tiExito'] == '1' ) {
+
+                $status = $output['tiIdTipoOrden'] == 10 ? "cancel" : "processing";
+                $message = $status == "cancel" ? "Transaction is cancelled." : "Transaction is in process.";
+
+                $this->em->getRepository('BackendBundle:Log')
+                    ->addLog(
+                        $this->getWorkerSetting('service_id'),
+                        'consultaCambios',
+                        json_encode($param),
+                        $response
+                    );
+
+                $this->tbNotifier->notify(
+                    'confirm',
+                    $status,
+                    $message,
+                    $output['vReferencia']
+                );
+            }
         }
     }
-}
-
-
 }
