@@ -1,6 +1,7 @@
 BackendBundle\Entity\NotificationRequest:
     type: entity
     table: notification_request
+    repositoryClass: BackendBundle\Entity\Repository\NotificationRequestRepository
     id:
         id:
             type: integer
