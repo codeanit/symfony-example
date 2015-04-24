@@ -4,8 +4,6 @@ var/**/*
 #Ignore app folder
 app/cache/*
 app/config/parameters.yml
-app/phpunit.xml.dist
-
 app/phpunit.xml
 
 /bin
