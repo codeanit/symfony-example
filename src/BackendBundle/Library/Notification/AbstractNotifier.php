@@ -10,7 +10,7 @@ use BackendBundle\Entity\NotificationRequest;
  * Class AbstractNotifier
  * @package BackendBundle\Library\Notification
  */
-abstract class AbstractNotifier
+abstract class AbstractNotifier implements NotifierInterface
 {
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -71,6 +71,33 @@ abstract class AbstractNotifier
         } catch(\Exception $e) {
 //            throw $e;
             //@todo log error
+            $this->logger->addError('aaaxxx', [$e->getMessage(), $e->getFile(), $e->getLine()]);
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param NotificationRequest $notificationRequest
+     * @return mixed|void
+     */
+    public function notifyExisting(NotificationRequest $notificationRequest)
+    {
+        try {
+            $responseDump = $this->sendNotificationRequest($notificationRequest);
+            $responseStatus = (isset($responseDump['status']) and strtolower($responseDump['status']) == NotificationRequest::STATUS_SUCCESS)
+                ? NotificationRequest::STATUS_SUCCESS : NotificationRequest::STATUS_FAILED;
+
+            $notificationRequest->setNotificationStatus($responseStatus);
+            $notificationRequest->setLastResponse($responseDump);
+
+            $this->em->persist($notificationRequest);
+            $this->em->flush();
+
+            return true;
+
+        } catch(\Exception $e) {
             $this->logger->addError('aaaxxx', [$e->getMessage(), $e->getFile(), $e->getLine()]);
         }
 
