@@ -247,5 +247,5 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
     /**
      * @return mixed
      */
-    abstract protected function prepareCredentials();
+    abstract public function prepareCredentials();
 }
