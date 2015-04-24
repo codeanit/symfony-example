@@ -168,7 +168,7 @@ class SanMartinWorker extends BaseWorker {
      * @return mixed
      */
     public function confirmTransaction()
-    { 
+    {
         $contents=array();
         $getMTCN=array();
         $fileCount=0;        
@@ -176,7 +176,7 @@ class SanMartinWorker extends BaseWorker {
             $rootPath=dirname($this->container->getParameter('kernel.root_dir')).'/web/generated_files/sanmartin/';
             $unparsedPath= $rootPath.'unparsed/';
             $parsedPath= $rootPath.'parsed/';
-            if (!is_dir($rootPath.'/web/generated_files/sanmartin/unparsed/')) 
+            if (!is_dir($rootPath.'unparsed/')) 
             {               
                 mkdir($unparsedPath, 0777, true);
                 mkdir($parsedPath, 0777, true);
@@ -199,9 +199,9 @@ class SanMartinWorker extends BaseWorker {
                } 
                if(copy($unparsedPath.$file->getRelativePathname(),$parsedPath.$file->getRelativePathname())){
                   unlink($unparsedPath.$file->getRelativePathname());
-               }                             
-            }
-          } catch (\Exception $e) {
+               }                                       
+            }           
+          } catch (\Exception $e) {        
             $this->logger->error('SANMARTIN_CONFIRM', [$e->getMessage()]);
             $this->em->getRepository('BackendBundle:Log')
              ->addLog(
