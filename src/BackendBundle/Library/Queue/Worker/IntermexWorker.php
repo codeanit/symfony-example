@@ -177,7 +177,7 @@ class IntermexWorker extends BaseWorker
         $bankBranch     = '';
         $bankAccount    = '';
         $beneficiaryTelephone = ($transaction->getBeneficiaryPhoneMobile()) ?
-            $transaction->getBeneficiaryPhoneMobile() : $transaction->getBeneficiaryPhoneMobile();
+            $transaction->getBeneficiaryPhoneMobile() : $transaction->getBeneficiaryPhoneLandline();
 
         $settings = $this->getWorkerSetting();
         $url = (isset($settings['url'])) ? $settings['url'] : false;
@@ -317,7 +317,6 @@ class IntermexWorker extends BaseWorker
          */
         $reExecute = !$flag;
         $this->updateExecutedQueue($queue, $reExecute);
-//        $this->notifyTb($notiDump);
         $this->tbNotifier->notify(
             'cancel',
             $notiDump['status'],
@@ -333,12 +332,6 @@ class IntermexWorker extends BaseWorker
                         $outputStatus
                     );
 
-//        return [
-//            'message'     => $outputMessage,
-//            'status'      => $outputStatus,
-//            'status_code' => $outputStatusCode,
-//            'data'        => $outputData
-//        ];
         return $flag;
     }
 
@@ -405,6 +398,7 @@ class IntermexWorker extends BaseWorker
 
     /**
      * @param Transactions $transaction
+     * @return bool
      * @throws \Exception
      */
     public function changeBeneficiaryFirstName(Transactions $transaction)
@@ -421,7 +415,7 @@ class IntermexWorker extends BaseWorker
 
         try {
             $params = [
-                'iIdAgencia' => $this->conectar($url, $username, $password),
+                'iIdAgencia' => $this->token,
                 'vReferencia' => $transaction->getTransactionCode(),
                 'vNuevoBeneficiario' => $transaction->getBeneficiaryFirstName(),//$txn['transaction']->beneficiary_first_name,
                 'vMotivoModificacion' => 'reason to change'
@@ -488,7 +482,7 @@ class IntermexWorker extends BaseWorker
 
         try {
             $params = [
-                'iIdAgencia' => $this->conectar($url, $username, $password),
+                'iIdAgencia' => $this->token,
                 'vReferencia' => $transaction->getTransactionCode(),
                 'vNuevoBeneficiario' => $transaction->getRemitterFirstName(),//$txn['transaction']->remitter_first_name,
                 'vMotivoModificacion' => 'reason to change'
@@ -553,7 +547,7 @@ class IntermexWorker extends BaseWorker
 
         try {
             $params = [
-                'iIdAgencia' => $this->conectar($url, $username, $password),
+                'iIdAgencia' => $this->token,
                 'vReferencia' => $transaction->getTransactionCode(),
                 'vNuevoBeneficiario' => $transaction->getBeneficiaryPhoneMobile(),//$txn['transaction']->beneficiary_first_name,
                 'vMotivoModificacion' => 'reason to change'
@@ -656,7 +650,7 @@ class IntermexWorker extends BaseWorker
      */
     public function consultaPagados()
     {
-        $iIdAgencia=$this->conectar(
+        $iIdAgencia = $this->conectar(
             'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
             '308901',
             'ixrue308901p'
@@ -766,11 +760,7 @@ class IntermexWorker extends BaseWorker
      */
     public function consultaCambios()
     {
-        $iIdAgencia=$this->conectar(
-            'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
-            '308901',
-            'ixrue308901p'
-        );
+        $iIdAgencia=$this->token;
         $param=array('iIdAgencia'=>$iIdAgencia);
         $soap_client = new \SoapClient(
             $this->url,
@@ -822,11 +812,7 @@ class IntermexWorker extends BaseWorker
             '7'=>'Receiver phone Number change',
             '10'=>'Remittance Cancellation',
         );
-        $iIdAgencia=$this->conectar(
-            'http://187.157.136.71/SIINetAg/SIINetAg.asmx?wsdl',
-            '308901',
-            'ixrue308901p'
-        );
+        $iIdAgencia = $this->token;
         $param=array('iIdAgencia'=>$iIdAgencia,'iIdOrden'=>$iIdOrden);
         $soap_client = new \SoapClient(
             $this->url,
