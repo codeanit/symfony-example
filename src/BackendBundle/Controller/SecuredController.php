@@ -124,6 +124,25 @@ class SecuredController extends Controller
     }
 
     /**
+     * @Route("/uploaded_files/{name}/{id}", name="list_uploaded_files")
+     * @Template()
+     */
+    public function listUploadedFilesAction($name=null)
+    {
+        $contents=array();
+        $path= $this->container->get('request')->server->get('DOCUMENT_ROOT').'/generated_files/'.$name.'/parsed/';
+        $finder = new Finder();
+        $i=0;
+        $finder->files()->in($path)->sortByName();
+        foreach ($finder as $file) {          
+            $contents [$i]['name'] = $file->getRelativePathname();
+            $contents [$i]['date'] = date ("Y-m-d H:i:s.", filemtime($path.$file->getRelativePathname()));
+            ++$i;
+        }        
+        return array('files' => $contents ,'path'=>$path,'service'=>$name);
+    }
+
+    /**
      * @Route("/download/{name}/{service}/", name="download")
      * 
      */

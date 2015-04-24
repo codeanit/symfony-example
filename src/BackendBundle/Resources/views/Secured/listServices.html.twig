@@ -31,7 +31,7 @@
                  
                   {% if entry.is_ftp_service == 1 %}  
                     <a href="{{url('list', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-primary btn-xs'>Generated Files</a>
-                    <a href="{{url('list', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-primary btn-xs'>Uploaded Files</a>
+                    <a href="{{url('list_uploaded_files', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-primary btn-xs'>Uploaded Files</a>
                     <a href="{{url('upload', {'name':entry.service_name,'id': entry.id})}}" class='btn btn-primary btn-xs'>Upload</a>
                   {% endif %}
 

@@ -1,0 +1,31 @@
+{% extends "BackendBundle:Secured:secured-layout.html.twig" %}
+
+{% block body %}
+      
+      <div class="jumbotron">
+        <h2>Parsed File List</h2>
+        <br>
+        <br>
+         
+        <table class="table table-hover">
+            <tr>
+                <th>S.N</th>
+                <th>File Name</th>               
+                <th>Date</th>               
+                <!-- <th>Download</th> -->               
+            </tr>       
+          
+            {% for entry in files %}            
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>{{ entry.name }}</td>
+                <td>{{ entry.date }}</td>
+               <!--  <td>
+                  <a href="{{ url('download', {'name': entry.name,'service':service}) }}" target="">Download</a>
+                </td> -->
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+
+{% endblock %}
