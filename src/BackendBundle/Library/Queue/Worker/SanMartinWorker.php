@@ -21,7 +21,7 @@ class SanMartinWorker extends BaseWorker {
     /**
      * @return mixed
      */
-    protected function prepareCredentials()
+    public function prepareCredentials()
     {
         // TODO: Implement prepareCredentials() method.
     }
@@ -96,7 +96,7 @@ class SanMartinWorker extends BaseWorker {
             $finder->files()->in($rootPath.'/web/generated_files/sanmartin/generated/');                  
             $fileCount=str_pad(count($finder)+1, 3, '0', STR_PAD_LEFT);
             $path=dirname($this->container->getParameter('kernel.root_dir'))
-                    .'/web/generated_files/sanmartin/generate/SM'
+                    .'/web/generated_files/sanmartin/generated/SM'
                     .date('ymd').$fileCount
                     .'.txt';
     
@@ -114,13 +114,10 @@ class SanMartinWorker extends BaseWorker {
                         json_encode($dataToGenerate),
                         $output,
                         'SUCCESS'
-                    );
-                
+                    );                
                     $status = "processing";
-                    $message = "Sanmartin transacton created successfully";
-                    
+                    $message = "Sanmartin transacton created successfully";                    
                     $this->updateExecutedQueue($queue);
-
             }
         } catch (\Exception $e) {
           $status = "error";
@@ -172,18 +169,18 @@ class SanMartinWorker extends BaseWorker {
      */
     public function confirmTransaction()
     { 
-            $contents=array();
-            $getMTCN=array();
-            $fileCount=0;        
+        $contents=array();
+        $getMTCN=array();
+        $fileCount=0;        
         try {
-            $rootPath=dirname($this->container->getParameter('kernel.root_dir'));
-              if (!is_dir($rootPath.'/web/generated_files/sanmartin/unparsed/')) 
-              {               
-                mkdir($rootPath.'/web/generated_files/sanmartin/unparsed/', 0777, true);
-                mkdir($rootPath.'/web/generated_files/sanmartin/parsed/', 0777, true);
-              }
-            $unparsedPath= $rootPath.'/web/generated_files/sanmartin/unparsed/';
-            $parsedPath= $rootPath.'/web/generated_files/sanmartin/parsed/';
+            $rootPath=dirname($this->container->getParameter('kernel.root_dir')).'/web/generated_files/sanmartin/';
+            $unparsedPath= $rootPath.'unparsed/';
+            $parsedPath= $rootPath.'parsed/';
+            if (!is_dir($rootPath.'/web/generated_files/sanmartin/unparsed/')) 
+            {               
+                mkdir($unparsedPath, 0777, true);
+                mkdir($parsedPath, 0777, true);
+            }
             $finder = new Finder();
             $finder->files()->in($unparsedPath);
             foreach ($finder as $file) {
@@ -204,17 +201,16 @@ class SanMartinWorker extends BaseWorker {
                   unlink($unparsedPath.$file->getRelativePathname());
                }                             
             }
-          } catch (\Exception $e) {         
-              // echo $e->getMessage();die; 
-              $this->logger->error('SANMARTIN_CONFIRM', [$e->getMessage()]);
-              $this->em->getRepository('BackendBundle:Log')
-                 ->addLog(
-                    $this->getWorkerSetting('service_id'),
-                    'Confirm',
-                    json_encode($contents[$fileCount]),
-                    $e->getMessage(),
-                    "ERROR"
-                );                    
+          } catch (\Exception $e) {
+            $this->logger->error('SANMARTIN_CONFIRM', [$e->getMessage()]);
+            $this->em->getRepository('BackendBundle:Log')
+             ->addLog(
+                $this->getWorkerSetting('service_id'),
+                'Confirm',
+                json_encode($contents[$fileCount]),
+                $e->getMessage(),
+                "ERROR"
+            );                    
           } 
         return;
     }
