@@ -13,27 +13,33 @@ use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
  */
 class BdoWorker extends BaseWorker
 {
-    private $url;
-    private $type;
+    private $encryptedPassowrd;
+
+    /**
+     * @var array
+     */
+    private $type = [
+        'pickupCash'=> ['transactionType'=>'01','payableCode'=>'BPMM'],
+        'pickupMLLhuillier' => ['transactionType'=>'42','payableCode'=>'BPMM'],
+        'pickupCebuana' => ['transactionType'=>'CL','payableCode'=>'BPMM']
+    ];
 
     /**
      * [__construct description]
      */
-    function __construct() {               
-        $this->url = "https://203.177.92.217/RemittanceWSApi/RemitAPIService?wsdl";
-        $this->type=array(
-            'pickupCash'=>array('transactionType'=>'01','payableCode'=>'BPMM'),
-            'pickupMLLhuillier'=>array('transactionType'=>'42','payableCode'=>'BPMM'),
-            'pickupCebuana'=>array('transactionType'=>'CL','payableCode'=>'BPMM'),
-            );
-    }
+    function __construct() {}
+
     /**
-     * @param array $arg
-     * @return mixed
+     * Find BDO create function
      */
-    public function confirmTransaction()
+    private function mapBDOCreate($payoutPayerName)
     {
-        echo 1234; die;
+        $settings = $this->getWorkerSetting();
+        $bdoCreateFunction = array_search($payoutPayerName, $settings, true);
+
+        if ($bdoCreateFunction && array_key_exists($bdoCreateFunction, $this->type)) {
+            return $bdoCreateFunction;
+        }
     }
 
     /**
@@ -45,39 +51,40 @@ class BdoWorker extends BaseWorker
     }
 
     /**
-     * @param Transactions $transaction
-     * @param array $args
-     * @return mixed|void
-     */
-    public function enqueueTransaction(Transactions $transaction, $args = [])
-    {
-        // TODO: Implement enqueueTransaction() method.
-    }
-
-    /**
      * @param OperationsQueue $queue
      * @param array $args
      * @return mixed
      */
     public function createTransaction(OperationsQueue $queue, $args = [])
-    {   
-        $transaction = $queue->getTransaction();
-        $settings = $this->getWorkerSetting();      
-        if($settings['pickup_cash'] == $transaction->getPayoutPayerName()){           
-            $this->pickupCash($transaction);
-        }
-        if($settings['pickup_cebuana'] == $transaction->getPayoutPayerName()){
-            $this->pickupMLLhuillier($transaction);
-        }
-        if($settings['pickup_mllhuillier'] == $transaction->getPayoutPayerName()){
-            $this->pickupCebuana($transaction);
-        }
-       return;
+    {
+        $bdoCreateFunction = $this->mapBDOCreate($transaction->getPayoutPayerName());
+
+        $createData = $this->prepareCreateData(
+            $queue->getTransaction()->getTransactionCode(),
+            $bdoCreateFunction
+        );
+
+        $actual = $this->sendWSDLHttpRequest($this->url, $createData, $bdoCreateFunction);
+
+        $status = ($actual->responseCode=='00' || $actual->responseCode=='0')
+            ? 'SUCCESS': 'ERROR';
+
+        $this->em->getRepository('BackendBundle:Log')
+            ->addLog(
+                $this->getWorkerSetting('service_id'),
+                'pickupCebuana',
+                json_encode($xml),
+                json_encode($actual),
+                $status
+            );
+
     }
+
+
 
     /**
      * @param OperationsQueue $queue
-     * @param array $args
+     * @param array $argss
      * @return mixed
      */
     public function cancelTransaction(OperationsQueue $queue, $args = [])
@@ -92,10 +99,17 @@ class BdoWorker extends BaseWorker
      */
     public function changeTransaction(OperationsQueue $queue, $args = [])
     {
-        echo 'Changing Transactions!!', PHP_EOL;
         // TODO: Implement changeTransaction() method.
     }
 
+    /**
+     * @param array $arg
+     * @return mixed
+     */
+    public function confirmTransaction()
+    {
+        // TODO: Implement changeTransaction() method.
+    }
 
     /**
      * Returns encrypted password
@@ -104,7 +118,7 @@ class BdoWorker extends BaseWorker
      *
      * @return string
      */
-    public function getEncryptedPassword($password)
+    private function getEncryptedPassword($password)
     {
         $queryString = "java -cp "
             . "src/BackendBundle/Library/BDO/RemittanceAPITool.jar:."
@@ -152,12 +166,13 @@ class BdoWorker extends BaseWorker
             .",TRANSACTION_DATE=" . $para['TRANSACTION_DATE']
             .",ACCOUNT_NUMBER=" . $para['ACCOUNT_NUMBER'];
 
-
         return shell_exec($queryString);
     }
 
+    /**
+     * @param null $data
+     */
     public function pickupCash($data=null){ 
-
         try {
           $xml=$this->xml($data ,'pickupCash');        
           $actual = $this->sendHttpRequest($this->url, $xml, 'PickUpCash');     
@@ -177,22 +192,17 @@ class BdoWorker extends BaseWorker
         return;
     }
 
+    /**
+     * @param null $data
+     */
     public function pickupCebuana($data=null){
-        $xml=$this->xml($data,'pickupCebuana');
-        $actual = $this->sendHttpRequest($this->url, $xml, 'pickupCebuana'); 
 
-        $status=($actual->responseCode=='00' || $actual->responseCode=='0')?'SUCCESS':'ERROR';
-        $this->em->getRepository('BackendBundle:Log')
-             ->addLog(
-                $this->getWorkerSetting('service_id'),
-                'pickupCebuana',
-                json_encode($xml),
-                json_encode($actual),
-                $status               
-            );  
         return;
     }
-    
+
+    /**
+     * @param null $data
+     */
     public function pickupMLLhuillier($data=null){        
         $xml=$this->xml($data,'pickupMLLhuillier');
         $actual = $this->sendHttpRequest($this->url, $xml, 'pickupMLLhuillier'); 
@@ -211,68 +221,84 @@ class BdoWorker extends BaseWorker
 
     /**
      * [xml String Generator]
+     *
      * @param  [array] $data
-     * @return [String]       [xml string]
+     *
+     * @return [array]
      */
-    public function xml($transaction=null,$type=null){
+    private function prepareCreateData($transaction =null, $type= null) {
 
-        $methodData=$this->type[$type];       
-        if (strtolower($transaction->getTransactionType())=='bank') {
-            $acc=$transaction->getBeneficiaryAccountNumber();
-            $bankBranch=$transaction->getBeneficiaryBankBranch();
+        $methodData = $this->type[$type];
+        $bankAccountNumber = $bankBranch = $bankAccountNumber = '';
+
+        if ( strtolower($transaction->getTransactionType()) =='bank' ) {
             $bankAccountNumber=$transaction->getBeneficiaryAccountNumber();
-        }else{
-            $acc=$bankBranch=$bankAccountNumber='';
+            $bankBranch=$transaction->getBeneficiaryBankBranch();
         }
-        $param = array(
-            "SignatureType" => "TXN",
-            "CLEAR_BRS_PASSWORD" => "bdoRemit1!",
-            "TRANSACTION_REFERENCE_NUMBER" =>
-                $transaction->getTransactionCode(),
-            "LANDED_AMOUNT" => $transaction->getPayoutAmount(),
-            "TRANSACTION_DATE"=> $transaction->getRemittanceDate()->format('Y-m-d'),
-            "ACCOUNT_NUMBER" => $acc);
 
-        $wsdl=  array(
-            'userName'=>'220FGOFC1',
-            'password'=>$this->getEncryptedPassword("bdoRemit1!"),
-            'signedData'=>$this->getSignedData($param),
-            'conduitCode'=>'FG',
-            'locatorCode'=>'220',
-            'referenceNo'=>$transaction->getTransactionCode(),
-            'transDate'=>$transaction->getRemittanceDate()->format('Y-m-d'),
-            'senderFirstname'=>$transaction->getRemitterfirstName(),
-            'senderLastname'=>$transaction->getRemitterLastName(),
-            'senderMiddlename'=>$transaction->getRemitterMiddleName(),
-            'senderAddress1'=>$transaction->getRemitterAddress(),
-            'senderAddress2'=>'',
-            'senderPhone'=>$transaction->getRemitterPhoneMobile(),
-            'receiverFirstname'=>$transaction->getBeneficiaryFirstName(),
-            'receiverLastname'=>$transaction->getBeneficiaryLastName(),
-            'receiverMiddlename'=>$transaction->getBeneficiaryMiddleName(),
-            'receiverAddress1'=>$transaction->getBeneficiaryAddress(),
-            'receiverAddress2'=>'',
-            'receiverMobilePhone'=>$transaction->getBeneficiaryPhoneMobile(),
-            'receiverBirthDate'=>'1991-07-24',
-            'receiverGender'=>'',
-            'transactionType'=>$methodData['transactionType'],
-            'payableCode'=>$methodData['payableCode'],
-            'bankCode'=>'BDO',
-            'branchName'=>$bankBranch,
-            'accountNo'=>$acc,
-            'landedCurrency'=>$transaction->getPayoutCurrency(),
-            'landedAmount'=>$transaction->getPayoutAmount(),
-            'messageToBene1'=>'messsage',
-            'messageToBene2'=>'message',
-        );     
-        return $wsdl;
+        $param = array(
+            "SignatureType"                => "TXN",
+            "CLEAR_BRS_PASSWORD"           => $this->password,
+            "TRANSACTION_REFERENCE_NUMBER" => $transaction->getTransactionCode(),
+            "LANDED_AMOUNT"                => $transaction->getPayoutAmount(),
+            "TRANSACTION_DATE"             => $transaction->getRemittanceDate()->format('Y-m-d'),
+            "ACCOUNT_NUMBER"               => $bankAccountNumber
+        );
+
+        return array(
+            'userName'              =>  $this->password,
+            'password'              =>  $this->encryptedPassowrd,
+            'signedData'            =>  $this->getSignedData($param),
+            'conduitCode'           =>  'FG',
+            'locatorCode'           =>  '220',
+            'referenceNo'           =>  $transaction->getTransactionCode(),
+            'transDate'             =>  $transaction->getRemittanceDate()->format('Y-m-d'),
+            'senderFirstname'       =>  $transaction->getRemitterfirstName(),
+            'senderLastname'        =>  $transaction->getRemitterLastName(),
+            'senderMiddlename'      =>  $transaction->getRemitterMiddleName(),
+            'senderAddress1'        =>  $transaction->getRemitterAddress(),
+            'senderAddress2'        =>  '',
+            'senderPhone'           =>  $transaction->getRemitterPhoneMobile(),
+            'receiverFirstname'     =>  $transaction->getBeneficiaryFirstName(),
+            'receiverLastname'      =>  $transaction->getBeneficiaryLastName(),
+            'receiverMiddlename'    =>  $transaction->getBeneficiaryMiddleName(),
+            'receiverAddress1'      =>  $transaction->getBeneficiaryAddress(),
+            'receiverAddress2'      =>  '',
+            'receiverMobilePhone'   =>  $transaction->getBeneficiaryPhoneMobile(),
+            'receiverBirthDate'     =>  $transaction->getBeneficiary->format('Y-m-d'),
+            'receiverGender'        =>  '',
+            'transactionType'       =>  $methodData['transactionType'],
+            'payableCode'           =>  $methodData['payableCode'],
+            'bankCode'              =>  'BDO',
+            'branchName'            =>  $bankBranch,
+            'accountNo'             =>  $bankAccountNumber,
+            'landedCurrency'        =>  $transaction->getPayoutCurrency(),
+            'landedAmount'          =>  $transaction->getPayoutAmount(),
+            'messageToBene1'        =>  'messsage',
+            'messageToBene2'        =>  'message',
+        );
     }
 
     /**
      * @return mixed
      */
-    protected function prepareCredentials()
+    public function prepareCredentials()
     {
-        // TODO: Implement prepareCredentials() method.
+        $this->url                  = $this->getWorkerSetting('url');
+        $this->username             = $this->getWorkerSetting('username');
+        $this->password             = $this->getWorkerSetting('password');
+        $this->encryptedPassowrd    = $this->getWorkerSetting('encrypted_password')
+            ? $this->getWorkerSetting('encrypted_password')
+            : $this->getEncryptedPassword($this->password);
+    }
+
+    /**
+     * @param Transactions $transaction
+     * @param array $args
+     * @return mixed
+     */
+    public function enqueueTransaction(Transactions $transaction, $args = [])
+    {
+        // TODO: Implement enqueueTransaction() method.
     }
 }

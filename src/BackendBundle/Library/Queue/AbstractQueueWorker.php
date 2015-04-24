@@ -178,8 +178,10 @@ abstract class AbstractQueueWorker implements QueueWorkerInterface
 
     protected function notifyTb(array $params)
     {
-        $tbUrl = 'http://172.16.1.50/fgm/Webservice/cdex.php';
-        $localtbUrl = 'http://172.16.1.50/fgm/Webservice/cdex.php';
+        //$tbUrl = 'http://172.16.1.50/fgm/Webservice/cdex.php';
+        //$localtbUrl = 'http://172.16.1.50/fgm/Webservice/cdex.php';
+
+        $tbUrl = http://devtest.firstglobalmoney.com:8025/Webservice/cdex.php
         $client = new Client();
         $options = [
             'body' => json_encode($params),

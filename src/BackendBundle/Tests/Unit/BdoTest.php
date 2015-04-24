@@ -17,9 +17,8 @@ class BdoTest extends WebTestCase {
     $this->bdo= $this->container->get('cdex_queue_worker.bdo');
   }
 
-  public function testBDOPicuup()
-  { echo 111; die;
-
+  public function testPickUp()
+  {
     $data=array(
     "source"=> "tb",
     "service"=> "bdo",
