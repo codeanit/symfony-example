@@ -176,6 +176,8 @@ class IntermexWorker extends BaseWorker
         $isBankDeposit  = '';
         $bankBranch     = '';
         $bankAccount    = '';
+        $beneficiaryTelephone = ($transaction->getBeneficiaryPhoneMobile()) ?
+            $transaction->getBeneficiaryPhoneMobile() : $transaction->getBeneficiaryPhoneMobile();
 
         $settings = $this->getWorkerSetting();
         $url = (isset($settings['url'])) ? $settings['url'] : false;
@@ -215,7 +217,7 @@ class IntermexWorker extends BaseWorker
             'vNomsBeneficiario'   => $transaction->getBeneficiaryFirstName(),// $data['transaction']->beneficiary_first_name,
             'vApedosBeneficiario' => $transaction->getBeneficiaryLastName(),// $data['transaction']->beneficiary_last_name,
             'vDireccionBen'       => $transaction->getBeneficiaryAddress(),// $data['transaction']->beneficiary_address,
-            'vTelefonoBen'        => $transaction->getBeneficiaryPhoneMobile(),// $data['transaction']->beneficiary_phone_mobile,
+            'vTelefonoBen'        => $beneficiaryTelephone,// $data['transaction']->beneficiary_phone_mobile,
             'vCiudadBenef'        => $transaction->getBeneficiaryCountry(),// $data['transaction']->beneficiary_country,
             'vEstadoBenef'        => $transaction->getBeneficiaryState(),// $data['transaction']->beneficiary_state,
             'iIdDestino'          => $iIdDestino,// $data['transaction']->payout_agent_id,
