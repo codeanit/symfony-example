@@ -14,11 +14,12 @@ class BdoTest extends WebTestCase {
   {
     $client = $this->createClient(); 
     $this->container = $client->getContainer();
-    $this->bdo=$this->container->get('cdex_queue_worker.bdo');
+    $this->bdo= $this->container->get('cdex_queue_worker.bdo');
   }
 
   public function testBDOPicuup()
-  {    
+  { echo 111; die;
+
     $data=array(
     "source"=> "tb",
     "service"=> "bdo",

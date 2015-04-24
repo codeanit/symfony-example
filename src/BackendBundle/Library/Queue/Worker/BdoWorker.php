@@ -8,7 +8,7 @@ use BackendBundle\Entity\Transactions;
 use BackendBundle\Library\Queue\AbstractQueueWorker as BaseWorker;
 
 /**
- * Class IntermexWorker
+ * Class BdoWorker
  * @package BackendBundle\Library\Queue\Worker
  */
 class BdoWorker extends BaseWorker
