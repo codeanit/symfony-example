@@ -57,17 +57,23 @@ class BdoWorker extends BaseWorker
      */
     public function createTransaction(OperationsQueue $queue, $args = [])
     {
-        $bdoCreateFunction = $this->mapBDOCreate($transaction->getPayoutPayerName());
+        $bdoCreateFunction = $this->mapBDOCreate(
+            $queue->getTransaction()->getPayoutPayerName()
+        );
 
         $createData = $this->prepareCreateData(
             $queue->getTransaction()->getTransactionCode(),
             $bdoCreateFunction
         );
 
-        $actual = $this->sendWSDLHttpRequest($this->url, $createData, $bdoCreateFunction);
+        $actual = $this->sendWSDLHttpRequest(
+            $this->url,
+            $createData,
+            $bdoCreateFunction
+        );
 
-        $status = ($actual->responseCode=='00' || $actual->responseCode=='0')
-            ? 'SUCCESS': 'ERROR';
+        $status = ( $actual->responseCode == '00'
+            || $actual->responseCode == '0' ) ? 'SUCCESS' : 'ERROR';
 
         $this->em->getRepository('BackendBundle:Log')
             ->addLog(
@@ -226,9 +232,9 @@ class BdoWorker extends BaseWorker
      *
      * @return [array]
      */
-    private function prepareCreateData($transaction =null, $type= null) {
+    private function prepareCreateData($transaction, $type= null) {
 
-        $methodData = $this->type[$type];
+        $relatedFunctionData = $this->type[$type];
         $bankAccountNumber = $bankBranch = $bankAccountNumber = '';
 
         if ( strtolower($transaction->getTransactionType()) =='bank' ) {
@@ -267,8 +273,8 @@ class BdoWorker extends BaseWorker
             'receiverMobilePhone'   =>  $transaction->getBeneficiaryPhoneMobile(),
             'receiverBirthDate'     =>  $transaction->getBeneficiary->format('Y-m-d'),
             'receiverGender'        =>  '',
-            'transactionType'       =>  $methodData['transactionType'],
-            'payableCode'           =>  $methodData['payableCode'],
+            'transactionType'       =>  $relatedFunctionData['transactionType'],
+            'payableCode'           =>  $relatedFunctionData['payableCode'],
             'bankCode'              =>  'BDO',
             'branchName'            =>  $bankBranch,
             'accountNo'             =>  $bankAccountNumber,
